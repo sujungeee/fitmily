@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.home
+package com.ssafy.fitmily_android.presentation.ui.main.home
 
 import com.ssafy.fitmily_android.domain.usecase.TmpUseCase
 
