@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.d208.user_service.user.dto.JoinRequestDTO;
 import com.d208.user_service.user.entity.User;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class UserService {
     public boolean isUsernameDuplicate(String username) {
         return userMapper.existsByLoginId(username);
     }
-    
+
     // 회원가입
     public void joinprocess(JoinRequestDTO dto){
 
@@ -33,5 +34,14 @@ public class UserService {
 
         //  INSERT
         userMapper.insert(user);
+    }
+
+    // v 로그인시 refresh 토큰 저장
+    @Transactional
+    public void updateRefreshToken(Integer userId, String refreshToken) {
+        int rows = userMapper.updateRefreshToken(userId, refreshToken);
+        if (rows == 0) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 }
