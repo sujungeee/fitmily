@@ -1,4 +1,4 @@
-package user_service.user_service.user.controller;
+package com.d208.user_service.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

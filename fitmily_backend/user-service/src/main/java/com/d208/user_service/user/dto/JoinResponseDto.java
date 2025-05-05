@@ -1,4 +1,4 @@
-package user_service.user_service.user.dto;
+package com.d208.user_service.user.dto;
 
 import lombok.Getter;
 import lombok.Setter;
