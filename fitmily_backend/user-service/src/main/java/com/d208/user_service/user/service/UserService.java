@@ -44,4 +44,10 @@ public class UserService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
     }
+
+    // v 로그아웃 (리프레시 토큰 삭제)
+    @Transactional
+    public void clearRefreshToken(Integer userId) {
+        userMapper.clearRefreshToken(userId);
+    }
 }
