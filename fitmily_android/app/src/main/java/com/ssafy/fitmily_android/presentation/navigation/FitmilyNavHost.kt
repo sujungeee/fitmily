@@ -14,8 +14,8 @@ fun FitmilyNavHost (
         navController = navController
         , startDestination = startDestination.route
     ) {
-        authNavGraph()
-        mainNavGraph()
+        authNavGraph(navController)
+        mainNavGraph(navController)
     }
 }
 

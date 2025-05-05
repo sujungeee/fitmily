@@ -8,13 +8,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.navigation.bottom.BottomNavItem.Companion.items
+import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun BottomNavigation(
     currentTab: BottomNavItem,
     onTabSelected: (BottomNavItem) -> Unit
 ) {
-    NavigationBar {
+    NavigationBar (
+        containerColor = mainWhite
+    ) {
         items.forEach { item ->
             NavigationBarItem(
                 selected = currentTab == item
