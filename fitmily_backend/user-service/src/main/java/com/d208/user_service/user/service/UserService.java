@@ -50,4 +50,22 @@ public class UserService {
     public void clearRefreshToken(Integer userId) {
         userMapper.clearRefreshToken(userId);
     }
+
+
+    /* reissue 하기 */
+    public String reissueAccessToken(String refreshToken) {
+
+        //  토큰 유효성 검사
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+        }
+
+        // 토큰 매칭 검사
+        Integer userId = jwtUtil.getUserId(refreshToken);
+        if (!userMapper.existsByIdAndRefreshToken(userId, refreshToken)) {
+            throw new BusinessException(ErrorCode.REFRESH_TOKEN_MISMATCH);
+        }
+        // 엑세스토큰 재생성
+        return jwtUtil.createAccessToken(userId, "ROLE_USER");
+    }
 }
