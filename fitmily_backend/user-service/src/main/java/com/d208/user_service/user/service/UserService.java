@@ -10,6 +10,12 @@ import com.d208.user_service.user.entity.User;
 @RequiredArgsConstructor
 public class UserService {
 
+
+    // v 아이디 중복 체크
+    public boolean isUsernameDuplicate(String username) {
+        return userMapper.existsByLoginId(username);
+    }
+    
     // 회원가입
     public void joinprocess(JoinRequestDTO dto){
 
