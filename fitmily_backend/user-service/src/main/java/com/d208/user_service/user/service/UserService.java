@@ -1,7 +1,12 @@
 package com.d208.user_service.user.service;
 
 
+import com.d208.user_service.common.exception.BusinessException;
+import com.d208.user_service.common.exception.ErrorCode;
+import com.d208.user_service.jwt.JWTUtil;
+import com.d208.user_service.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.d208.user_service.user.dto.JoinRequestDTO;
 import com.d208.user_service.user.entity.User;
@@ -10,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private final UserMapper userMapper;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JWTUtil jwtUtil;
 
 
     // v 아이디 중복 체크

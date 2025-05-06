@@ -3,6 +3,7 @@ package com.d208.user_service.jwt;
 
 import com.d208.user_service.user.dto.CustomUserDetails;
 import com.d208.user_service.user.entity.User;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

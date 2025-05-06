@@ -1,5 +1,6 @@
 package com.d208.user_service.common.exception;
 
+import com.d208.user_service.common.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

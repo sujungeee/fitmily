@@ -1,5 +1,6 @@
 package com.d208.user_service.user.controller;
 
+import com.d208.user_service.common.response.ApiResponse;
 import com.d208.user_service.user.dto.CustomUserDetails;
 import com.d208.user_service.user.dto.JoinRequestDTO;
 import com.d208.user_service.user.dto.LoginRequestDTO;
