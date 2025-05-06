@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.d208.user_service.user.mapper.UserMapper">
+
+    <!-- 1) existsByLoginId -->
+    <select id="existsByLoginId" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM users
+        WHERE user_login_id = #{loginId}
+        )
+    </select>
+
+    <!-- 2) findByLoginId -->
+    <select id="findByLoginId" resultType="User">
+        SELECT
+        user_id            AS id,
+        user_login_id      AS loginId,
+        user_pw            AS password,
+        user_nickname      AS nickname,
+        user_birth         AS birth,
+        user_gender        AS gender,
+        user_refresh_token AS refreshToken,
+        role
+        FROM users
+        WHERE user_login_id = #{loginId}
+    </select>
+
+    <!-- 3) insert -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (
+        user_login_id, user_pw, user_nickname,
+        user_birth, user_gender,
+        user_refresh_token, role
+        ) VALUES (
+        #{loginId}, #{password}, #{nickname},
+        #{birth}, #{gender},
+        #{refreshToken}, #{role}
+        )
+    </insert>
+
+    <!-- 4) updateRefreshToken -->
+    <update id="updateRefreshToken">
+        UPDATE users
+        SET user_refresh_token = #{refreshToken}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 5) existsByIdAndRefreshToken -->
+    <select id="existsByIdAndRefreshToken" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM users
+        WHERE user_id = #{userId}
+        AND user_refresh_token = #{refreshToken}
+        )
+    </select>
+
+    <update id="clearRefreshToken">
+        UPDATE users
+        SET user_refresh_token = NULL
+        WHERE user_id = #{userId}
+    </update>
+
+
+</mapper>
