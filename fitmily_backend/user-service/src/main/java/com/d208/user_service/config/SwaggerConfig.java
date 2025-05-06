@@ -34,7 +34,7 @@ public class SwaggerConfig {
     }
     private Info apiInfo() {
         return new Info()
-                .title("Team xiāojīnzhì")
+                .title("Team 정모")
                 .description("중국 악성 해킹 백도어 앱")
                 .version("1.0.0");
     }
