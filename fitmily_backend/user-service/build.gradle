@@ -24,16 +24,41 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	//web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
-	compileOnly 'org.projectlombok:lombok'
+
+	//jdbc
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	//Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Validation (Bean Validation) - 뭔지 잘모르겠음.
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//MyBatis
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2'
+	implementation 'org.mybatis:mybatis-spring:3.0.3'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	//JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+	//Swagger(2.8.6)
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+
+	//lombok
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//기타
+	implementation 'org.jsoup:jsoup:1.17.2'
+	compileOnly("org.springframework.boot:spring-boot-devtools")
+	implementation 'org.glassfish:jakarta.el:3.0.4'
+	
 }
 
 tasks.named('test') {

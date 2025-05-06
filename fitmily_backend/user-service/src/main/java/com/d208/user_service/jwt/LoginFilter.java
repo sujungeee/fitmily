@@ -1,5 +1,7 @@
 package com.d208.user_service.jwt;
 
+import com.d208.user_service.user.dto.CustomUserDetails;
+import com.d208.user_service.user.dto.LoginRequestDTO;
 import com.d208.user_service.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
