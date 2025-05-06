@@ -1,6 +1,9 @@
 package com.d208.user_service.user.controller;
 
+import com.d208.user_service.user.dto.CustomUserDetails;
+import com.d208.user_service.user.dto.JoinRequestDTO;
 import com.d208.user_service.user.dto.LoginRequestDTO;
+import com.d208.user_service.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +62,5 @@ public class UserController {
         String newAccessToken = userService.reissueAccessToken(refreshToken);
         return ApiResponse.ok(newAccessToken,"토큰 재발급 성공");
     }
-    
+
 }
