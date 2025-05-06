@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -54,8 +55,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
 
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
-        String username = details.getUsername();
+
         Integer userId = details.getId();
+        String userNickname = details.getNickname();
 
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -69,10 +71,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         UserService userService = applicationContext.getBean(UserService.class);
         userService.updateRefreshToken(userId, refreshToken);
 
-        // 응답 작성
+
+        // 응답 작성 , userId, userNickname, userProfileImg
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        Map<String, String> tokenMap = new HashMap<>();
+        Map<String, Object> tokenMap = new LinkedHashMap<>(); //LinkedHashMap 쓴 이유:선입선출(FIFO)의 순서를 지켜서 출력위해
+        tokenMap.put("userId", userId);
+        tokenMap.put("userNickname", userNickname);
         tokenMap.put("accessToken", accessToken);
         tokenMap.put("refreshToken", refreshToken);
 

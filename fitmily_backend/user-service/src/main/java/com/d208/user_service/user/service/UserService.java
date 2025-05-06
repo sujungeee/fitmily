@@ -4,6 +4,8 @@ package com.d208.user_service.user.service;
 import com.d208.user_service.common.exception.BusinessException;
 import com.d208.user_service.common.exception.ErrorCode;
 import com.d208.user_service.jwt.JWTUtil;
+import com.d208.user_service.user.dto.CustomUserDetails;
+import com.d208.user_service.user.dto.LoginResponseDto;
 import com.d208.user_service.user.dto.ReissueResponseDto;
 import com.d208.user_service.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class UserService {
     private final JWTUtil jwtUtil;
 
 
-    /*  아이디 중복 체크 */
+    /* 아이디 중복 체크 */
     public boolean isUsernameDuplicate(String username) {
         return userMapper.existsByLoginId(username);
     }
@@ -46,7 +48,7 @@ public class UserService {
         userMapper.insert(user);
     }
 
-    /*  로그인시 refresh 토큰 저장 */
+    /*  로그인 (refresh 토큰 저장) */
     @Transactional
     public void updateRefreshToken(Integer userId, String refreshToken) {
         int rows = userMapper.updateRefreshToken(userId, refreshToken);
@@ -54,6 +56,16 @@ public class UserService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
     }
+
+//    public LoginResponseDto buildLoginResponse(CustomUserDetails user,String accessToken, String refreshToken) {
+//        return new LoginResponseDto(
+//                user.getId(),
+//                user.getUsername(),
+//                user.getNickname(),
+//                accessToken,
+//                refreshToken
+//        );
+//    }
 
     /* 로그아웃 (리프레시 토큰 삭제) */
     @Transactional

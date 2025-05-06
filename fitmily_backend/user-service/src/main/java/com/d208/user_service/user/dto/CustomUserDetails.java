@@ -25,7 +25,6 @@ public class CustomUserDetails implements UserDetails {
         return userEntity.getId();
     }
 
-
     @Override
     public String getPassword() {
 
