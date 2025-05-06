@@ -1,10 +1,7 @@
 package com.d208.user_service.user.controller;
 
 import com.d208.user_service.common.response.ApiResponse;
-import com.d208.user_service.user.dto.CustomUserDetails;
-import com.d208.user_service.user.dto.JoinRequestDTO;
-import com.d208.user_service.user.dto.LoginRequestDTO;
-import com.d208.user_service.user.dto.ReissueRequestDto;
+import com.d208.user_service.user.dto.*;
 import com.d208.user_service.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,11 +53,11 @@ public class UserController {
     }
 
     @Operation(summary = "리이슈", description = "- access토큰 재발급")
-    @PostMapping("auth/reissue")
-    public ApiResponse<String> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
+    @PostMapping("/auth/reissue")
+    public ApiResponse<ReissueResponseDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
         String refreshToken = reissueRequestDto.getRefresh_token();
-        String newAccessToken = userService.reissueAccessToken(refreshToken);
-        return ApiResponse.ok(newAccessToken,"토큰 재발급 성공");
+        ReissueResponseDto newToken = userService.reissueAccessToken(refreshToken);
+        return ApiResponse.ok(newToken,"토큰 재발급 성공");
     }
 
 }
