@@ -1,4 +1,4 @@
-package com.d208.user_service.exception;
+package com.d208.user_service.common.exception;
 
 public class BusinessException extends RuntimeException {
     private final ErrorCode errorCode;

@@ -1,4 +1,4 @@
-package com.d208.user_service.exception;
+package com.d208.user_service.common.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
