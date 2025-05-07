@@ -4,7 +4,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.ssafy.fitmily_android.presentation.ui.main.walk.history.WalkHistoryScreen
 import com.ssafy.fitmily_android.presentation.ui.main.walk.WalkScreen
+import com.ssafy.fitmily_android.presentation.ui.main.walk.history.WalkHistoryDetailScreen
 
 fun NavGraphBuilder.walkNavGraph(navController: NavHostController) {
     navigation(
@@ -15,9 +17,11 @@ fun NavGraphBuilder.walkNavGraph(navController: NavHostController) {
             WalkScreen(navController)
         }
 
-        // TODO
+        composable("walk/history") {
+            WalkHistoryScreen(navController)
+        }
         composable("walk/detail") {
-            WalkScreen(navController)
+            WalkHistoryDetailScreen(navController)
         }
     }
 }
