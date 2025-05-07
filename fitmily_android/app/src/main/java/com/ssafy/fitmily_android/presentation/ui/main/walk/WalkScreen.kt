@@ -44,9 +44,12 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun WalkScreen(
+    navController: NavHostController
 ) {
     Column(
         modifier = Modifier
@@ -171,5 +174,5 @@ fun WalkScreen(
 @Composable
 @Preview(showSystemUi = true)
 fun WalkScreenPreview() {
-    WalkScreen()
+    WalkScreen(rememberNavController())
 }

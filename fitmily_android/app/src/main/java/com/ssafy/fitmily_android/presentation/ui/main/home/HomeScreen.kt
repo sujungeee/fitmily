@@ -25,6 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ChallengeCard
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.DashBoardPager
@@ -33,7 +36,9 @@ import com.ssafy.fitmily_android.presentation.ui.main.home.component.WeatherCard
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navController: NavHostController
+) {
     LazyColumn {
         item {
             Column(
@@ -137,5 +142,5 @@ fun HomeScreen() {
 @Composable
 @Preview(showSystemUi = true)
 fun HomeScreenPreview() {
-        HomeScreen()
+        HomeScreen(rememberNavController())
 }
