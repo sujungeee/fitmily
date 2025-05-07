@@ -24,7 +24,6 @@ public class WalkService {
         User user = userService.getUserById(userId);
 
 
-
         Walk walk = Walk.builder()
                 .userId(userId)
                 .walkRouteImg(dto.getWalkRouteImg())
