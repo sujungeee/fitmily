@@ -63,5 +63,16 @@
         WHERE user_id = #{userId}
     </update>
 
+    <select id="selectById" parameterType="int" resultType="User">
+        SELECT
+        user_id        AS id,
+        user_login_id  AS loginId,
+        user_weight    AS weight,    <!-- 체중(kg) -->
+        user_birth     AS birth,     <!-- 생년월일 -->
+        user_gender    AS gender     <!-- 성별 -->
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+
 
 </mapper>

@@ -55,15 +55,6 @@ public class UserService {
         }
     }
 
-//    public LoginResponseDto buildLoginResponse(CustomUserDetails user,String accessToken, String refreshToken) {
-//        return new LoginResponseDto(
-//                user.getId(),
-//                user.getUsername(),
-//                user.getNickname(),
-//                accessToken,
-//                refreshToken
-//        );
-//    }
 
     /* 로그아웃 (리프레시 토큰 삭제) */
     @Transactional
@@ -95,4 +86,11 @@ public class UserService {
         // 액세스+리프레시 토큰을 묶어서 반환
         return new ReissueResponseDto(newAccessToken, newRefreshToken);
     }
+
+    public User getUserById(Integer userId){
+        User user = userMapper.selectById(userId);
+        return user;
+
+    }
+
 }

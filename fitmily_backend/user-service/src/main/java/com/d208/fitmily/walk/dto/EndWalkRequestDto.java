@@ -17,5 +17,5 @@ public class EndWalkRequestDto {
     private Float walkDistance;
     private Integer walkHeartRate;
     private String walkRouteImg;
-    private Integer stepCount;
+//    private Integer stepCount;
 }

@@ -32,5 +32,8 @@ public interface UserMapper {
             @Param("refreshToken") String refreshToken
     );
 
+    // userId 로 조회
+    User selectById(Integer userId);
+
 
 }

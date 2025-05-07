@@ -6,6 +6,7 @@ import com.d208.fitmily.user.dto.CustomUserDetails;
 import com.d208.fitmily.walk.dto.EndWalkRequestDto;
 import com.d208.fitmily.walk.service.WalkService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @ResponseBody
 @RequestMapping("/api")
+@Tag(name = "회원 API", description = "로그인/회원가입 및 개인 정보")
 public class WalkController {
 
     private final WalkService walkService;

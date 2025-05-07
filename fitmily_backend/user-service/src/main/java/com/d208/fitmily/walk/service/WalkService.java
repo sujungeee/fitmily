@@ -1,5 +1,7 @@
 package com.d208.fitmily.walk.service;
 
+import com.d208.fitmily.user.entity.User;
+import com.d208.fitmily.user.service.UserService;
 import com.d208.fitmily.walk.dto.EndWalkRequestDto;
 import com.d208.fitmily.walk.entity.Walk;
 import com.d208.fitmily.walk.mapper.WalkMapper;
@@ -14,10 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class WalkService {
 
     private final WalkMapper walkMapper;
+    private final UserService userService;
 
-
+    //칼로리 계산해서 추가해야함
     @Transactional
     public void endWalk(Integer userId, EndWalkRequestDto dto){
+        User user = userService.getUserById(userId);
+
+
+
         Walk walk = Walk.builder()
                 .userId(userId)
                 .walkRouteImg(dto.getWalkRouteImg())
@@ -25,7 +32,6 @@ public class WalkService {
                 .walkEndTime(dto.getWalkEndTime())
                 .walkDistance(dto.getWalkDistance())
                 .walkHeartRate(dto.getWalkHeartRate())
-//                .stepCount(dto.getStepCount())
                 .build();
         walkMapper.insertStopWalk(walk);
     }
