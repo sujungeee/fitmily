@@ -17,13 +17,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.ui.theme.mainDarkGray
-import com.ssafy.fitmily_android.ui.theme.mainGray
+import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun WeatherCard(){
     Row(modifier = Modifier
         .fillMaxWidth()
-        .background(mainGray, shape = RoundedCornerShape(16.dp))
+        .background(mainWhite, shape = RoundedCornerShape(16.dp))
         .padding(vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically,){
 
