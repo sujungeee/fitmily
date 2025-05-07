@@ -1,46 +1,40 @@
 package com.ssafy.fitmily_android.presentation.ui.main.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ssafy.fitmily_android.R
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ChallengeCard
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.DashBoardPager
-import com.ssafy.fitmily_android.presentation.ui.main.home.component.NewsGrid
+import com.ssafy.fitmily_android.presentation.ui.main.home.component.NewsItem
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.WeatherCard
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navController: NavHostController
+) {
     LazyColumn {
         item {
             Column(
                 modifier = Modifier
                     .padding(
                         top = 32.dp,
-                        bottom = 24.dp,
                     )
             ) {
                 Text(
@@ -61,7 +55,7 @@ fun HomeScreen() {
                         style = typography.headlineLarge,
                     )
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = { navController.navigate("home/family") },
                         modifier = Modifier.padding(start = 8.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = mainBlue,
@@ -76,7 +70,8 @@ fun HomeScreen() {
 
 
                 Column(
-                    modifier = Modifier.padding(top = 24.dp)
+                    modifier = Modifier
+                        .padding(top = 24.dp)
                         .fillMaxWidth(),
                 ) {
                     Text(
@@ -98,7 +93,7 @@ fun HomeScreen() {
                         text = "산책 챌린지",
                         style = typography.titleLarge,
                     )
-                    ChallengeCard()
+                    ChallengeCard(navController)
                 }
                 Column(
                     modifier = Modifier.padding(
@@ -124,7 +119,18 @@ fun HomeScreen() {
                         text = "건강 뉴스",
                         style = typography.titleLarge,
                     )
-
+                }
+            }
+        }
+        itemsIndexed(listOf("1", "2", "3","4","5","6","7","8").chunked(2)) { index, item ->
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 28.dp)
+                    .wrapContentHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                item.forEachIndexed { rindex, ritem ->
+                    NewsItem(ritem, navController)
                 }
             }
         }
@@ -137,5 +143,5 @@ fun HomeScreen() {
 @Composable
 @Preview(showSystemUi = true)
 fun HomeScreenPreview() {
-        HomeScreen()
+        HomeScreen(rememberNavController())
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
+import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun DashBoardPager(items: List<String>) {
@@ -61,7 +62,7 @@ fun DashBoardItem(item:String){
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(mainGray, shape = RoundedCornerShape(16.dp))
+            .background(mainWhite, shape = RoundedCornerShape(16.dp))
             .padding(20.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
