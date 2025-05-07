@@ -12,7 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AddHealthRequestDto {
 
-    private Float healthBmi;
     private Float healthHeight;
     private Float healthWeight;
     private Float healthBodyFatPercentage;

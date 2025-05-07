@@ -1,6 +1,5 @@
 package com.d208.fitmily.health.service;
 
-
 import com.d208.fitmily.health.dto.AddHealthRequestDto;
 import com.d208.fitmily.health.entity.Health;
 import com.d208.fitmily.health.mapper.HealthMapper;
@@ -12,10 +11,16 @@ import org.springframework.stereotype.Service;
 public class HealthService {
     private final HealthMapper healthMapper;
 
+    // 건강상태 추가
     public void addHealth(Integer userId, AddHealthRequestDto dto){
+
+        //bmi 계산해서 넣음
+        float heightM = dto.getHealthHeight() / 100f;
+        float bmi = dto.getHealthWeight() / (heightM * heightM);
+
         Health health = Health.builder()
                 .userId(userId)
-                .healthBmi(dto.getHealthBmi())
+                .healthBmi((float) (Math.floor(bmi * 10) / 10))
                 .healthHeight(dto.getHealthHeight())
                 .healthWeight(dto.getHealthWeight())
                 .healthBodyFatPercentage(dto.getHealthBodyFatPercentage())
@@ -25,4 +30,9 @@ public class HealthService {
         healthMapper.insertHealth(health);
     }
 
+    //건강 상태 조회
+    public Health getLatestHealth(Integer userId){
+        Health health = healthMapper.selectLatestByUserId(userId);
+        return health;
+    }
 }

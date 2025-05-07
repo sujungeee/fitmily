@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @ResponseBody
 @RequestMapping("/api")
-@Tag(name = "회원 API", description = "로그인/회원가입 및 개인 정보")
+@Tag(name = "산책 API", description = "산책관련 API")
 public class WalkController {
 
     private final WalkService walkService;

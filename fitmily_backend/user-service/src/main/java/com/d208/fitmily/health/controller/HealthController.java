@@ -6,28 +6,24 @@ import com.d208.fitmily.health.dto.AddHealthRequestDto;
 import com.d208.fitmily.health.service.HealthService;
 import com.d208.fitmily.user.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
+@Tag(name = "건강상태 API", description = "건강상태 추가,조회,수정")
 public class HealthController {
 
     private final HealthService healthService;
 
 
     @Operation(summary = "건강 상태 등록", description = "JWT에서 추출한 userId로 건강 상태를 저장합니다.")
-    @PostMapping
-    public ApiResponse<Void> addHealth(
-            @ResponseBody AddHealthRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails principal
-            ){
+    @PostMapping()
+    public ApiResponse<Void> addHealth(@RequestBody AddHealthRequestDto dto, @AuthenticationPrincipal CustomUserDetails principal){
         healthService.addHealth(principal.getId(),dto);
         return ApiResponse.ok(null, "건강 상태가 등록되었습니다");
     }

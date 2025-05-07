@@ -10,4 +10,6 @@ public interface HealthMapper  {
     // 건강상태 추가
     int insertHealth(Health health);
 
+
+    Health selectLatestByUserId(Integer userId);
 }
