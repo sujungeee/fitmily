@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.main.my
+package com.ssafy.fitmily_android.presentation.ui.main.my.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue

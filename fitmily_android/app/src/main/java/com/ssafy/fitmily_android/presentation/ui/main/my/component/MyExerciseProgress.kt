@@ -1,7 +1,6 @@
-package com.ssafy.fitmily_android.presentation.ui.main.my
+package com.ssafy.fitmily_android.presentation.ui.main.my.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text

@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.main.my
+package com.ssafy.fitmily_android.presentation.ui.main.my.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

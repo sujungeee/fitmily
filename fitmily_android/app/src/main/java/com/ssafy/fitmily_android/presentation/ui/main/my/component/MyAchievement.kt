@@ -1,8 +1,7 @@
-package com.ssafy.fitmily_android.presentation.ui.main.my
+package com.ssafy.fitmily_android.presentation.ui.main.my.component
 
 import android.graphics.Color
 import android.graphics.Paint
-import android.widget.Space
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,18 +15,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ssafy.fitmily_android.presentation.ui.main.my.AchievementDay
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue
-import com.ssafy.fitmily_android.ui.theme.mainGray
-import com.ssafy.fitmily_android.ui.theme.secondaryBlue
 
 @Composable
 fun MyAchievement(
