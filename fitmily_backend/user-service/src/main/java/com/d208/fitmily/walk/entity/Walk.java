@@ -1,16 +1,14 @@
 package com.d208.fitmily.walk.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Walk {
     private Integer walkId;            // PK
     private Integer exerciseGoalId;    // FK → exercise_goal.exercise_goal_id

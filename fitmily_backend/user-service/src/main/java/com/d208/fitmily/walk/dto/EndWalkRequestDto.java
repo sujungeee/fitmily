@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StopWalkRequestDto {
+public class EndWalkRequestDto {
     private LocalDateTime walkStartTime;
     private LocalDateTime walkEndTime;
     private Float walkDistance;

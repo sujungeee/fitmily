@@ -11,24 +11,9 @@
             useGeneratedKeys="true"
             keyProperty="walkId">
         INSERT INTO walk (
-        exercise_goal_id,
-        user_id,
-        walk_route_img,
-        walk_start_time,
-        walk_end_time,
-        walk_distance,
-        walk_heart_rate,
-        step_count
-        ) VALUES (
-        #{exerciseGoalId},
-        #{userId},
-        #{walkRouteImg},
-        #{walkStartTime},
-        #{walkEndTime},
-        #{walkDistance},
-        #{walkHeartRate},
-        #{stepCount}
-        )
+        user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_heart_rate, step_count)
+        VALUES(
+        #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance}, #{walkHeartRate}, #{stepCount})
     </insert>
 
 </mapper>
