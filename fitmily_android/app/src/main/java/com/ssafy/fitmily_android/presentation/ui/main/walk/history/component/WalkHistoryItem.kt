@@ -1,20 +1,19 @@
-package com.ssafy.fitmily_android.presentation.ui.main.walk
+package com.ssafy.fitmily_android.presentation.ui.main.walk.history.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.typography
@@ -26,46 +25,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ssafy.fitmily_android.R
-import com.ssafy.fitmily_android.ui.theme.mainBlue
-
-@Composable
-fun WalkHistoryScreen(
-) {
-    Column(
-        modifier = Modifier
-            .padding(
-                top = 32.dp,
-                bottom = 24.dp,
-                start = 28.dp,
-                end = 28.dp
-            )
-    ) {
-        Text(
-            text = "산책",
-            style = typography.headlineLarge,
-        )
-
-        LazyColumn(modifier = Modifier.padding(top = 32.dp)) {
-             items(10) { index ->
-                WalkHistoryItem(
-                    thumbnailRes = R.drawable.ic_launcher_background,
-                    name = "산책 ${index + 1}",
-                    time = "00:30:00",
-                    distance = "3.5km",
-                    recordTime = "2023-10-01",
-                    dotColor = if (index % 2 == 0) mainBlue else Color.Gray
-                )
-            }        }
-
-
-    }
-}
+import androidx.navigation.NavHostController
 
 @Composable
 fun WalkHistoryItem(
+    navController: NavHostController,
     thumbnailRes: Int,
     name: String,
     time: String,
@@ -76,7 +41,10 @@ fun WalkHistoryItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 24.dp),
+            .padding(bottom = 24.dp)
+            .clickable {
+                navController.navigate("walk/detail")
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -116,10 +84,4 @@ fun WalkHistoryItem(
         }
 
     }
-}
-
-@Composable
-@Preview(showSystemUi = true)
-fun WalkHistoryScreenPreview() {
-    WalkHistoryScreen()
 }
