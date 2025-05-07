@@ -12,4 +12,5 @@ public interface HealthMapper  {
 
 
     Health selectLatestByUserId(Integer userId);
+
 }

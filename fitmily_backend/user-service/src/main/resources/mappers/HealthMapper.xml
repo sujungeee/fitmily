@@ -19,19 +19,9 @@
             parameterType="int"
             resultType="com.d208.fitmily.health.entity.Health">
         SELECT
-        health_id           AS healthId,
-        user_id             AS userId,
-        health_bmi          AS healthBmi,
-        health_height       AS healthHeight,
-        health_weight       AS healthWeight,
-        health_body_fat_percentage AS healthBodyFatPercentage,
-        health_disease      AS healthDisease,
-        health_created_at   AS healthCreatedAt,
-        health_updated_at   AS healthUpdatedAt
+        health_id, user_id, health_bmi, health_height, health_weight, health_body_fat_percentage, health_disease, health_created_at, health_updated_at
         FROM health
         WHERE user_id = #{userId}
-        ORDER BY health_created_at DESC
-        LIMIT 1
     </select>
 
 

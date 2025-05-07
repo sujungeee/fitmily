@@ -1,9 +1,13 @@
 package com.d208.fitmily.health.entity;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Builder
 public class Health {
     private Integer healthId;           // AUTO_INCREMENT PK

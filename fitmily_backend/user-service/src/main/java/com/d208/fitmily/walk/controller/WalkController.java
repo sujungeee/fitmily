@@ -10,10 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @Controller
@@ -31,12 +28,15 @@ public class WalkController {
         walkService.endWalk(principal.getId(),dto);
         return ApiResponse.ok(null,"산책이 종료됌");
     }
-}
+
     //산책기록 조회
+    @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다. ")
+    @GetMapping()
+
 
     //산책 기록 상세 조회
 
     //산책 목표 존재 여부 조회
 
-
+}
 

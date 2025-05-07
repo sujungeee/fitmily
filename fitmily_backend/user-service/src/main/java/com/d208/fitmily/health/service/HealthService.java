@@ -1,6 +1,7 @@
 package com.d208.fitmily.health.service;
 
 import com.d208.fitmily.health.dto.AddHealthRequestDto;
+import com.d208.fitmily.health.dto.HealthResponseDto;
 import com.d208.fitmily.health.entity.Health;
 import com.d208.fitmily.health.mapper.HealthMapper;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,18 @@ public class HealthService {
     }
 
     //건강 상태 조회
-    public Health getLatestHealth(Integer userId){
+    public HealthResponseDto getLatestHealth(Integer userId){
         Health health = healthMapper.selectLatestByUserId(userId);
-        return health;
+
+        return new HealthResponseDto(
+                health.getHealthId(),
+                health.getHealthBmi(),
+                health.getHealthHeight(),
+                health.getHealthWeight(),
+                health.getHealthBodyFatPercentage(),
+                health.getHealthDisease(),
+                health.getHealthCreatedAt(),
+                health.getHealthUpdatedAt()
+        );
     }
 }
