@@ -19,6 +19,11 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
     ),
+    headlineMedium = TextStyle(
+        fontFamily = ibmFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+    ),
     titleLarge = TextStyle(
         fontFamily = ibmFontFamily,
         fontWeight = FontWeight.SemiBold,
@@ -38,6 +43,11 @@ val Typography = Typography(
         fontFamily = ibmFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp
+    ),
+    labelLarge = TextStyle(
+        fontFamily = ibmFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp
     ),
 )
 
