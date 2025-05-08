@@ -18,4 +18,10 @@ public class WalkResponseDto {
     private Float   walkDistance;
     private Integer walkHeartRate;
     private Integer walkCalories;
+
+    private String userNickname;
+    private String userProfileImg;
+
+    //유저이미지
+    //유저 닉네임
 }

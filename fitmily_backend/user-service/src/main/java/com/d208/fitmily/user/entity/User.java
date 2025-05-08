@@ -15,4 +15,5 @@ public class User {
     private String gender;
     private String refreshToken;
     private String role;
+    private String profileImg;
 }

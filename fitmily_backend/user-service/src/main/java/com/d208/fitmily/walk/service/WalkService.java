@@ -63,6 +63,8 @@ public class WalkService {
 
         List<Walk> walks = walkMapper.selectWalks(params);
 
+        User user = userService.getUserById(userId);
+
         List<WalkResponseDto> dtos = new ArrayList<>();
 
         for (Walk w : walks) {
@@ -70,13 +72,14 @@ public class WalkService {
                     .walkId(w.getWalkId())
                     .userId(w.getUserId())
                     .walkRouteImg(w.getWalkRouteImg())
-                    // 유저 이미지?
                     .walkStartTime(w.getWalkStartTime())
                     .walkEndTime(w.getWalkEndTime())
                     .walkDistance(w.getWalkDistance())
                     .walkHeartRate(w.getWalkHeartRate())
                     .walkCalories(w.getWalkCalories())
-                    // 평균 페이스 가능?
+                    .userNickname(user.getNickname())
+                    .userProfileImg(user.getProfileImg())
+                    // 평균 페이스 가능 추가 가능?
                     .build();
             dtos.add(dto);
         }

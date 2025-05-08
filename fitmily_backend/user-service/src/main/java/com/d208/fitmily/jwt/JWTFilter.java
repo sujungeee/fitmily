@@ -70,23 +70,19 @@ public class JWTFilter extends OncePerRequestFilter {
         String role = jwtUtil.getRole(token);
         log.debug("  → 토큰 유효, userId=[{}]", userId);
 
-        // (권장) 실제 DB에서 UserEntity 조회 후 사용하세요
+        // 실제 DB에서 UserEntity 조회 후 사용하세요
         User user = new User();
         user.setId(userId);
         user.setPassword("temppassword");
         user.setRole(role);
 
 
+        //설명 필요
         CustomUserDetails details = new CustomUserDetails(user);
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                details, null, details.getAuthorities()
-        );
+        Authentication auth = new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        log.debug("  → SecurityContext에 인증 정보 저장: [{}]", auth);
 
         filterChain.doFilter(request, response);
-        log.debug("JWTFilter 종료 → SecurityContext=[{}]",
-                SecurityContextHolder.getContext().getAuthentication());
     }
 }
 

@@ -58,5 +58,4 @@ public class UserController {
         ReissueResponseDto newToken = userService.reissueAccessToken(refreshToken);
         return ApiResponse.ok(newToken,"토큰 재발급 성공");
     }
-
 }
