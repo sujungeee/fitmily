@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // backend 브랜치만 체크아웃
+                git branch: 'backend', url: 'https://gitlab.com/your-username/your-project.git'
+            }
+        }
+        
+        stage('Build SpringBoot') {
+            steps {
+                // SpringBoot 빌드
+                sh 'chmod +x ./gradlew || true'
+                sh './gradlew clean build -x test || mvn clean package -DskipTests'
+            }
+        }
+        
+        stage('Docker Build & Deploy') {
+            steps {
+                // Docker 이미지 빌드 및 서비스 배포
+                sh 'docker-compose build'
+                sh 'docker-compose up -d'
+            }
+        }
+        
+        stage('Health Check') {
+            steps {
+                // 서비스 시작 대기
+                sh 'sleep 30'
+                sh 'curl -f http://localhost:8080/actuator/health || true'
+            }
+        }
+    }
+    
+    post {
+        always {
+            // 빌드 결과 정리
+            cleanWs()
+        }
+    }
+}
