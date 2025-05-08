@@ -16,4 +16,32 @@
         #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance}, #{walkHeartRate})
     </insert>
 
+    <select id="selectWalks"
+            parameterType="map"
+            resultType="com.d208.fitmily.walk.entity.Walk">
+        SELECT
+        walk_id, user_id, exercise_goal_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_heart_rate,
+        walk_calories, step_count, walk_created_at, walk_updated_at
+        FROM walk
+
+<!-- "&gt;" 이게  ">" 이거임 -->
+<!-- "&lt;" 이게  "<" 이거임 -->
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="start != null">
+                AND walk_start_time &gt;= #{start}
+            </if>
+            <if test="end != null">
+                AND walk_end_time &lt;= #{end}
+            </if>
+        </where>
+        ORDER BY walk_start_time DESC
+    </select>
+
+
+
+
+
 </mapper>

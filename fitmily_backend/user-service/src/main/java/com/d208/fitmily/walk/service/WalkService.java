@@ -6,6 +6,7 @@ import com.d208.fitmily.health.service.HealthService;
 import com.d208.fitmily.user.entity.User;
 import com.d208.fitmily.user.service.UserService;
 import com.d208.fitmily.walk.dto.EndWalkRequestDto;
+import com.d208.fitmily.walk.dto.WalkResponseDto;
 import com.d208.fitmily.walk.entity.Walk;
 import com.d208.fitmily.walk.mapper.WalkMapper;
 import lombok.Builder;
@@ -14,6 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.time.Duration.between;
 
@@ -47,6 +54,33 @@ public class WalkService {
         walkMapper.insertStopWalk(walk);
     }
 
+    // 산책 조회
+    public List<WalkResponseDto> findWalks(Integer userId, LocalDateTime start, LocalDateTime end) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("start", start);
+        params.put("end", end);
+
+        List<Walk> walks = walkMapper.selectWalks(params);
+
+        List<WalkResponseDto> dtos = new ArrayList<>();
+
+        for (Walk w : walks) {
+            WalkResponseDto dto = WalkResponseDto.builder()
+                    .walkId(w.getWalkId())
+                    .userId(w.getUserId())
+                    .exerciseGoalId(w.getExerciseGoalId())
+                    .walkRouteImg(w.getWalkRouteImg())
+                    .walkStartTime(w.getWalkStartTime())
+                    .walkEndTime(w.getWalkEndTime())
+                    .walkDistance(w.getWalkDistance())
+                    .walkHeartRate(w.getWalkHeartRate())
+                    .walkCalories(w.getWalkCalories())
+                    .build();
+            dtos.add(dto);
+        }
+        return dtos;
+    }
 }
 
 

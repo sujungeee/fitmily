@@ -4,13 +4,18 @@ package com.d208.fitmily.walk.controller;
 import com.d208.fitmily.common.response.ApiResponse;
 import com.d208.fitmily.user.dto.CustomUserDetails;
 import com.d208.fitmily.walk.dto.EndWalkRequestDto;
+import com.d208.fitmily.walk.dto.WalkResponseDto;
 import com.d208.fitmily.walk.service.WalkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -32,6 +37,14 @@ public class WalkController {
     //산책기록 조회
     @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다. ")
     @GetMapping()
+    ApiResponse<List<WalkResponseDto>> getWalks(
+            @RequestParam(required = false) Integer userId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
+    ){
+        List<WalkResponseDto> list = walkService.findWalks(userId, start, end);
+        return ApiResponse.ok(list, "산책 기록 조회 성공");
+    }
 
 
     //산책 기록 상세 조회
