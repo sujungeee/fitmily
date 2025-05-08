@@ -69,13 +69,14 @@ public class WalkService {
             WalkResponseDto dto = WalkResponseDto.builder()
                     .walkId(w.getWalkId())
                     .userId(w.getUserId())
-                    .exerciseGoalId(w.getExerciseGoalId())
                     .walkRouteImg(w.getWalkRouteImg())
+                    // 유저 이미지?
                     .walkStartTime(w.getWalkStartTime())
                     .walkEndTime(w.getWalkEndTime())
                     .walkDistance(w.getWalkDistance())
                     .walkHeartRate(w.getWalkHeartRate())
                     .walkCalories(w.getWalkCalories())
+                    // 평균 페이스 가능?
                     .build();
             dtos.add(dto);
         }

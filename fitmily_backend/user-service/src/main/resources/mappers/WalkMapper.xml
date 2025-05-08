@@ -5,7 +5,9 @@
 
 <mapper namespace="com.d208.fitmily.walk.mapper.WalkMapper">
 
-<!-- useGeneratedKeys = pk   -->
+<!--parameterType 는 {} 으로 넘길데이터의 type임 -->
+
+
     <insert id="insertStopWalk"
             parameterType="Walk"
             useGeneratedKeys="true"
