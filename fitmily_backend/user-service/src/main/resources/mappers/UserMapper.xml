@@ -63,13 +63,10 @@
         WHERE user_id = #{userId}
     </update>
 
+    <!--user 정보 조회-->
     <select id="selectById" parameterType="int" resultType="User">
         SELECT
-        user_id
-        user_login_id
-        user_weight
-        user_birth
-        user_gender
+        user_id, user_login_id,user_birth ,user_gender
         FROM users
         WHERE user_id = #{userId}
     </select>

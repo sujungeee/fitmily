@@ -54,36 +54,15 @@ public class WalkService {
         walkMapper.insertStopWalk(walk);
     }
 
-    // 산책 조회
+    // 산책 기록 조회
     public List<WalkResponseDto> findWalks(Integer userId, LocalDateTime start, LocalDateTime end) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        params.put("start", start);
-        params.put("end", end);
+        params.put("start",   start);
+        params.put("end",     end);
 
-        List<Walk> walks = walkMapper.selectWalks(params);
-
-        User user = userService.getUserById(userId);
-
-        List<WalkResponseDto> dtos = new ArrayList<>();
-
-        for (Walk w : walks) {
-            WalkResponseDto dto = WalkResponseDto.builder()
-                    .walkId(w.getWalkId())
-                    .userId(w.getUserId())
-                    .walkRouteImg(w.getWalkRouteImg())
-                    .walkStartTime(w.getWalkStartTime())
-                    .walkEndTime(w.getWalkEndTime())
-                    .walkDistance(w.getWalkDistance())
-                    .walkHeartRate(w.getWalkHeartRate())
-                    .walkCalories(w.getWalkCalories())
-                    .userNickname(user.getNickname())
-                    .userProfileImg(user.getProfileImg())
-                    // 평균 페이스 가능 추가 가능?
-                    .build();
-            dtos.add(dto);
-        }
-        return dtos;
+        // mapper가 DTO의 모든 필드를 채워서 반환하므로, 그냥 그대로 리턴
+        return walkMapper.selectWalks(params);
     }
 }
 
