@@ -35,10 +35,10 @@ public class WalkController {
         return ApiResponse.ok(null,"산책이 종료됌");
     }
 
-    //산책기록 조회
+
     @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다. ")
-    @GetMapping()
-    ApiResponse<List<WalkResponseDto>> getWalks(
+    @GetMapping("/walks")
+    public ApiResponse<List<WalkResponseDto>> getWalks(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime end
@@ -47,10 +47,10 @@ public class WalkController {
         return ApiResponse.ok(list, "산책 기록 조회 성공");
     }
 
-
-    //산책 기록 상세 조회
-
     //산책 목표 존재 여부 조회
+    @Operation(summary = "산책 목표 존재 여부 조회", description = "목표에 산책이 있는지 확인후 결과를 응답합니다. ")
+    @GetMapping("/walks/goal/exist")
+
 
 }
 
