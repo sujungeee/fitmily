@@ -95,8 +95,8 @@ services:
       - "8080:8080"
       - "50000:50000"
     environment:
-      - JENKINS_OPTS="--httpPort=8080"
-      - JAVA_OPTS="-Dhudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds=180"
+      - JENKINS_OPTS=--httpPort=8080
+      - "JAVA_OPTS=-Dhudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds=180 -Dorg.apache.commons.jelly.tags.fmt.timeZone=Asia/Seoul"
       - TZ=Asia/Seoul
     volumes:
       - jenkins_home:/var/jenkins_home
@@ -106,7 +106,6 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
-    restart: always
 
 networks:
   app-network:
