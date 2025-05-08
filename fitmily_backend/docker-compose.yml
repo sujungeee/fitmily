@@ -96,7 +96,7 @@ services:
       - "50000:50000"
     environment:
       - JENKINS_OPTS="--httpPort=8080"
-      - JAVA_OPTS="-Dhudson.model.UpdateCenter.connectionTimeoutSeconds=120 -Dhudson.model.DownloadService.noKeyDownloadAllowed=true -Dorg.apache.commons.jelly.tags.fmt.timeZone=Asia/Seoul"
+      - JAVA_OPTS="Dhudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds=180"
       - TZ=Asia/Seoul
     volumes:
       - jenkins_home:/var/jenkins_home
