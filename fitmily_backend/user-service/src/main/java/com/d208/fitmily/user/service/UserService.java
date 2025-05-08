@@ -13,6 +13,9 @@ import com.d208.fitmily.user.dto.JoinRequestDTO;
 import com.d208.fitmily.user.entity.User;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -21,18 +24,23 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTUtil jwtUtil;
 
+    public static final String[] ZODIACS = {
+            "Monkey", "Rooster", "Dog", "Pig", "Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Sheep"
+    };
 
-    /* 아이디 중복 체크 */
-    public boolean isUsernameDuplicate(String username) {
-        return userMapper.existsByLoginId(username);
-    }
 
-    /* 회원가입 */
+    /* 회원가입 */ //
     public void joinprocess(JoinRequestDTO dto){
 
         if (userMapper.existsByLoginId(dto.getLogin_id())) {
             throw new BusinessException(ErrorCode.USERNAME_DUPLICATED);
         }
+
+        //띠 계산로직
+        String birth = dto.getBirth();
+        int year = Integer.parseInt(birth.substring(0, 4));
+        String zodiac = ZODIACS[year % 12];
+
 
         User user = new User();
         user.setLoginId(dto.getLogin_id());
@@ -40,8 +48,9 @@ public class UserService {
         user.setNickname(dto.getNickname());
         user.setBirth(dto.getBirth());
         user.setGender(dto.getGender());
+        user.getProfileImg();
         user.setRole("ROLE_USER");
-
+        user.setProfileImg(zodiac);
 
         userMapper.insert(user);
     }
@@ -87,10 +96,15 @@ public class UserService {
         return new ReissueResponseDto(newAccessToken, newRefreshToken);
     }
 
+    /* 유저 정보 조회 */
     public User getUserById(Integer userId){
         User user = userMapper.selectById(userId);
         return user;
 
     }
 
+    /* 아이디 중복 체크 */
+    public boolean isUsernameDuplicate(String username) {
+        return userMapper.existsByLoginId(username);
+    }
 }

@@ -33,11 +33,11 @@
         INSERT INTO users (
         user_login_id, user_pw, user_nickname,
         user_birth, user_gender,
-        user_refresh_token, role
+        user_refresh_token, role, user_profile_img
         ) VALUES (
         #{loginId}, #{password}, #{nickname},
         #{birth}, #{gender},
-        #{refreshToken}, #{role}
+        #{refreshToken}, #{role} ,#{profileImg}
         )
     </insert>
 
@@ -65,11 +65,11 @@
 
     <select id="selectById" parameterType="int" resultType="User">
         SELECT
-        user_id        AS id,
-        user_login_id  AS loginId,
-        user_weight    AS weight,    <!-- 체중(kg) -->
-        user_birth     AS birth,     <!-- 생년월일 -->
-        user_gender    AS gender     <!-- 성별 -->
+        user_id
+        user_login_id
+        user_weight
+        user_birth
+        user_gender
         FROM users
         WHERE user_id = #{userId}
     </select>
