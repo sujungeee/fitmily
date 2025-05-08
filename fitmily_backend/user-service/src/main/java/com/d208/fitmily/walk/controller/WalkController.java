@@ -50,6 +50,11 @@ public class WalkController {
     //산책 목표 존재 여부 조회
     @Operation(summary = "산책 목표 존재 여부 조회", description = "목표에 산책이 있는지 확인후 결과를 응답합니다. ")
     @GetMapping("/walks/goal/exist")
+    public ApiResponse<Boolean> goalexist(@AuthenticationPrincipal CustomUserDetails principal){
+        boolean Existence = walkService.walkGoalExists(principal.getId());
+
+        return ApiResponse.ok(Existence, "산책 기록 조회 성공");
+    }
 
 
 }

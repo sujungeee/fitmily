@@ -64,6 +64,11 @@ public class WalkService {
         // mapper가 DTO의 모든 필드를 채워서 반환하므로, 그냥 그대로 리턴
         return walkMapper.selectWalks(params);
     }
+
+    // 산책 목표 여부 조회
+    public Boolean walkGoalExists(Integer userId){
+        return walkMapper.walkGoalExists(userId);
+    }
 }
 
 

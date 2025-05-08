@@ -10,9 +10,13 @@ import java.util.Map;
 @Mapper
 public interface WalkMapper {
 
+    // 산책 중지시 데이터 저장
     int insertStopWalk(Walk walk);
 
+    // 산책 기록 조회
     List<WalkResponseDto> selectWalks(Map<String, Object> params);
 
+    //산책 목표 존재 조회
+    Boolean walkGoalExists(Integer userId);
 
 }

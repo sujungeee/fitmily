@@ -23,18 +23,8 @@
             parameterType="map"
             resultType="com.d208.fitmily.walk.dto.WalkResponseDto">
         SELECT
-        w.walk_id,
-        w.user_id,
-        u.user_nickname,
-        u.user_profile_img,
-        w.walk_route_img,
-        w.walk_start_time,
-        w.walk_end_time,
-        w.walk_distance,
-        w.walk_heart_rate,
-        w.walk_calories,
-        w.walk_step_count
-        FROM walk w
+        w.walk_id, w.user_id, u.user_nickname, u.user_profile_img, w.walk_route_img, w.walk_start_time, w.walk_end_time, w.walk_distance, w.walk_heart_rate,
+        w.walk_calories,w.walk_step_count FROM walk w
         LEFT JOIN users u
         ON u.user_id = w.user_id
         <where>
@@ -51,6 +41,8 @@
         ORDER BY w.walk_start_time DESC
     </select>
 
+
+    walkGoalExists
 
 
 
