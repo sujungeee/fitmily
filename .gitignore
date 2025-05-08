@@ -478,3 +478,19 @@ obj/
 
 
 /mr_patent_bigdata/credentials/
+
+
+!Jenkinsfile
+!docker-compose.yml
+!**/Dockerfile
+!nginx/conf.d/**
+!prometheus/**
+
+!**/application-prod.yml
+!**/application-dev.yml
+!**/application-jenkins.yml
+
+!jenkins/**
+
+!deploy/**
+!scripts/**
