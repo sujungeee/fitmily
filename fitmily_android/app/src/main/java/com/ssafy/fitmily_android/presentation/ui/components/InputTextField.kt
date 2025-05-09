@@ -1,10 +1,9 @@
-package com.ssafy.fitmily_android.presentation.ui.auth
+package com.ssafy.fitmily_android.presentation.ui.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,6 +37,7 @@ fun InputTextField(
     , inputType: String
     , value: String
     , onValueChange: (String) -> Unit
+    , fontSize : Int = 16
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val visualTransformation = when(inputType) {
@@ -90,7 +90,7 @@ fun InputTextField(
                         , style = TextStyle(
                             fontFamily = ibmFontFamily,
                             fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp
+                            fontSize = fontSize.sp
                         )
                         , color = mainDarkGray
                     )
