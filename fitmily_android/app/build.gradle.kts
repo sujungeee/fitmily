@@ -62,4 +62,7 @@ dependencies {
 
     // navigation
     implementation("androidx.navigation:navigation-compose:2.8.9")
+
+    // 네이버 지도
+    implementation("com.naver.maps:map-sdk:3.21.0")
 }
