@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.auth
+package com.ssafy.fitmily_android.presentation.ui.auth.join.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement

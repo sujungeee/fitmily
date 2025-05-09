@@ -29,7 +29,7 @@ fun WeatherCard(){
 
         Spacer(Modifier.weight(1f))
         Image(
-            painter = painterResource(id = R.drawable.myselectedicon),
+            painter = painterResource(id = R.drawable.my_selected_icon),
             contentDescription = "item",
         )
         Spacer(Modifier.weight(1f))
