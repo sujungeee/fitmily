@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder             // ← 이걸 추가해야 WalkResponseDto.builder() 가 생성됩니다.
+@Builder
 public class WalkResponseDto {
     private Integer walkId;
     private Integer userId;

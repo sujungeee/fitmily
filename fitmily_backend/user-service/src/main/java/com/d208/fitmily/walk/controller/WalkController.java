@@ -52,9 +52,9 @@ public class WalkController {
     @GetMapping("/walks/goal/exist")
     public ApiResponse<Boolean> goalexist(@AuthenticationPrincipal CustomUserDetails principal){
         boolean Existence = walkService.walkGoalExists(principal.getId());
-
         return ApiResponse.ok(Existence, "산책 기록 조회 성공");
     }
+
 
 
 }

@@ -42,9 +42,15 @@
     </select>
 
 
-    walkGoalExists
-
-
+    <select id="walkGoalExists"
+            parameterType="int"
+            resultType="boolean">
+        SELECT
+        EXISTS (SELECT 1
+                FROM exercise_goal
+                WHERE user_id = #{userId} AND exercise_goal_name = 'walk' AND DATE(exercise_goal_created_at) = CURDATE()
+                )
+    </select>
 
 
 </mapper>
