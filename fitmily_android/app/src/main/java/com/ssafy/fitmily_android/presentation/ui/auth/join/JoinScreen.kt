@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.auth
+package com.ssafy.fitmily_android.presentation.ui.auth.join
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -28,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.presentation.navigation.RootNavGraph
+import com.ssafy.fitmily_android.presentation.ui.auth.components.ActivateButton
+import com.ssafy.fitmily_android.presentation.ui.auth.join.components.GenderSelector
+import com.ssafy.fitmily_android.presentation.ui.components.InputTextField
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
 import com.ssafy.fitmily_android.ui.theme.mainBlack
@@ -86,7 +87,9 @@ fun JoinScreen(
                     , { id =  it }
                 )
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(
+                    modifier = Modifier.width(12.dp)
+                )
 
                 Button(
                     onClick = {
@@ -120,7 +123,7 @@ fun JoinScreen(
 
             InputTextField(
                 modifier = Modifier.fillMaxWidth()
-            ,"비밀번호"
+                ,"비밀번호"
                 , "영어, 숫자, 특수문자(!@#\$%) 포함 8~12자로 가능합니다."
                 , "pwd"
                 , pwd
