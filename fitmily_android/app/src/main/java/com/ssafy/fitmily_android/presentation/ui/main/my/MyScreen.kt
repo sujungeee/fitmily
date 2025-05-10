@@ -10,8 +10,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyAchievement
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseGoal
@@ -43,11 +45,11 @@ fun MyScreen(
     )
 
     val histories = listOf(
-        ExerciseHistory(R.drawable.health, "21시 33분", "런지", 10f, "회"),
-        ExerciseHistory(R.drawable.health, "20시 33분", "산책", 1.2f, "km"),
-        ExerciseHistory(R.drawable.health, "19시 33분", "런지", 10f, "회"),
-        ExerciseHistory(R.drawable.health, "19시 33분", "런지", 10f, "회"),
-        ExerciseHistory(R.drawable.health, "19시 33분", "런지", 10f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "산책", 170, 1.5f, "km"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
     )
 
     Scaffold(
@@ -107,7 +109,7 @@ fun MyScreen(
             item {
                 Spacer(Modifier.height(32.dp))
                 MyTodayExerciseHistory(
-                    totalExerciseTime = "6시간 23분",
+                    totalExerciseCalorie = 6300,
                     histories = histories
                 )
             }
@@ -129,8 +131,8 @@ data class AchievementDay(
 
 data class ExerciseHistory(
     val iconRes: Int,
-    val time: String,
     val exerciseName: String,
-    val exerciseCount: Float,
+    val exerciseCalorie: Int,
+    val exerciseValue: Float,
     val unit: String
 )
