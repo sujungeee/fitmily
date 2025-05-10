@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.ssafy.fitmily_android.presentation.ui.main.my.MyScreen
+import com.ssafy.fitmily_android.presentation.ui.main.my.goal.MyGoalScreen
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.MyNotificationScreen
 
 fun NavGraphBuilder.myNavGraph(navController: NavHostController) {
@@ -17,6 +18,10 @@ fun NavGraphBuilder.myNavGraph(navController: NavHostController) {
 
         composable("my/notification") {
             MyNotificationScreen(navController)
+        }
+
+        composable("my/goal") {
+            MyGoalScreen(navController)
         }
     }
 }

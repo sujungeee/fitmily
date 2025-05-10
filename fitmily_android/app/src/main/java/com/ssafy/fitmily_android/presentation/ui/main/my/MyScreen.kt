@@ -92,8 +92,9 @@ fun MyScreen(
                 MyRecordButtonRow(
                     // TODO 건강 기록 화면으로 가기
                     onHealthClick = { },
-                    // TODO 목표 설정 화면으로 가기
-                    onGoalClick = { },
+                    onGoalClick = {
+                        navController.navigate("my/goal")
+                    },
                     // TODO 운동 기록 화면으로 가기
                     onExerciseClick = { }
                 )
