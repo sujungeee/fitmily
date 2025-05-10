@@ -55,8 +55,9 @@ fun MyScreen(
             MyTobBar(
                 profileImage = painterResource(id = R.drawable.my_unselected_icon),
                 nickname = "예지렐라",
-                // TODO 알림 화면으로 가기.
-                onNotificationClick = { }
+                onNotificationClick = {
+                    navController.navigate("my/notification")
+                }
             )
         },
         modifier = Modifier
