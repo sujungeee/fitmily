@@ -47,7 +47,6 @@ fun MyExerciseHistoryItem(
             painter = painterResource(id = history.iconRes),
             contentDescription = null,
             modifier = Modifier
-                .height(120.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
         )
