@@ -15,7 +15,8 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
-fun MyGoalAddButton(
+fun MyGoalButton(
+    text: String,
     onClick: () -> Unit,
     modifier: Modifier
 ) {
@@ -29,7 +30,7 @@ fun MyGoalAddButton(
         onClick = onClick,
     ) {
         Text(
-            text = "목표 설정",
+            text = text,
             style = Typography.bodyLarge,
             color = mainWhite
         )
