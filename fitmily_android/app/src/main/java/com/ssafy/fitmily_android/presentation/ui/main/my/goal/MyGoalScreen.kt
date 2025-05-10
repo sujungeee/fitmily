@@ -11,12 +11,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalAddButton
+import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalEditDialog
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalItem
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.component.MyGoalTopBar
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
@@ -25,6 +30,11 @@ import com.ssafy.fitmily_android.ui.theme.backGroundGray
 fun MyGoalScreen(
     navController: NavHostController
 ) {
+
+    // TODO 추후 UI State로 추출
+    var showEditDialog by remember { mutableStateOf(false) }
+    var selectedGoal by remember { mutableStateOf<GoalItem?>(null) }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -59,10 +69,25 @@ fun MyGoalScreen(
             items (goals) { goal ->
                 MyGoalItem(
                     goal = goal,
-                    onEditClick = { /* TODO 수정 다이얼로그 띄우기 */ },
+                    onEditClick = {
+                        selectedGoal = goal
+                        showEditDialog = true
+                    },
                     onDeleteClick = { /* TODO 삭제 이벤트 */ }
                 )
             }
+        }
+
+        if(showEditDialog && selectedGoal != null) {
+            MyGoalEditDialog(
+                goalName = selectedGoal!!.name,
+                initialValue = "${selectedGoal!!.total}",
+                onDismiss = { showEditDialog = false },
+                onConfirm = { newValue ->
+                    /* TODO 실제 수정 로직 */
+                    showEditDialog = false
+                }
+            )
         }
     }
 }
