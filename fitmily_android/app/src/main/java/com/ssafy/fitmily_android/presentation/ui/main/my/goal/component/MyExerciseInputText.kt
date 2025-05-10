@@ -22,7 +22,7 @@ import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 
 @Composable
-fun MyGoalRegisterExerciseInputText(
+fun MyExerciseInputText(
     onClick: () -> Unit
 ) {
 

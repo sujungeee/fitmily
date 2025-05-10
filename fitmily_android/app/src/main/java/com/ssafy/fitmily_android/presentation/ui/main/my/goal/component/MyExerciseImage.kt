@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.R
 
 @Composable
-fun MyGoalRegisterExerciseImage(
+fun MyExerciseImage(
     exerciseName: String
 ) {
 
