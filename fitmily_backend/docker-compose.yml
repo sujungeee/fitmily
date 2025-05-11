@@ -43,9 +43,7 @@ services:
       - app-network
 
   springboot-app:
-    build:
-      context: .
-      dockerfile: ./user-service/Dockerfile
+    build: ./user-service
     container_name: springboot-app
     ports:
       - "8080:8080"
