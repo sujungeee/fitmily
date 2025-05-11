@@ -72,10 +72,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     // permissions
     implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
 
-
-    implementation(project(":fitmily_common"))
 }
 
 kapt {
