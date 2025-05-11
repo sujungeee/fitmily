@@ -2,20 +2,24 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("org.jetbrains.kotlin.plugin.serialization")
+
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
 }
 
 android {
-    namespace = "com.ssafy.fitmily_android"
+    namespace = "com.ssafy.fitmily_wearos"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.ssafy.fitmily_android"
-        minSdk = 26
-        targetSdk = 34
+        applicationId = "com.ssafy.fitmily_wearos"
+        minSdk = 30
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -41,28 +45,37 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(libs.play.services.wearable)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.wear.tooling.preview)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.splashscreen)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // compose
-    implementation("androidx.compose.foundation:foundation:1.9.0-alpha01")
 
-    // navigation
-    implementation("androidx.navigation:navigation-compose:2.8.9")
+    val hilt_version = "2.48"
+    // Wearable Data Layer
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
+    implementation("com.google.android.gms:play-services-wearable:18.1.0")
+    // hilt
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-compiler:$hilt_version")
 
-    // 네이버 지도
-    implementation("com.naver.maps:map-sdk:3.21.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    // permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
+
+}
+
+kapt {
+    useBuildCache = false
+    correctErrorTypes= true
 }

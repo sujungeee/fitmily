@@ -28,9 +28,10 @@ import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
-fun ChallengeCard(navController: NavHostController){
+fun ChallengeCard(navController: NavHostController) {
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .aspectRatio(2f)
             .background(mainWhite, shape = RoundedCornerShape(16.dp))
             .padding(20.dp)
@@ -53,8 +54,10 @@ fun ChallengeCard(navController: NavHostController){
                 style = typography.bodyLarge,
             )
         }
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.End) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.End
+        ) {
             Text(
                 text = "현재 순위",
                 style = typography.bodyLarge,
