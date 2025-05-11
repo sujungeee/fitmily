@@ -58,14 +58,18 @@ fun DashBoardPager(items: List<String>) {
 }
 
 @Composable
-fun DashBoardItem(item:String){
+fun DashBoardItem(item: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(mainWhite, shape = RoundedCornerShape(16.dp))
             .padding(20.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             ProfileItem()
 
             Button(
@@ -86,7 +90,9 @@ fun DashBoardItem(item:String){
             contentAlignment = Alignment.BottomStart
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -112,8 +118,10 @@ fun DashBoardItem(item:String){
                         progress = 0.8f
                     )
 
-                    Text(text = "80%",
-                        style = typography.bodyLarge,)
+                    Text(
+                        text = "80%",
+                        style = typography.bodyLarge,
+                    )
 
                 }
 
@@ -121,7 +129,6 @@ fun DashBoardItem(item:String){
         }
     }
 }
-
 
 
 @Composable
