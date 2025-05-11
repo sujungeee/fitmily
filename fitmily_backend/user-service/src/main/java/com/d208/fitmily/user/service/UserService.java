@@ -49,7 +49,9 @@ public class UserService {
         user.setBirth(dto.getBirth());
         user.setGender(dto.getGender());
         user.setRole("ROLE_USER");
-        user.setZidiacName(zodiac);
+        user.setFamilySequence(0);
+        user.setRefreshToken("");
+        user.setZodiacName(zodiac);
 
         userMapper.insert(user);
     }

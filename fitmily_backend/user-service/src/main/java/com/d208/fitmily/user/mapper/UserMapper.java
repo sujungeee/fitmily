@@ -15,7 +15,7 @@ public interface UserMapper {
     // 로그인 아이디로 User 조회
     User findByLoginId(@Param("loginId") String loginId);
 
-    // 회원 정보 삽입 (INSERT)
+    // 회원 가입
     int insert(User user);
 
     // 리프레시 토큰 업데이트

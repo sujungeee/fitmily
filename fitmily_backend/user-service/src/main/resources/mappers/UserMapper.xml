@@ -8,7 +8,7 @@
     <!-- 1) existsByLoginId -->
     <select id="existsByLoginId" resultType="boolean">
         SELECT EXISTS(
-        SELECT 1 FROM users
+        SELECT 1 FROM user
         WHERE user_login_id = #{loginId}
         )
     </select>
@@ -29,21 +29,23 @@
     </select>
 
     <!-- 3) insert -->
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO users (
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user (
         user_login_id, user_pw, user_nickname,
-        user_birth, user_gender,
-        user_refresh_token, role, user_profile_img
+        user_birth, user_gender, user_refresh_token,
+        user_zodiac_name, user_family_sequence,
+        user_created_at, user_updated_at
         ) VALUES (
         #{loginId}, #{password}, #{nickname},
-        #{birth}, #{gender},
-        #{refreshToken}, #{role} ,#{profileImg}
+        #{birth}, #{gender}, #{refreshToken},
+        #{zodiacName}, #{familySequence},
+        NOW(), NOW()
         )
     </insert>
 
     <!-- 4) updateRefreshToken -->
     <update id="updateRefreshToken">
-        UPDATE users
+        UPDATE user
         SET user_refresh_token = #{refreshToken}
         WHERE user_id = #{userId}
     </update>
@@ -51,14 +53,14 @@
     <!-- 5) existsByIdAndRefreshToken -->
     <select id="existsByIdAndRefreshToken" resultType="boolean">
         SELECT EXISTS(
-        SELECT 1 FROM users
+        SELECT 1 FROM user
         WHERE user_id = #{userId}
         AND user_refresh_token = #{refreshToken}
         )
     </select>
 
     <update id="clearRefreshToken">
-        UPDATE users
+        UPDATE user
         SET user_refresh_token = NULL
         WHERE user_id = #{userId}
     </update>
@@ -67,7 +69,7 @@
     <select id="selectById" parameterType="int" resultType="User">
         SELECT
         user_id, user_login_id,user_birth ,user_gender
-        FROM users
+        FROM user
         WHERE user_id = #{userId}
     </select>
 

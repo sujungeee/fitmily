@@ -72,7 +72,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 실제 DB에서 UserEntity 조회 후 사용하세요
         User user = new User();
-        user.setId(userId);
+        user.setUserId(userId);
         user.setPassword("temppassword");
         user.setRole(role);
 

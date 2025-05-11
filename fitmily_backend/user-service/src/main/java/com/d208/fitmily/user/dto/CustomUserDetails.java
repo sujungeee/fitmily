@@ -22,7 +22,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public Integer getId() {
-        return userEntity.getId();
+        return userEntity.getUserId();
     }
 
     @Override
