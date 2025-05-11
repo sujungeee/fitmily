@@ -48,7 +48,7 @@ import com.ssafy.fitmily_android.presentation.ui.main.walk.component.StopWalkDia
 fun WalkScreen(
     navController: NavHostController
 ) {
-    var bool = remember { mutableStateOf(true) }
+    var isWalking = remember { mutableStateOf(true) }
     var isDialogOpen = remember { mutableStateOf(false) }
     var watching = remember { mutableStateOf(0) }
 
@@ -79,7 +79,7 @@ fun WalkScreen(
                 )
             }
         }
-        if(bool.value){
+        if(isWalking.value){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -159,17 +159,17 @@ fun WalkScreen(
         ) {
             Button(
                 onClick = {
-                    if(bool.value){
+                    if(isWalking.value){
                         isDialogOpen.value = true
                     }else {
-                        bool.value = !bool.value
+                        isWalking.value = !isWalking.value
                     }},
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier.size(100.dp)
             ) {
-                if (!bool.value) {
+                if (!isWalking.value) {
                     Icon(
                         painter = painterResource(id = R.drawable.walk_start_icon), // 정지 아이콘
                         contentDescription = "정지",
@@ -194,7 +194,7 @@ fun WalkScreen(
         StopWalkDialog(
             onDismissRequest = { isDialogOpen.value = false },
             onConfirmation = {
-                bool.value = !bool.value
+                isWalking.value = !isWalking.value
                 isDialogOpen.value = false
             }
         )
