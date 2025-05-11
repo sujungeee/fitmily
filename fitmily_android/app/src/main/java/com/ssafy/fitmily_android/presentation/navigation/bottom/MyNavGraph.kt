@@ -8,6 +8,7 @@ import com.ssafy.fitmily_android.presentation.ui.main.my.MyScreen
 import com.ssafy.fitmily_android.presentation.ui.main.my.exercise.MyExerciseRegisterScreen
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.MyGoalRegisterScreen
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.MyGoalScreen
+import com.ssafy.fitmily_android.presentation.ui.main.my.health.MyHealthRegisterScreen
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.MyNotificationScreen
 
 fun NavGraphBuilder.myNavGraph(navController: NavHostController) {
@@ -32,6 +33,10 @@ fun NavGraphBuilder.myNavGraph(navController: NavHostController) {
 
         composable("my/exercise") {
             MyExerciseRegisterScreen(navController)
+        }
+
+        composable("my/health") {
+            MyHealthRegisterScreen(navController)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my
 
+import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -90,12 +91,12 @@ fun MyScreen(
             item {
                 Spacer(Modifier.height(12.dp))
                 MyRecordButtonRow(
-                    // TODO 건강 기록 화면으로 가기
-                    onHealthClick = { },
+                    onHealthClick = {
+                        navController.navigate("my/health")
+                    },
                     onGoalClick = {
                         navController.navigate("my/goal")
                     },
-                    // TODO 운동 기록 화면으로 가기
                     onExerciseClick = {
                         navController.navigate("my/exercise")
                     }
