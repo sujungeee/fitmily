@@ -12,10 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EndWalkRequestDto {
-    private LocalDateTime walkStartTime;
-    private LocalDateTime walkEndTime;
-    private Float walkDistance;
-    private Integer walkHeartRate;
-    private String walkRouteImg;
-//    private Integer stepCount;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private Float distance;
+    private String routeImg;
+
 }

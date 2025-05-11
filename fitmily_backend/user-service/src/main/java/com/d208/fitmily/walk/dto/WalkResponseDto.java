@@ -13,14 +13,12 @@ public class WalkResponseDto {
     private Integer walkId;
     private Integer userId;
     private String  walkRouteImg;
-    private LocalDateTime walkStartTime;
-    private LocalDateTime walkEndTime;
-    private Float   walkDistance;
-    private Integer walkHeartRate;
-    private Integer walkCalories;
-    private Integer walkStepCount;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private Float distance;
+    private Integer calories;
 
-    private String userNickname;
-    private String userProfileImg;
+    private String nickname;
+    private String zodiacName;
 
 }

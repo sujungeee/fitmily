@@ -39,17 +39,15 @@ public class WalkService {
         User user = userService.getUserById(userId);
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
-        float weight = health.getHealthWeight();
-        float hr = dto.getWalkHeartRate();
-        long walkTime = between(dto.getWalkStartTime(), dto.getWalkEndTime()).toMinutes();
+        float weight = health.getWeight();
+        long walkTime = between(dto.getStartTime(), dto.getEndTime()).toMinutes();
 
         Walk walk = Walk.builder()
                 .userId(userId)
-                .walkRouteImg(dto.getWalkRouteImg())
-                .walkStartTime(dto.getWalkStartTime())
-                .walkEndTime(dto.getWalkEndTime())
-                .walkDistance(dto.getWalkDistance())
-                .walkHeartRate(dto.getWalkHeartRate())
+                .routeImg(dto.getRouteImg())
+                .startTime(dto.getStartTime())
+                .endTime(dto.getEndTime())
+                .distance(dto.getDistance())
                 .build();
         walkMapper.insertStopWalk(walk);
     }
@@ -61,7 +59,6 @@ public class WalkService {
         params.put("start",   start);
         params.put("end",     end);
 
-        // mapper가 DTO의 모든 필드를 채워서 반환하므로, 그냥 그대로 리턴
         return walkMapper.selectWalks(params);
     }
 
