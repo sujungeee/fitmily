@@ -14,6 +14,6 @@ public class User {
     private String birth;
     private String gender;
     private String refreshToken;
+    private String zidiacName;
     private String role;
-    private String profileImg;
 }

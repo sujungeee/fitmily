@@ -41,7 +41,7 @@
         ORDER BY w.walk_start_time DESC
     </select>
 
-
+<!-- CURDATE() 는서버의 현재 날짜 불러옴-->
     <select id="walkGoalExists"
             parameterType="int"
             resultType="boolean">
