@@ -32,7 +32,7 @@ fun MyExerciseInputText(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick }
+            .clickable { onClick() }
             .padding(vertical = 14.dp)
             .drawBehind {
                 val strokeWidth = 1.dp.toPx()
