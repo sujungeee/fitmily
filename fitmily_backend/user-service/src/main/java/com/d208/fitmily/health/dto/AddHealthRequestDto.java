@@ -12,9 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AddHealthRequestDto {
 
-    private Float healthHeight;
-    private Float healthWeight;
-    private Float healthBodyFatPercentage;
-    private String healthDisease;
+    private Float height;
+    private Float weight;
+    private String otherDiseases;
+    private String fiveMajorDiseases;
+
+
 
 }

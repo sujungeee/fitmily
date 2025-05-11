@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class HealthResponseDto {
     private Integer healthId;
-    private Float healthBmi;
-    private Float healthHeight;
-    private Float healthWeight;
-    private Float healthBodyFatPercentage;
-    private String healthDisease;
-    private LocalDateTime healthCreatedAt;
-    private LocalDateTime healthUpdatedAt;
+    private Float bmi;
+    private Float height;
+    private Float weight;
+    private String otherDiseases;
+    private String fiveMajorDiseases;
+    private LocalDateTime CreatedAt;
+    private LocalDateTime UpdatedAt;
 }

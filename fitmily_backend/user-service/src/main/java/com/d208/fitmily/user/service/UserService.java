@@ -36,7 +36,7 @@ public class UserService {
             throw new BusinessException(ErrorCode.USERNAME_DUPLICATED);
         }
 
-        //띠 계산로직
+        //생년월일별 띠 계산
         String birth = dto.getBirth();
         int year = Integer.parseInt(birth.substring(0, 4));
         String zodiac = ZODIACS[year % 12];
@@ -48,9 +48,8 @@ public class UserService {
         user.setNickname(dto.getNickname());
         user.setBirth(dto.getBirth());
         user.setGender(dto.getGender());
-        user.getProfileImg();
         user.setRole("ROLE_USER");
-        user.setProfileImg(zodiac);
+        user.setZidiacName(zodiac);
 
         userMapper.insert(user);
     }

@@ -16,16 +16,16 @@ public class HealthService {
     public void addHealth(Integer userId, AddHealthRequestDto dto){
 
         //bmi 계산해서 넣음
-        float heightM = dto.getHealthHeight() / 100f;
-        float bmi = dto.getHealthWeight() / (heightM * heightM);
+        float heightM = dto.getHeight() / 100f;
+        float bmi = dto.getWeight() / (heightM * heightM);
 
         Health health = Health.builder()
                 .userId(userId)
-                .healthBmi((float) (Math.floor(bmi * 10) / 10))
-                .healthHeight(dto.getHealthHeight())
-                .healthWeight(dto.getHealthWeight())
-                .healthBodyFatPercentage(dto.getHealthBodyFatPercentage())
-                .healthDisease(dto.getHealthDisease())
+                .bmi((float) (Math.floor(bmi * 10) / 10))
+                .height(dto.getHeight())
+                .weight(dto.getWeight())
+                .otherDiseases(dto.getOtherDiseases())
+                .fiveMajorDiseases(dto.getFiveMajorDiseases())
                 .build();
 
         healthMapper.insertHealth(health);
@@ -37,13 +37,13 @@ public class HealthService {
 
         return new HealthResponseDto(
                 health.getHealthId(),
-                health.getHealthBmi(),
-                health.getHealthHeight(),
-                health.getHealthWeight(),
-                health.getHealthBodyFatPercentage(),
-                health.getHealthDisease(),
-                health.getHealthCreatedAt(),
-                health.getHealthUpdatedAt()
+                health.getBmi(),
+                health.getHeight(),
+                health.getWeight(),
+                health.getOtherDiseases(),
+                health.getFiveMajorDiseases(),
+                health.getCreatedAt(),
+                health.getUpdatedAt()
         );
     }
 }

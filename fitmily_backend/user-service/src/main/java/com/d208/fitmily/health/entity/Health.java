@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class Health {
-    private Integer healthId;           // AUTO_INCREMENT PK
-    private Integer userId;             // FK → user.user_id
-    private Float   healthBmi;
-    private Float   healthHeight;
-    private Float   healthWeight;
-    private Float   healthBodyFatPercentage;
-    private String  healthDisease;
-    private LocalDateTime healthCreatedAt;
-    private LocalDateTime healthUpdatedAt;
+    private Integer healthId;
+    private Integer userId;
+    private Float   height;
+    private Float   weight;
+    private Float   bmi;
+    private String  otherDiseases;
+    private String  fiveMajorDiseases;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }
