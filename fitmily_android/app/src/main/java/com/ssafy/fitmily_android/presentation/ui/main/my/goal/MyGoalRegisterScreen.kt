@@ -21,11 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseSelectBottomSheet
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyExerciseImage
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyExerciseInputText
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyExerciseValueInputText
-import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.component.MyGoalTopBar
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ fun MyGoalRegisterScreen(
             .background(backGroundGray),
         topBar = { MyGoalTopBar(navController) },
         bottomBar = {
-            MyGoalButton(
+            MyButton(
                 text = "추가하기",
                 onClick = {
                     /* TODO 목표 리스트에 추가하기 */

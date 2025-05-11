@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.main.my.goal.component
+package com.ssafy.fitmily_android.presentation.ui.main.my.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,7 +15,7 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
-fun MyGoalButton(
+fun MyButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier

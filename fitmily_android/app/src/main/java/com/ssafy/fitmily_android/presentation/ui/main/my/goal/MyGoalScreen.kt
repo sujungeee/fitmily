@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
-import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalButton
+import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalEditDialog
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalItem
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.component.MyGoalTopBar
@@ -41,7 +41,7 @@ fun MyGoalScreen(
             .background(backGroundGray),
         topBar = { MyGoalTopBar(navController) },
         bottomBar = {
-            MyGoalButton(
+            MyButton(
                 text = "목표 추가",
                 onClick = { navController.navigate("my/goal/register") },
                 modifier = Modifier.padding(bottom = 24.dp)
