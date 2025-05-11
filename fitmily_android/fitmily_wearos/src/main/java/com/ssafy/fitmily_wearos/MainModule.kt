@@ -20,13 +20,6 @@ import android.content.Context
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.Wearable
-import com.ssafy.fitmily_wearos.data.CapabilityRepository
-import com.ssafy.fitmily_wearos.data.CapabilityRepositoryImpl
-import com.ssafy.fitmily_wearos.data.HealthTrackingServiceConnection
-import com.ssafy.fitmily_wearos.data.MessageRepository
-import com.ssafy.fitmily_wearos.data.MessageRepositoryImpl
-import com.ssafy.fitmily_wearos.data.TrackingRepository
-import com.ssafy.fitmily_wearos.data.TrackingRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,26 +53,5 @@ class MainModule {
         return Wearable.getMessageClient(context)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Provides
-    @Singleton
-    fun provideTrackingRepository(
-        coroutineScope: CoroutineScope,
-        healthTrackingServiceConnection: HealthTrackingServiceConnection,
-        @ApplicationContext context: Context
-    ): TrackingRepository {
-        return TrackingRepositoryImpl(coroutineScope, healthTrackingServiceConnection, context)
-    }
 
-    @Provides
-    @Singleton
-    fun provideMessageRepository(messageClient: MessageClient): MessageRepository {
-        return MessageRepositoryImpl(messageClient)
-    }
-
-    @Provides
-    @Singleton
-    fun provideCapabilitiesRepository(capabilityClient: CapabilityClient): CapabilityRepository {
-        return CapabilityRepositoryImpl(capabilityClient)
-    }
 }
