@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.ssafy.fitmily_android.presentation.ui.main.home.HomeScreen
 import com.ssafy.fitmily_android.presentation.ui.main.home.challenge.ChallengeScreen
-import com.ssafy.fitmily_android.presentation.ui.main.home.component.NewsWebview
 import com.ssafy.fitmily_android.presentation.ui.main.home.profile.FamilyProfileScreen
 
 fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
@@ -23,9 +22,7 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
         composable("home/challenge") {
             ChallengeScreen(navController)
         }
-        composable("home/news") {
-            NewsWebview(navController)
-        }
+
 
 
     }
