@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.auth
+package com.ssafy.fitmily_android.presentation.ui.auth.login
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.navigation.RootNavGraph
+import com.ssafy.fitmily_android.presentation.ui.auth.components.ActivateButton
+import com.ssafy.fitmily_android.presentation.ui.components.InputTextField
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
 import com.ssafy.fitmily_android.ui.theme.mainBlue

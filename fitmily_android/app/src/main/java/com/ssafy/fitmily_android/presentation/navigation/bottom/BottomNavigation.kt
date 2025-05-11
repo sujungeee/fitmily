@@ -44,11 +44,11 @@ sealed class BottomNavItem(
     val unselectedIcon: Int,
     val route: String
 ) {
-    object Home : BottomNavItem("Home", R.drawable.homeselectedicon, R.drawable.homeunselectedicon, "home")
-    object Family : BottomNavItem("Family", R.drawable.familyselectedicon, R.drawable.familyunselectedicon, "family")
-    object Walk : BottomNavItem("Walk", R.drawable.walkselectedicon, R.drawable.walkunselectedicon, "walk")
-    object Chat : BottomNavItem("Chat", R.drawable.chatselectedicon, R.drawable.chatunselectedicon, "chat")
-    object My : BottomNavItem("My", R.drawable.myselectedicon, R.drawable.myunselectedicon, "my")
+    object Home : BottomNavItem("Home", R.drawable.home_selected_icon, R.drawable.home_unselected_icon, "home")
+    object Family : BottomNavItem("Family", R.drawable.family_selected_icon, R.drawable.family_unselected_icon, "family")
+    object Walk : BottomNavItem("Walk", R.drawable.walk_selected_icon, R.drawable.walk_unselected_icon, "walk")
+    object Chat : BottomNavItem("Chat", R.drawable.chat_selected_icon, R.drawable.chat_unselected_icon, "chat")
+    object My : BottomNavItem("My", R.drawable.my_selected_icon, R.drawable.my_unselected_icon, "my")
 
     companion object {
         val items = listOf(Home, Family, Walk, Chat, My)

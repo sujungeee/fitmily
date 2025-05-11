@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.auth
+package com.ssafy.fitmily_android.presentation.ui.auth.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
