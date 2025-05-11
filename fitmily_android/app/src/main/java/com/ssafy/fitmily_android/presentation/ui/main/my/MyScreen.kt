@@ -96,7 +96,9 @@ fun MyScreen(
                         navController.navigate("my/goal")
                     },
                     // TODO 운동 기록 화면으로 가기
-                    onExerciseClick = { }
+                    onExerciseClick = {
+                        navController.navigate("my/exercise")
+                    }
                 )
             }
 
