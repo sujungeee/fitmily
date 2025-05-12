@@ -20,12 +20,13 @@ pipeline {
 
         stage('Docker Build & Deploy') {
             steps {
-                // Docker 이미지 빌드 및 서비스 배포
-                sh 'docker-compose build'
-                sh 'docker-compose up -d'
+                dir('fitmily_backend') {  // docker-compose.yml이 있는 디렉토리로 이동
+                    sh '/usr/local/bin/docker-compose build || docker compose build'
+                    sh '/usr/local/bin/docker-compose up -d || docker compose up -d'
+                }
             }
         }
-        
+
         stage('Health Check') {
             steps {
                 // 서비스 시작 대기
