@@ -62,6 +62,7 @@ public class SecurityConfig {
                         .requestMatchers( "/v3/api-docs/**").permitAll()
                         .requestMatchers( "/api-docs/**").permitAll()
                         .requestMatchers( "/swagger-ui.html").permitAll()
+                        .requestMatchers( "/*").permitAll()
 
 //                       .permitAll() 대신 -> .hasRole("ADMIN") 붙이면 ADMIN이라는 접근을 가진사람만 접근가능해짐
                         .anyRequest().authenticated()); //나머지는 로그인한 사용자만 접근할 수 있게
