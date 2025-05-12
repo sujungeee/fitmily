@@ -5,10 +5,11 @@ pipeline {
         stage('Checkout') {
             steps {
                 // backend 브랜치만 체크아웃
-                git branch: 'backend', url: 'https://gitlab.com/your-username/your-project.git'
+                git branch: 'backend', credentialsId: 'gitlab-credentials', url: 'https://lab.ssafy.com/s12-final/S12P31D208.git'
             }
         }
         
+        // 나머지 스테이지는 그대로 유지
         stage('Build SpringBoot') {
             steps {
                 // SpringBoot 빌드
