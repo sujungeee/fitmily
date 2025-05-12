@@ -6,23 +6,44 @@
 <mapper namespace="com.d208.fitmily.health.mapper.HealthMapper">
 
     <insert id="insertHealth"
-            parameterType="com.d208.fitmily.health.entity.Health"
+            parameterType="com.d208.fitmily.health.dto.AddHealthRequestDto"
             useGeneratedKeys="true"
             keyProperty="healthId">
         INSERT INTO health(
-        user_id, health_bmi, health_height, health_weight, health_body_fat_percentage, health_disease)
+        user_id, health_bmi, health_height, health_weight, health_other_diseases, health_five_major_diseases)
         VALUES(
-        #{userId}, #{healthBmi}, #{healthHeight}, #{healthWeight}, #{healthBodyFatPercentage}, #{healthDisease})
+        #{userId}, #{bmi}, #{height}, #{weight}, #{otherDiseases}, #{fiveMajorDiseases})
     </insert>
 
     <select id="selectLatestByUserId"
             parameterType="int"
-            resultType="com.d208.fitmily.health.entity.Health">
+            resultType="com.d208.fitmily.health.dto.HealthResponseDto">
         SELECT
-        health_id, user_id, health_bmi, health_height, health_weight, health_body_fat_percentage, health_disease, health_created_at, health_updated_at
+        health_id AS healthId,
+        health_bmi AS bmi,
+        health_height AS height,
+        health_weight AS weight,
+        health_other_diseases AS otherDiseases,
+        health_five_major_diseases AS fiveMajorDiseases,
+        health_created_at AS createdAt,
+        health_updated_at AS updatedAt
         FROM health
         WHERE user_id = #{userId}
+        ORDER BY health_created_at DESC
+        LIMIT 1
     </select>
+
+    <update id="updateHealth" parameterType="com.d208.fitmily.health.dto.UpdateHealthResponseDto">
+        UPDATE health
+        SET
+        health_bmi = #{bmi},
+        health_height = #{height},
+        health_weight = #{weight},
+        health_other_diseases = #{otherDiseases},
+        health_five_major_diseases = #{fiveMajorDiseases},
+        WHERE user_id = #{userId}
+    </update>
+
 
 
 

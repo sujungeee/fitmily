@@ -87,7 +87,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         Map<String, Object> responseMap = new LinkedHashMap<>();
         responseMap.put("data", tokenMap);
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         new ObjectMapper().writeValue(response.getWriter(), responseMap);

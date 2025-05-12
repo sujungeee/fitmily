@@ -1,7 +1,7 @@
 package com.d208.fitmily.walk.service;
 
 import com.d208.fitmily.health.dto.HealthResponseDto;
-import com.d208.fitmily.health.entity.Health;
+//import com.d208.fitmily.health.entity.Health;
 import com.d208.fitmily.health.service.HealthService;
 import com.d208.fitmily.user.entity.User;
 import com.d208.fitmily.user.service.UserService;
