@@ -43,4 +43,3 @@ application.yml
 
 # 배포 환경 설정 파일
 application-prod.yml
-secrets/
