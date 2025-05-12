@@ -9,15 +9,15 @@ pipeline {
             }
         }
         
-        // 나머지 스테이지는 그대로 유지
         stage('Build SpringBoot') {
             steps {
-                // SpringBoot 빌드
-                sh 'chmod +x ./gradlew || true'
-                sh './gradlew clean build -x test || mvn clean package -DskipTests'
+                dir('fitmily_backend/user-service') {  // 실제 gradlew 파일이 있는 디렉토리로 이동
+                    sh 'chmod +x ./gradlew || true'
+                    sh './gradlew clean build -x test || mvn clean package -DskipTests'
+                }
             }
         }
-        
+
         stage('Docker Build & Deploy') {
             steps {
                 // Docker 이미지 빌드 및 서비스 배포
