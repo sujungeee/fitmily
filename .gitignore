@@ -476,10 +476,6 @@ obj/
 
 # End of https://www.toptal.com/developers/gitignore/api/java,kotlin,python,gradle,androidstudio,intellij
 
-
-/mr_patent_bigdata/credentials/
-
-
 !Jenkinsfile
 !docker-compose.yml
 !**/Dockerfile
@@ -494,3 +490,5 @@ obj/
 
 !deploy/**
 !scripts/**
+
+fitmily_backend/secrets/
