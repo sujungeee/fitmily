@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my
 
+import android.util.Log
 import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyAchievement
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseGoal
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseStatusGraph
+import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyLogout
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyRecordButtonRow
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTobBar
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTodayExerciseHistory
@@ -116,6 +118,14 @@ fun MyScreen(
                     totalExerciseCalorie = 6300,
                     histories = histories
                 )
+            }
+
+            /* 로그아웃 섹션 */
+            item {
+                MyLogout {
+                    /* TODO 로그아웃 로직 */
+                    Log.d("test1234", "로그아웃 버튼 눌림")
+                }
             }
         }
     }
