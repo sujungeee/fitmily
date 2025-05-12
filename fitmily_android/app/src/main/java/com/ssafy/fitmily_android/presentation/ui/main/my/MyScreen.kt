@@ -38,13 +38,13 @@ fun MyScreen(
     )
 
     val weekData = listOf(
-        AchievementDay("일", 0.7f),
-        AchievementDay("월", 0.9f),
-        AchievementDay("화", 0.5f),
-        AchievementDay("수", 0.8f),
-        AchievementDay("목", 0.6f),
-        AchievementDay("금", 1.0f),
-        AchievementDay("토", 0.4f),
+        AchievementDay("5/10", 0.7f),
+        AchievementDay("5/11", 0.9f),
+        AchievementDay("5/12", 0.5f),
+        AchievementDay("5/13", 0.8f),
+        AchievementDay("5/14", 0.6f),
+        AchievementDay("5/15", 1.0f),
+        AchievementDay("5/16", 0.4f),
     )
 
     val histories = listOf(
