@@ -22,13 +22,17 @@ public class JWTUtil {
     }
 
     public Integer getUserId(String token) {
-        Number idNum = Jwts.parser()                    // jjwt 0.12.x 이하
+        Number idNum = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get("userId", Number.class);               // Number로 먼저 꺼냄
-        return idNum.intValue();                        // int로 변환해서 반환
+                .get("userId", Number.class);
+        return idNum.intValue();
+    }
+
+    public String getRole(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
 
     public boolean validateToken(String token) {
@@ -40,16 +44,11 @@ public class JWTUtil {
         }
     }
 
-
-    public String getRole(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
-    }
-
     //만료되었는지 확인하는 함수
     public Boolean isExpired(String token) {
-
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
+
 
     //토큰 생성 메소드
     public String createJwt(Integer userId, String role, String tokenType, Long expiredMs) {

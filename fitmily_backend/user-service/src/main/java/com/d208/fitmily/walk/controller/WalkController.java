@@ -4,7 +4,9 @@ package com.d208.fitmily.walk.controller;
 import com.d208.fitmily.common.response.ApiResponse;
 import com.d208.fitmily.user.dto.CustomUserDetails;
 import com.d208.fitmily.walk.dto.EndWalkRequestDto;
+import com.d208.fitmily.walk.dto.GpsDto;
 import com.d208.fitmily.walk.dto.WalkResponseDto;
+import com.d208.fitmily.walk.service.GpsRedisService;
 import com.d208.fitmily.walk.service.WalkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,12 +32,12 @@ public class WalkController {
 
     private final WalkService walkService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final GpsRedisService gpsRedisService;
 
     //산책 시작
     @MessageMapping("/walk/gps")  // /app/walk/gps 로 전송된 메시지를 처리함
     public void handleGps(@Payload GpsDto gpsDto) {
-        log.info("📍 GPS 데이터 수신: {}", gpsDto);
-//        gpsRedisService.saveGps(gpsDto);
+        gpsRedisService.saveGps(gpsDto);
 
         String topic = "/sub/walk/gps/" + gpsDto.getUserId();
         messagingTemplate.convertAndSend(topic, gpsDto); //브로드캐스팅 역할

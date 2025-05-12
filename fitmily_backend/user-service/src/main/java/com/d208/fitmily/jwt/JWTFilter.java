@@ -33,18 +33,15 @@ public class JWTFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String authHeader = request.getHeader("Authorization");
 
-        log.debug("JWTFilter 시작 → 요청 URI=[{}], Authorization 헤더=[{}]", uri, authHeader);
 
         // swagger-ui, API-docs 경로는 검증 스킵
         if (uri.startsWith("/swagger-ui") || uri.startsWith("/v3/api-docs")) {
-            log.debug("  → Swagger 관련 경로, 필터 건너뜀");
             filterChain.doFilter(request, response);
             return;
         }
 
         // 헤더 유무 확인
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.debug("  → Bearer 토큰이 없음. SecurityContext 미설정 상태로 다음 필터로 이동");
             filterChain.doFilter(request, response);
             return;
         }
@@ -57,10 +54,8 @@ public class JWTFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             expired = true;
         }
-        log.debug("  → 토큰 추출 완료, 만료 여부=[{}]", expired);
 
         if (expired) {
-            log.debug("  → 토큰이 만료됨. 인증 정보 설정 없이 다음 필터로 이동");
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,7 +63,6 @@ public class JWTFilter extends OncePerRequestFilter {
         // 토큰 유효 → 사용자 정보 가져와서 Authentication 설정
         Integer  userId = jwtUtil.getUserId(token);
         String role = jwtUtil.getRole(token);
-        log.debug("  → 토큰 유효, userId=[{}]", userId);
 
         // 실제 DB에서 UserEntity 조회 후 사용하세요
         User user = new User();
