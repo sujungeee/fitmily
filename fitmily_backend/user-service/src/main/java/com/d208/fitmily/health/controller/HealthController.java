@@ -24,7 +24,7 @@ public class HealthController {
     private final HealthService healthService;
 
 
-    @Operation(summary = "건강 상태 등록", description = "JWT에서 추출한 userId로 건강 상태를 저장합니다.")
+    @Operation(summary = "건강 상태 등록", description = "- JWT에서 추출한 userId로 건강 상태를 저장합니다.")
     @PostMapping("health") //주소 아직 안정함
     public ApiResponse<Void> addHealth(@RequestBody AddHealthRequestDto dto, @AuthenticationPrincipal CustomUserDetails principal) throws JsonProcessingException {
         healthService.addHealth(principal.getId(),dto);
@@ -33,7 +33,7 @@ public class HealthController {
 
 
 
-    @Operation(summary = "건강 상태 조회", description = "JWT에서 추출한 userId로 건강 상태를 조회합니다.")
+    @Operation(summary = "건강 상태 조회", description = "- JWT에서 추출한 userId로 건강 상태를 조회합니다.")
     @GetMapping("health")
     public ApiResponse<HealthResponseDto> gethealth(@AuthenticationPrincipal CustomUserDetails principal){
         HealthResponseDto dto = healthService.getLatestHealth(principal.getId());
@@ -41,8 +41,8 @@ public class HealthController {
     }
 
 
-    //건강상태 수정
-    @PatchMapping("/api/health")
+    @Operation(summary = "건강 상태 수정", description = "- 건강상태를 수정합니다")
+    @PatchMapping("health")
     public ApiResponse<UpdateHealthRequestDto> updateHealth(
             @RequestBody UpdateHealthRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails principal) {

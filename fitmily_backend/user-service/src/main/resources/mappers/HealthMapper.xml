@@ -40,7 +40,7 @@
         health_height = #{height},
         health_weight = #{weight},
         health_other_diseases = #{otherDiseases},
-        health_five_major_diseases = #{fiveMajorDiseases},
+        health_five_major_diseases = #{fiveMajorDiseases}
         WHERE user_id = #{userId}
     </update>
 
