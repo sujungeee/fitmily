@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // backend 브랜치만 체크아웃
+                git branch: 'backend', credentialsId: 'gitlab-credentials', url: 'https://lab.ssafy.com/s12-final/S12P31D208.git'
+            }
+        }
+        
+        stage('Build SpringBoot') {
+            steps {
+                dir('fitmily_backend/user-service') {  // 실제 gradlew 파일이 있는 디렉토리로 이동
+                    sh 'chmod +x ./gradlew || true'
+                    sh './gradlew clean build -x test || mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Docker Build & Deploy') {
+            steps {
+                dir('fitmily_backend') {  // docker-compose.yml이 있는 디렉토리로 이동
+                    sh '/usr/local/bin/docker-compose build || docker compose build'
+                    sh '/usr/local/bin/docker-compose up -d || docker compose up -d'
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                // 서비스 시작 대기
+                sh 'sleep 30'
+                sh 'curl -f http://localhost:8080/actuator/health || true'
+            }
+        }
+    }
+    
+    post {
+        always {
+            // 빌드 결과 정리
+            cleanWs()
+        }
+    }
+}
