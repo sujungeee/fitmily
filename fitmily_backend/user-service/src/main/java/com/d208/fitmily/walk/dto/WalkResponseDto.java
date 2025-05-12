@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class WalkResponseDto {
     private Integer walkId;
     private Integer userId;
-    private String  walkRouteImg;
+    private String  RouteImg;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Float distance;

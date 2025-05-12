@@ -13,9 +13,9 @@
             useGeneratedKeys="true"
             keyProperty="walkId">
         INSERT INTO walk (
-        user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_heart_rate)
+        user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance )
         VALUES(
-        #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance}, #{walkHeartRate})
+        #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance})
     </insert>
 
 
@@ -23,9 +23,9 @@
             parameterType="map"
             resultType="com.d208.fitmily.walk.dto.WalkResponseDto">
         SELECT
-        w.walk_id, w.user_id, u.user_nickname, u.user_profile_img, w.walk_route_img, w.walk_start_time, w.walk_end_time, w.walk_distance, w.walk_heart_rate,
-        w.walk_calories,w.walk_step_count FROM walk w
-        LEFT JOIN users u
+        w.walk_id, w.user_id, u.user_nickname, w.walk_route_img, w.walk_start_time, w.walk_end_time, w.walk_distance,
+        w.walk_calories FROM walk w
+        LEFT JOIN user u
         ON u.user_id = w.user_id
         <where>
             <if test="userId != null">

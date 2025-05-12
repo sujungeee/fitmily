@@ -16,15 +16,15 @@
     <!-- 2) findByLoginId -->
     <select id="findByLoginId" resultType="User">
         SELECT
-        user_id            AS id,
-        user_login_id      AS loginId,
-        user_pw            AS password,
-        user_nickname      AS nickname,
-        user_birth         AS birth,
-        user_gender        AS gender,
-        user_refresh_token AS refreshToken,
-        role
-        FROM users
+        user_id              AS userId,
+        user_login_id        AS loginId,
+        user_pw              AS password,
+        user_nickname        AS nickname,
+        user_birth           AS birth,
+        user_gender          AS gender,
+        user_refresh_token   AS refreshToken,
+        user_role            AS role
+        FROM user
         WHERE user_login_id = #{loginId}
     </select>
 

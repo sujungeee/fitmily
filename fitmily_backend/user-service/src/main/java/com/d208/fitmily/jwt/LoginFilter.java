@@ -54,6 +54,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
 
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
+        System.out.println("로그인 성공 userId: " + details.getId());
 
         Integer userId = details.getId();
         String userNickname = details.getNickname();
@@ -69,6 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // refreshToken DB 업데이트
         UserService userService = applicationContext.getBean(UserService.class);
         userService.updateRefreshToken(userId, refreshToken);
+        System.out.println("리프레시 토큰 저장 시도: userId = " + userId);
 
 
         // 응답 작성 , userId, userNickname, userProfileImg

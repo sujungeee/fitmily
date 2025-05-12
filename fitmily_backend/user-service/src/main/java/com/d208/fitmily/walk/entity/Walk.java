@@ -17,7 +17,6 @@ public class Walk {
     private LocalDateTime endTime;
     private Float distance;
     private Integer calories;
-    private Integer stepCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
