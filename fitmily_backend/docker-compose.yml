@@ -1,4 +1,3 @@
-# version: '3.8'
 services:
   mysql:
     image: mysql:8.0
@@ -6,14 +5,16 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: mydb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_USER: d208
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
+    secrets:
+      - mysql_password
 
   mongodb:
     image: mongo:latest
@@ -47,12 +48,25 @@ services:
     container_name: springboot-app
     ports:
       - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+      - JWT_SECRET_FILE=/run/secrets/jwt_secret
     depends_on:
       - mysql
       - redis
       - rabbitmq
     networks:
       - app-network
+    secrets:
+      - mysql_password
+      - jwt_secret
+    command: >
+      /bin/sh -c "
+        export MYSQL_PASSWORD=$$(cat $${MYSQL_PASSWORD_FILE}) &&
+        export JWT_SECRET=$$(cat $${JWT_SECRET_FILE}) &&
+        java -jar app.jar
+      "
 
   nginx:
     image: nginx:latest
@@ -116,3 +130,9 @@ volumes:
   mongodb_data:
   grafana_data:
   jenkins_home:
+
+secrets:
+  mysql_password:
+    file: ./secrets/mysql_password.txt
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt
