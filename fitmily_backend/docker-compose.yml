@@ -50,8 +50,11 @@ services:
       - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
-      - JWT_SECRET_FILE=/run/secrets/jwt_secret
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - ./secrets/mysql_password.txt:/run/secrets/mysql_password:ro
+      - ./secrets/jwt_secret.txt:/run/secrets/jwt_secret:ro
     depends_on:
       - mysql
       - redis
@@ -61,12 +64,11 @@ services:
     secrets:
       - mysql_password
       - jwt_secret
-    command: >
-      /bin/sh -c "
-        export MYSQL_PASSWORD=$$(cat $${MYSQL_PASSWORD_FILE}) &&
-        export JWT_SECRET=$$(cat $${JWT_SECRET_FILE}) &&
-        java -jar app.jar
-      "
+    entrypoint: >
+      sh -c "export MYSQL_PASSWORD=$$(cat /run/secrets/mysql_password) &&
+            export JWT_SECRET=$$(cat /run/secrets/jwt_secret) &&
+            java -jar app.jar"
+
 
   nginx:
     image: nginx:latest
