@@ -25,6 +25,7 @@ import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseSelectBottomSheet
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyExerciseImage
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyExerciseInputText
+import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyExerciseTimeInputText
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyExerciseValueInputText
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.component.MyExerciseTopBar
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
@@ -84,6 +85,11 @@ fun MyExerciseRegisterScreen(
 
             // 운동 목표 영역
             MyExerciseValueInputText()
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 운동한 시간 영역
+            MyExerciseTimeInputText()
         }
 
         if(showBottomSheet) {
