@@ -48,6 +48,11 @@ public class CustomUserDetails implements UserDetails {
         return userEntity.getGender();
     }
 
+    public String getgetZodiacName() { return userEntity.getZodiacName();}
+
+    public Integer getfamilyId() { return userEntity.getFamilyId();}
+
+
 
     @Override
     public boolean isAccountNonExpired() {

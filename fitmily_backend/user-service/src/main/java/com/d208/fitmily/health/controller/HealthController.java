@@ -28,7 +28,7 @@ public class HealthController {
         healthService.addHealth(principal.getId(),dto);
         return ApiResponse.ok(null, "건강 상태가 등록되었습니다");
     }
-    //건강상태 조회
+
 
     @Operation(summary = "건강 상태 조회", description = "JWT에서 추출한 userId로 건강 상태를 조회합니다.")
     @GetMapping("health")
