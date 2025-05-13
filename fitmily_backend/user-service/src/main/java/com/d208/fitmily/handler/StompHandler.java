@@ -1,7 +1,8 @@
-package com.d208.fitmily.chat.handler;
+package com.d208.fitmily.handler;
 
 import com.d208.fitmily.common.exception.BusinessException;
 import com.d208.fitmily.common.exception.ErrorCode;
+import com.d208.fitmily.jwt.JWTUtil;
 import com.d208.fitmily.user.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class StompHandler implements ChannelInterceptor {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final JWTUtil jwtUtil;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -30,7 +32,28 @@ public class StompHandler implements ChannelInterceptor {
 
         // WebSocket 연결 시 JWT 토큰 검증
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            // 기존 코드 유지
+            String authHeader = accessor.getFirstNativeHeader("Authorization");
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+
+                if (!jwtUtil.validateToken(token)) {
+                    throw new BusinessException(ErrorCode.INVALID_TOKEN);
+                }
+                Integer userId = jwtUtil.getUserId(token);
+                String role = jwtUtil.getRole(token);
+
+                CustomUserDetails userDetails = new CustomUserDetails(userId, role);
+
+                Authentication auth = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, Collections.singletonList(new SimpleGrantedAuthority(role))
+
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                accessor.setUser(auth);
+            } else {
+                throw new BusinessException(ErrorCode.INVALID_TOKEN);
+            }
+
         }
 
         // 채팅방 구독 처리
