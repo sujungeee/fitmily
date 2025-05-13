@@ -1,17 +1,39 @@
 pipeline {
     agent any
     
+    // 변수 선언 추가
+    environment {
+        GIT_AUTHOR_ID = ''
+        GIT_AUTHOR_EMAIL = ''
+    }
+    
     stages {
         stage('Checkout') {
             steps {
                 // backend 브랜치만 체크아웃
                 git branch: 'backend', credentialsId: 'gitlab-credentials', url: 'https://lab.ssafy.com/s12-final/S12P31D208.git'
+                
+                // Git 정보를 환경 변수에 저장 (env. 사용)
+                script {
+                    // 환경 변수에 값 저장 - withEnv 블록 사용
+                    def authorName = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                    def authorEmail = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                    
+                    // 변수 설정
+                    env.GIT_AUTHOR_NAME = authorName
+                    env.GIT_AUTHOR_EMAIL = authorEmail
+                    
+                    // 디버깅
+                    echo "Git Author: ${env.GIT_AUTHOR_NAME}, Email: ${env.GIT_AUTHOR_EMAIL}"
+                }
             }
         }
         
+        // 다른 stages는 그대로 유지...
+        
         stage('Build SpringBoot') {
             steps {
-                dir('fitmily_backend/user-service') {  // 실제 gradlew 파일이 있는 디렉토리로 이동
+                dir('fitmily_backend/user-service') {
                     sh 'chmod +x ./gradlew || true'
                     sh './gradlew clean build -x test || mvn clean package -DskipTests'
                 }
@@ -20,7 +42,7 @@ pipeline {
 
         stage('Docker Build & Deploy') {
             steps {
-                dir('fitmily_backend') {  // docker-compose.yml이 있는 디렉토리로 이동
+                dir('fitmily_backend') {
                     sh '/usr/local/bin/docker-compose build || docker compose build'
                     sh '/usr/local/bin/docker-compose up -d || docker compose up -d'
                 }
@@ -29,7 +51,6 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                // 서비스 시작 대기 - 15초로 단축
                 sh 'sleep 15'
                 sh 'curl -f http://localhost:8080/actuator/health || true'
             }
@@ -39,28 +60,23 @@ pipeline {
     post {
         success {
             script {
-                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
-                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
                 mattermostSend (color: 'good', 
-                message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/xxx-your-webhook-endpoint', 
-                channel: 'fitmily-cicd-alerts'
+                message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
+                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
+                channel: 'D208-Build-Bot'
                 )
             }
         }
         failure {
             script {
-                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
-                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
                 mattermostSend (color: 'danger', 
-                message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/xxx-your-webhook-endpoint', 
-                channel: 'fitmily-cicd-alerts'
+                message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
+                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
+                channel: 'D208-Build-Bot'
                 )
             }
         }
         always {
-            // 빌드 결과 정리
             cleanWs()
         }
     }
