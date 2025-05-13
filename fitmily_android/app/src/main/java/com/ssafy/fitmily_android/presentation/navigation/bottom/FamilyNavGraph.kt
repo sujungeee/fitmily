@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.ssafy.fitmily_android.presentation.ui.main.family.FamilyScreen
+import com.ssafy.fitmily_android.presentation.ui.main.family.detail.FamilyDetailScreen
 
 fun NavGraphBuilder.familyNavGraph(navController: NavHostController) {
     navigation(
@@ -16,8 +17,8 @@ fun NavGraphBuilder.familyNavGraph(navController: NavHostController) {
         }
 
         // TODO
-        composable("family/detail") {
-            FamilyScreen(navController)
+        composable("family/main/detail") {
+            FamilyDetailScreen(navController)
         }
     }
 }
