@@ -26,6 +26,7 @@ public class UserController {
         userService.joinprocess(joinRequestDTO);
         return ApiResponse.ok(null, "회원가입 성공");
     }
+
     // 실제 인증은 LoginFilter에서 진행함 이건 그냥 swagger용 컨트롤러임
     @Operation(summary = "로그인", description = "- ID, PW로 로그인하고 AccessToken, RefreshToken 발급")
     @PostMapping("/auth/login")
