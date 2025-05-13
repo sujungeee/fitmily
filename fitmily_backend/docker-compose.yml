@@ -73,6 +73,7 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx
+    restart: always  # 서버 재시작이나 충돌시 항상 재시작
     ports:
       - "80:80"
       - "443:443"  # HTTPS 포트 추가
@@ -107,9 +108,11 @@ services:
       - app-network
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    # image: jenkins/jenkins:lts-jdk17
+    image: custom-jenkins:latest  # 커스텀 이미지 사용
     container_name: jenkins
     user: root
+    restart: always  # 서버 재시작이나 충돌시 항상 재시작
     ports:
       - "8080:8080"
       - "50000:50000"
