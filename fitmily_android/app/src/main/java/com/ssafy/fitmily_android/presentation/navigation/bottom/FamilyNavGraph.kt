@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.ssafy.fitmily_android.presentation.ui.main.family.FamilyScreen
 import com.ssafy.fitmily_android.presentation.ui.main.family.detail.FamilyDetailScreen
+import com.ssafy.fitmily_android.presentation.ui.main.family.exercise.FamilyExerciseScreen
 
 fun NavGraphBuilder.familyNavGraph(navController: NavHostController) {
     navigation(
@@ -16,9 +17,12 @@ fun NavGraphBuilder.familyNavGraph(navController: NavHostController) {
             FamilyScreen(navController)
         }
 
-        // TODO
-        composable("family/main/detail") {
+        composable("family/detail") {
             FamilyDetailScreen(navController)
+        }
+
+        composable("family/exercise") {
+            FamilyExerciseScreen(navController)
         }
     }
 }
