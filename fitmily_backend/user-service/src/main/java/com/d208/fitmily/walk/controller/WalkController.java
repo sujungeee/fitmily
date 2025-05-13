@@ -44,6 +44,12 @@ public class WalkController {
         // 다음 단계에서 Redis 저장 추가
     }
 
+    @GetMapping("/gps/{userId}")
+    public ApiResponse<List<GpsDto>> getGpsList(@PathVariable Integer userId) {
+        List<GpsDto> gpsList = gpsRedisService.getGpsListByUserId(userId);
+        return ApiResponse.ok(gpsList,"산책 gps데이터 조회완료");
+    }
+
 
     @Operation(summary = "산책 종료", description = "산책 중지 시점 데이터를 저장합니다. ")
     @PostMapping("/walks/end")
