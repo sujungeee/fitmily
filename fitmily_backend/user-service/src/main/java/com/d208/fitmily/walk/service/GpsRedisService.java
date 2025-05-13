@@ -19,10 +19,10 @@ public class GpsRedisService {
     private final ObjectMapper objectMapper;         // Jackson의 JSON 변환기
 
     //gps 데이터 저장
-    public void saveGps(GpsDto gpsDto) {
+    public void saveGps( Integer userId,GpsDto gpsDto) {
         try {
             // key 설정
-            String key = "walk:gps:" + gpsDto.getUserId();
+            String key = "walk:gps:" + userId;
 
             //  GpsDto → JSON 문자열로 변환
             String jsonValue = objectMapper.writeValueAsString(gpsDto);
