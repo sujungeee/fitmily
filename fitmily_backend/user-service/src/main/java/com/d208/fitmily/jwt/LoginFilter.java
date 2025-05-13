@@ -54,9 +54,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
 
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
+        System.out.println("로그인 성공 userId: " + details.getId());
 
         Integer userId = details.getId();
         String userNickname = details.getNickname();
+        Integer familyId = details.getfamilyId();
+        String zodiacName = details.getgetZodiacName();
+
 
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -69,18 +73,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // refreshToken DB 업데이트
         UserService userService = applicationContext.getBean(UserService.class);
         userService.updateRefreshToken(userId, refreshToken);
+        System.out.println("리프레시 토큰 저장 시도: userId = " + userId);
 
 
-        // 응답 작성 , userId, userNickname, userProfileImg
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        Map<String, Object> tokenMap = new LinkedHashMap<>(); //LinkedHashMap 쓴 이유:선입선출(FIFO)의 순서를 지켜서 출력위해
+
+        Map<String, Object> tokenMap   = new LinkedHashMap<>(); //LinkedHashMap 쓴 이유:선입선출(FIFO)의 순서를 지켜서 출력위해
         tokenMap.put("userId", userId);
         tokenMap.put("userNickname", userNickname);
         tokenMap.put("accessToken", accessToken);
         tokenMap.put("refreshToken", refreshToken);
+        tokenMap.put("familyId", familyId);
+        tokenMap.put("zodiacName", zodiacName);
 
-        new ObjectMapper().writeValue(response.getWriter(), tokenMap);
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+        responseMap.put("data", tokenMap);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        new ObjectMapper().writeValue(response.getWriter(), responseMap);
+
         System.out.println("로그인 성공");
     }
 

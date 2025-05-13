@@ -1,6 +1,6 @@
 package com.d208.fitmily.config;
 
-import com.d208.fitmily.chat.handler.StompHandler;
+import com.d208.fitmily.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;

@@ -1,8 +1,10 @@
-package com.d208.fitmily.chat.handler;
+package com.d208.fitmily.handler;
 
 import com.d208.fitmily.common.exception.BusinessException;
 import com.d208.fitmily.common.exception.ErrorCode;
+import com.d208.fitmily.jwt.JWTUtil;
 import com.d208.fitmily.user.dto.CustomUserDetails;
+import com.d208.fitmily.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.Message;
@@ -12,6 +14,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.Authentication;
 
@@ -23,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class StompHandler implements ChannelInterceptor {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final JWTUtil jwtUtil;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -30,7 +34,34 @@ public class StompHandler implements ChannelInterceptor {
 
         // WebSocket 연결 시 JWT 토큰 검증
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            // 기존 코드 유지
+            String authHeader = accessor.getFirstNativeHeader("Authorization");
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+
+                if (!jwtUtil.validateToken(token)) {
+                    throw new BusinessException(ErrorCode.INVALID_TOKEN);
+                }
+
+                Integer userId = jwtUtil.getUserId(token);
+                String role = jwtUtil.getRole(token);
+
+                User user = new User();
+                user.setUserId(userId);
+                user.setPassword("temppassword"); // 비밀번호는 의미 없음
+                user.setRole(role);
+
+                CustomUserDetails userDetails = new CustomUserDetails(user);
+
+                // 인증 객체를 생성하는거임 그리고 이 객체를 넘기기
+                Authentication auth = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+
+                        accessor.setUser(auth);
+            } else {
+                throw new BusinessException(ErrorCode.INVALID_TOKEN);
+            }
         }
 
         // 채팅방 구독 처리
