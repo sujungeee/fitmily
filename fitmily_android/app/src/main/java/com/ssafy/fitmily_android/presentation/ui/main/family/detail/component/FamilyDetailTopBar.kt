@@ -27,7 +27,8 @@ import com.ssafy.fitmily_android.ui.theme.mainWhite
 @Composable
 fun FamilyDetailTopBar (
     navController: NavHostController,
-    text: String
+    text: String,
+    onClickBottomSheet: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -52,7 +53,7 @@ fun FamilyDetailTopBar (
         Row(
             modifier = Modifier
                 .align(Alignment.Center)
-                .clickable {  },
+                .clickable { onClickBottomSheet() },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

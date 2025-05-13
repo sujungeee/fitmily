@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.kizitonwose.calendar.sample.compose.FamilyWeekCalendar
+import com.ssafy.fitmily_android.presentation.ui.main.family.detail.component.FamilyDateBottomSheet
 import com.ssafy.fitmily_android.presentation.ui.main.family.detail.component.FamilyStatsItem
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.component.FamilyDetailTopBar
 import com.ssafy.fitmily_android.ui.theme.Typography
@@ -31,6 +32,7 @@ import com.ssafy.fitmily_android.ui.theme.familyFirst
 import com.ssafy.fitmily_android.ui.theme.familySecond
 import com.ssafy.fitmily_android.ui.theme.familyThird
 import com.ssafy.fitmily_android.ui.theme.mainBlack
+import java.time.LocalDate
 
 @Composable
 fun FamilyDetailScreen(
@@ -39,6 +41,8 @@ fun FamilyDetailScreen(
 ) {
 
     var monthText by remember { mutableStateOf("") }
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     val statsList = listOf(
         FamilyMemberStats("예지렐라", familyFirst, 100, 1550, "6시간 23분"),
@@ -54,7 +58,8 @@ fun FamilyDetailScreen(
         topBar = {
             FamilyDetailTopBar(
                 navController = navController,
-                text = monthText
+                text = monthText,
+                onClickBottomSheet = { showBottomSheet = true }
             )
         }
     ) { innerPadding ->
@@ -96,13 +101,26 @@ fun FamilyDetailScreen(
                         stats = stats,
                         onClick = {
                             navController.navigate("family/exercise")
-                            Log.d("test1234", "FamilyDetailScreen에서 FamilyStatsItem 클릭됌")
                         }
                     )
                 }
                 Spacer(Modifier.height(20.dp))
             }
         }
+
+        FamilyDateBottomSheet(
+            visible = showBottomSheet,
+            selectedDate = selectedDate,
+            onDateChange = { selectedDate = it },
+            onTodayClick = { selectedDate = LocalDate.now()},
+            onConfirmClick = {
+                /* TODO 날짜 선택 확정 로직 */
+                monthText = "${selectedDate.year}.${selectedDate.monthValue}"
+                showBottomSheet = false
+            },
+            onDismissClick = { showBottomSheet = false }
+
+        )
     }
 }
 
