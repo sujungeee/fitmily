@@ -1,7 +1,9 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my.notification.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -47,11 +49,22 @@ fun FamilyDetailTopBar (
             )
         }
 
-        Text(
-            text = text,
-            style = Typography.headlineMedium,
-            color = mainBlack,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        Row(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .clickable {  },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = text,
+                style = Typography.headlineMedium,
+                color = mainBlack,
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.bottom_sheet_open),
+                contentDescription = "날짜 바텀시트 띄우는 버튼",
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
     }
 }
