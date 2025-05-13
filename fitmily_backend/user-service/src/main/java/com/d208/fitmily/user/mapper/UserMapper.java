@@ -9,12 +9,13 @@ import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
 
+    // 아이디 중복 조회
     boolean existsByLoginId(@Param("loginId") String loginId);
 
     // 로그인 아이디로 User 조회
     User findByLoginId(@Param("loginId") String loginId);
 
-    // 회원 정보 삽입 (INSERT)
+    // 회원 가입
     int insert(User user);
 
     // 리프레시 토큰 업데이트
@@ -31,6 +32,9 @@ public interface UserMapper {
             @Param("userId") Integer userId,
             @Param("refreshToken") String refreshToken
     );
+
+    // userId 로 조회
+    User selectById(Integer userId);
 
 
 }

@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c5cbf38b-820c-4c8f-b5f1-48994acc8996" name="변경" comment="" />
+    <list default="true" id="c5cbf38b-820c-4c8f-b5f1-48994acc8996" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/handler/StompHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/handler/StompHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/jwt/JWTFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/jwt/JWTFilter.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,28 +59,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.user-service [:com.d208.user_service.UserServiceApplication.main()].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "S12P31D208-117-산책-기능",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/자율208/S12P31D208/fitmily_backend"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.user-service [:com.d208.fitmily.FitmilyApplication.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.user-service [:com.d208.user_service.UserServiceApplication.main()].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;S12P31D208-117-산책-기능&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/자율208/S12P31D208/fitmily_backend&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;모듈&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.d208.fitmily.health.mapper" />
       <recent name="com.d208.user_service.user.controller" />
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="UserServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.d208.user_service.UserServiceApplication" />
+    <configuration name="FitmilyApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.d208.fitmily.FitmilyApplication" />
       <module name="user-service.main" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.d208.user_service.*" />
+          <option name="PATTERN" value="com.d208.fitmily.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -86,7 +96,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="애플리케이션.UserServiceApplication" />
+        <item itemvalue="애플리케이션.FitmilyApplication" />
       </list>
     </recent_temporary>
   </component>
