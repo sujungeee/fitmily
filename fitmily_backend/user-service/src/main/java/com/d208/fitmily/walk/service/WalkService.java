@@ -6,11 +6,13 @@ import com.d208.fitmily.health.service.HealthService;
 import com.d208.fitmily.user.entity.User;
 import com.d208.fitmily.user.service.UserService;
 import com.d208.fitmily.walk.dto.EndWalkRequestDto;
+import com.d208.fitmily.walk.dto.UserDto;
 import com.d208.fitmily.walk.dto.WalkResponseDto;
 import com.d208.fitmily.walk.entity.Walk;
 import com.d208.fitmily.walk.mapper.WalkMapper;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,8 @@ public class WalkService {
     private final WalkMapper walkMapper;
     private final UserService userService;
     private final HealthService healthService;
+    private final StringRedisTemplate redisTemplate;
+
 
     // 산책 중지 (칼로리 계산에서 막힘 일단 패스 )
     @Transactional
@@ -66,6 +70,26 @@ public class WalkService {
     public Boolean walkGoalExists(Integer userId){
         return walkMapper.walkGoalExists(userId);
     }
+
+    // 산책중인 가족 구성원 조회
+//    public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
+//
+//        // familyId로 가족 구성원의 userId 다 리스트로 가져옴
+//        List<Integer> userIds = familyService.getUserIdsByFamilyId(familyId);
+//        List<UserDto> result = new ArrayList<>();
+//
+//        for (Integer userId : userIds) {
+//            if (redisTemplate.hasKey("walk:gps:" + userId)) {
+//                result.add(UserDto.builder()
+//                        .userId(user.getUserId())
+////                        .name(user.getName())
+////                        .profileImg(user.getProfileImg())
+//                        .build());
+//            }
+//        }
+//        return result;
+//            }
+//        }
 }
 
 
