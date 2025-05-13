@@ -61,7 +61,7 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         // 토큰 유효 → 사용자 정보 가져와서 Authentication 설정
-        Integer  userId = jwtUtil.getUserId(token);
+        Integer userId = jwtUtil.getUserId(token);
         String role = jwtUtil.getRole(token);
 
         // 실제 DB에서 UserEntity 조회 후 사용하세요
