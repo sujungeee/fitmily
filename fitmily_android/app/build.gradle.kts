@@ -94,4 +94,7 @@ dependencies {
 
     // Datetime
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+
+    // WheelPicker
+    implementation("com.github.commandiron:WheelPickerCompose:1.1.11")
 }
