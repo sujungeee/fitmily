@@ -39,7 +39,7 @@ public class WalkController {
     public void handleGps(@Payload GpsDto gpsDto) {
         gpsRedisService.saveGps(gpsDto);
 
-        String topic = "/sub/walk/gps/" + gpsDto.getUserId();
+        String topic = "/topic/walk/gps/" + gpsDto.getUserId();
         messagingTemplate.convertAndSend(topic, gpsDto); //브로드캐스팅 역할
         // 다음 단계에서 Redis 저장 추가
     }
