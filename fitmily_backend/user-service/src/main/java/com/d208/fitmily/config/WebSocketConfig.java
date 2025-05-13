@@ -2,6 +2,7 @@ package com.d208.fitmily.config;
 
 import com.d208.fitmily.chat.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -14,6 +15,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WebSocketConfig.class);
+
     private final StompHandler stompHandler;
 
     @Override
@@ -22,6 +25,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/topic");
         // 메시지 송신
         registry.setApplicationDestinationPrefixes("/app");
+        // 사용자 지정 수신 (/user/{username}/queue/messages)
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -30,11 +35,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/api/ws-connect")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
+        log.info("WebSocket 엔드포인트 등록 완료: /api/ws-connect");
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         // STOMP 메시지 처리 전 인터셉터 등록
         registration.interceptors(stompHandler);
+        log.info("StompHandler 인터셉터 등록 완료");
     }
 }
