@@ -73,7 +73,7 @@
         WHERE user_id = #{userId}
     </select>
 
-    <select id="getUserDtoById" resultType="com.d208.fitmily.user.dto.UserDto">
+    <select id="getUserDtoById" resultType="com.d208.fitmily.walk.dto.UserDto">
         SELECT
         user_id AS userId,
         user_family_sequence AS userFamilySequence,
