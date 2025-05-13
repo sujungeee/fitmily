@@ -22,7 +22,7 @@ public class SwaggerConfig {
         );
 
 //        Server server = new Server();
-//        server.setUrl("https://j12d208.p.ssafy.io");
+//        server.setUrl("https://k12d208.p.ssafy.io");
 
         return new OpenAPI()
                 .components(new Components())
