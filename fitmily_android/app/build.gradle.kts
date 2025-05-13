@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.dagger.hilt.android)
 }
 
 android {
@@ -14,7 +16,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,11 +29,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
@@ -40,7 +41,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -65,4 +65,27 @@ dependencies {
 
     // 네이버 지도
     implementation("com.naver.maps:map-sdk:3.21.0")
+
+    // dagger hilt
+    implementation("com.google.dagger:hilt-android:2.56.2")
+
+    // ksp
+    ksp("com.google.dagger:hilt-compiler:2.56.2")
+
+    // hilt compose
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    // retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // preference data store
+    implementation("androidx.datastore:datastore-preferences:1.1.6")
+
+    // lifecycle
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
 }

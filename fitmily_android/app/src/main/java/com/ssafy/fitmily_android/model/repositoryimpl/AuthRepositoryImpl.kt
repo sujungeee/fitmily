@@ -1,0 +1,35 @@
+package com.ssafy.fitmily_android.model.repositoryimpl
+
+import android.util.Log
+import com.ssafy.fitmily_android.domain.repository.AuthRepository
+import com.ssafy.fitmily_android.model.dto.request.JoinRequest
+import com.ssafy.fitmily_android.model.dto.request.LoginRequest
+import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
+import com.ssafy.fitmily_android.model.dto.response.LoginResponse
+import com.ssafy.fitmily_android.model.dto.response.ReissueResponse
+import com.ssafy.fitmily_android.model.service.AuthService
+import jakarta.inject.Inject
+
+class AuthRepositoryImpl @Inject constructor(
+    private val authService: AuthService
+): AuthRepository {
+    override suspend fun login(id: String, pwd: String): LoginResponse {
+        return authService.login(LoginRequest(id, pwd))
+    }
+
+    override suspend fun logout(): Boolean {
+        return authService.logout()
+    }
+
+    override suspend fun reissue(refreshToken: String): ReissueResponse {
+        return authService.reissue(ReissueRequest(refreshToken))
+    }
+
+    override suspend fun checkDuplId(userId: String): Boolean {
+        return authService.checkDuplId(userId)
+    }
+
+    override suspend fun join(userLoginId: String, userPw: String, userNickname: String, userBirth: String, userGender: Int): Boolean {
+        return authService.join(JoinRequest(userLoginId, userPw, userNickname, userBirth, userGender))
+    }
+}
