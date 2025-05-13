@@ -47,7 +47,7 @@ fun FamilyScreen(
             FamilyCalendar(
                 modifier = Modifier.weight(1f),
                 onDayClick = { day ->
-                    navController.navigate("family/main/detail")
+                    navController.navigate("family/detail")
                 }
             )
             FamilyNameDotFlowRow(

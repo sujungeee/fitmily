@@ -95,7 +95,7 @@ fun FamilyDetailScreen(
                     FamilyStatsItem(
                         stats = stats,
                         onClick = {
-                            /* TODO 가족 운동 상세 화면으로 가기 */
+                            navController.navigate("family/exercise")
                             Log.d("test1234", "FamilyDetailScreen에서 FamilyStatsItem 클릭됌")
                         }
                     )
