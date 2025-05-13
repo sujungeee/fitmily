@@ -88,4 +88,10 @@ dependencies {
 
     // lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
+
+    // kizitonwose
+    implementation("com.kizitonwose.calendar:compose:2.6.2")
+
+    // Datetime
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
 }
