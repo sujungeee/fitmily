@@ -5,6 +5,7 @@ import com.d208.fitmily.common.response.ApiResponse;
 import com.d208.fitmily.user.dto.CustomUserDetails;
 import com.d208.fitmily.walk.dto.EndWalkRequestDto;
 import com.d208.fitmily.walk.dto.GpsDto;
+import com.d208.fitmily.walk.dto.UserDto;
 import com.d208.fitmily.walk.dto.WalkResponseDto;
 import com.d208.fitmily.walk.service.GpsRedisService;
 import com.d208.fitmily.walk.service.WalkService;
@@ -45,7 +46,7 @@ public class WalkController {
     }
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
-    @GetMapping("/gps/{userId}")
+    @GetMapping("/walks/gps/{userId}")
     public ApiResponse<List<GpsDto>> getGpsList(@PathVariable Integer userId) {
         List<GpsDto> gpsList = gpsRedisService.getGpsListByUserId(userId);
         return ApiResponse.ok(gpsList,"산책 gps데이터 조회완료");
@@ -60,6 +61,12 @@ public class WalkController {
         return ApiResponse.ok(null,"산책이 종료됌");
     }
 
+    @GetMapping("/api/family/{familyId}/walking-members")
+    public ApiResponse<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
+        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
+        return ApiResponse.ok(walkingUsers, "산책중인 가족인원 조회완료");
+        
+    }
 
     @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다. ")
     @GetMapping("/walks")
