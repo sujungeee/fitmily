@@ -55,7 +55,7 @@ fun FamilyExerciseItem(
                 )
             }
 
-            Spacer(Modifier.width(20.dp))
+            Spacer(Modifier.width(12.dp))
 
             Column {
                 // 운동 이름
