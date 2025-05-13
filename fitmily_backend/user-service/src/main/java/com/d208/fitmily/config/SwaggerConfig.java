@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,14 +22,14 @@ public class SwaggerConfig {
                 .bearerFormat("JWT")
         );
 
-//        Server server = new Server();
-//        server.setUrl("https://j12d208.p.ssafy.io");
+        Server server = new Server();
+        server.setUrl("https://k12d208.p.ssafy.io");
 
         return new OpenAPI()
                 .components(new Components())
                 .info(apiInfo())
                 .addSecurityItem(securityRequirement)
-//                .addServersItem(server) //서버 열렸을때 주석 풀기
+                .addServersItem(server) //서버 열렸을때 주석 풀기
                 .components(components);
     }
     private Info apiInfo() {
