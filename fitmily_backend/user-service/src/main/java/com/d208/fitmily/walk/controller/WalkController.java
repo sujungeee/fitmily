@@ -44,6 +44,7 @@ public class WalkController {
         // 다음 단계에서 Redis 저장 추가
     }
 
+    @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/gps/{userId}")
     public ApiResponse<List<GpsDto>> getGpsList(@PathVariable Integer userId) {
         List<GpsDto> gpsList = gpsRedisService.getGpsListByUserId(userId);
