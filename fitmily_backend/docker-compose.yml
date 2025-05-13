@@ -79,10 +79,10 @@ services:
       - "80:80"
       - "443:443"  # HTTPS 포트 추가
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      # - ./nginx/conf.d:/etc/nginx/conf.d
       - /etc/letsencrypt/live/k12d208.p.ssafy.io:/etc/nginx/certs:ro
       - /etc/letsencrypt/archive/k12d208.p.ssafy.io:/etc/nginx/archive:ro
-      # - /home/ubuntu/S12P31D208/S12P31D208/fitmily_backend/nginx/conf.d:/etc/nginx/conf.d  # 절대경로로 변경했음.
+      - /home/ubuntu/S12P31D208/S12P31D208/fitmily_backend/nginx/conf.d:/etc/nginx/conf.d  # 절대경로로 변경했음.
       # - /etc/letsencrypt/live/k12d208.p.ssafy.io:/etc/nginx/certs  # 인증서 경로 마운트
       # - /etc/letsencrypt/archive:/etc/nginx/archive  # 필요한 경우
     depends_on:
