@@ -25,6 +25,16 @@ pipeline {
             }
         }
         
+        // 추가: 워크스페이스 및 경로 디버깅
+        stage('Debug Environment') {
+            steps {
+                sh 'echo "Current working directory: $(pwd)"'
+                sh 'echo "Service path: ${SERVICE_PATH}"'
+                sh 'ls -la'
+                sh 'ls -la fitmily_backend || true'
+            }
+        }
+        
         // EC2 서비스 디렉토리 최신화 단계 추가
         stage('Update Service Code') {
             steps {
@@ -34,22 +44,42 @@ pipeline {
             }
         }
         
-        // 시크릿 파일 안전하게 생성하는 단계 추가
+        // 시크릿 파일 생성 - 두 가지 방법 모두 시도
         stage('Prepare Secrets') {
             steps {
-                // Jenkins Credentials에서 비밀 정보 안전하게 가져와 파일 생성
+                sh 'echo "Creating secret files..."'
+                
+                // 1. Jenkins 워크스페이스에 시크릿 생성
+                dir('fitmily_backend') {
+                    sh 'mkdir -p secrets'
+                    withCredentials([
+                        string(credentialsId: 'mysql-password', variable: 'MYSQL_PWD'),
+                        string(credentialsId: 'mysql-root-password', variable: 'MYSQL_ROOT_PWD'),
+                        string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET_KEY')
+                    ]) {
+                        sh '''
+                            echo "$MYSQL_PWD" > secrets/mysql_password.txt
+                            echo "$MYSQL_ROOT_PWD" > secrets/mysql_root_password.txt
+                            echo "$JWT_SECRET_KEY" > secrets/jwt_secret.txt
+                            chmod 600 secrets/*.txt
+                            ls -la secrets/
+                        '''
+                    }
+                }
+                
+                // 2. EC2 서비스 디렉토리에도 시크릿 생성
                 withCredentials([
                     string(credentialsId: 'mysql-password', variable: 'MYSQL_PWD'),
                     string(credentialsId: 'mysql-root-password', variable: 'MYSQL_ROOT_PWD'),
                     string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET_KEY')
                 ]) {
-                    // EC2 서비스 디렉토리에 시크릿 파일 생성
                     sh '''
                         mkdir -p ${SERVICE_PATH}/secrets
                         echo "$MYSQL_PWD" > ${SERVICE_PATH}/secrets/mysql_password.txt
                         echo "$MYSQL_ROOT_PWD" > ${SERVICE_PATH}/secrets/mysql_root_password.txt
                         echo "$JWT_SECRET_KEY" > ${SERVICE_PATH}/secrets/jwt_secret.txt
                         chmod 600 ${SERVICE_PATH}/secrets/*.txt
+                        ls -la ${SERVICE_PATH}/secrets/
                     '''
                 }
             }
@@ -66,6 +96,9 @@ pipeline {
 
         stage('Docker Build & Deploy') {
             steps {
+                // 빌드된 jar 파일을 서비스 디렉토리로 복사 (필요시)
+                sh 'cp -f fitmily_backend/user-service/build/libs/*.jar ${SERVICE_PATH}/user-service/build/libs/ || true'
+                
                 // 서비스 디렉토리에서 도커 작업 수행
                 sh 'cd ${SERVICE_PATH} && /usr/local/bin/docker-compose build || docker compose build'
                 sh 'cd ${SERVICE_PATH} && /usr/local/bin/docker-compose up -d || docker compose up -d'
