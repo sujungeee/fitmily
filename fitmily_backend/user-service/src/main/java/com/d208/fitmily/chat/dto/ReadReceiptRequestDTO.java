@@ -1,5 +1,4 @@
 package com.d208.fitmily.chat.dto;
-// 메시지 요청 DTO
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageRequestDTO {
-    private String messageType;
-    private String content;
-    private String imageUrl;
+public class ReadReceiptRequestDTO {
+    private String messageId;  // 마지막으로 읽은 메시지 ID
 }
