@@ -1,15 +1,15 @@
 pipeline {
     agent any
     
-    // 변수 선언 추가
     environment {
         GIT_AUTHOR_ID = ''
         GIT_AUTHOR_EMAIL = ''
+        // EC2 서비스 경로 정의
+        SERVICE_PATH = '/home/ubuntu/S12P31D208/S12P31D208/fitmily_backend'
     }
     
     stages {
         stage('Checkout') {
-            // 기존 코드 유지
             steps {
                 git branch: 'backend', credentialsId: 'gitlab-credentials', url: 'https://lab.ssafy.com/s12-final/S12P31D208.git'
                 
@@ -25,8 +25,37 @@ pipeline {
             }
         }
         
+        // EC2 서비스 디렉토리 최신화 단계 추가
+        stage('Update Service Code') {
+            steps {
+                sh 'echo "Updating service code on EC2..."'
+                // EC2 서비스 디렉토리에서 최신 코드 가져오기
+                sh 'cd ${SERVICE_PATH} && git pull origin backend'
+            }
+        }
+        
+        // 시크릿 파일 안전하게 생성하는 단계 추가
+        stage('Prepare Secrets') {
+            steps {
+                // Jenkins Credentials에서 비밀 정보 안전하게 가져와 파일 생성
+                withCredentials([
+                    string(credentialsId: 'mysql-password', variable: 'MYSQL_PWD'),
+                    string(credentialsId: 'mysql-root-password', variable: 'MYSQL_ROOT_PWD'),
+                    string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET_KEY')
+                ]) {
+                    // EC2 서비스 디렉토리에 시크릿 파일 생성
+                    sh '''
+                        mkdir -p ${SERVICE_PATH}/secrets
+                        echo "$MYSQL_PWD" > ${SERVICE_PATH}/secrets/mysql_password.txt
+                        echo "$MYSQL_ROOT_PWD" > ${SERVICE_PATH}/secrets/mysql_root_password.txt
+                        echo "$JWT_SECRET_KEY" > ${SERVICE_PATH}/secrets/jwt_secret.txt
+                        chmod 600 ${SERVICE_PATH}/secrets/*.txt
+                    '''
+                }
+            }
+        }
+        
         stage('Build SpringBoot') {
-            // 기존 코드 유지
             steps {
                 dir('fitmily_backend/user-service') {
                     sh 'chmod +x ./gradlew || true'
@@ -36,29 +65,22 @@ pipeline {
         }
 
         stage('Docker Build & Deploy') {
-            // 기존 코드 유지
             steps {
-                dir('fitmily_backend') {
-                    sh '/usr/local/bin/docker-compose build || docker compose build'
-                    sh '/usr/local/bin/docker-compose up -d || docker compose up -d'
-                }
+                // 서비스 디렉토리에서 도커 작업 수행
+                sh 'cd ${SERVICE_PATH} && /usr/local/bin/docker-compose build || docker compose build'
+                sh 'cd ${SERVICE_PATH} && /usr/local/bin/docker-compose up -d || docker compose up -d'
             }
         }
         
-        // 새로운 단계 추가: Nginx 설정 적용 및 재시작
         stage('Update Nginx Config') {
             steps {
-                // Nginx 설정 파일 확인 및 재시작
-                dir('fitmily_backend') {
-                    sh 'echo "Applying latest Nginx configuration..."'
-                    sh 'ls -la nginx/conf.d/'  // 설정 파일 존재 확인
-                    sh '/usr/local/bin/docker-compose restart nginx || docker compose restart nginx'
-                }
+                sh 'echo "Applying latest Nginx configuration..."'
+                sh 'cd ${SERVICE_PATH} && ls -la nginx/conf.d/'
+                sh 'cd ${SERVICE_PATH} && /usr/local/bin/docker-compose restart nginx || docker compose restart nginx'
             }
         }
 
         stage('Health Check') {
-            // 기존 코드 유지
             steps {
                 sh 'sleep 15'
                 sh 'curl -f http://localhost:8080/actuator/health || true'
@@ -66,23 +88,24 @@ pipeline {
         }
     }
     
-    // post 섹션 유지
     post {
         success {
             script {
-                mattermostSend (color: 'good', 
-                message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
-                channel: 'D208-Build-Bot'
+                mattermostSend (
+                    color: 'good',
+                    message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)",
+                    endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
+                    channel: 'D208-Build-Bot'
                 )
             }
         }
         failure {
             script {
-                mattermostSend (color: 'danger', 
-                message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
-                channel: 'D208-Build-Bot'
+                mattermostSend (
+                    color: 'danger',
+                    message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)",
+                    endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
+                    channel: 'D208-Build-Bot'
                 )
             }
         }
