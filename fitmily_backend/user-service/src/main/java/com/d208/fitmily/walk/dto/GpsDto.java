@@ -5,9 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
+// gps로 저장할 데이터
+
 public class GpsDto {
-    private Integer userId;
-    private Double latitude;
-    private Double longitude;
+    private Double lat;
+    private Double lon;
     private Long timestamp;
 }
