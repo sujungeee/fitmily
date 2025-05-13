@@ -13,6 +13,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 채팅 메시지 엔티티
+ * MongoDB messages 컬렉션에 저장
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
