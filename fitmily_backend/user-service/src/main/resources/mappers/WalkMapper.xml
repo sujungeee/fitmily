@@ -5,30 +5,52 @@
 
 <mapper namespace="com.d208.fitmily.walk.mapper.WalkMapper">
 
-<!-- useGeneratedKeys = pk   -->
+<!--parameterType 는 {} 으로 넘길데이터의 type임 -->
+
+
     <insert id="insertStopWalk"
             parameterType="Walk"
             useGeneratedKeys="true"
             keyProperty="walkId">
         INSERT INTO walk (
-        exercise_goal_id,
-        user_id,
-        walk_route_img,
-        walk_start_time,
-        walk_end_time,
-        walk_distance,
-        walk_heart_rate,
-        step_count
-        ) VALUES (
-        #{exerciseGoalId},
-        #{userId},
-        #{walkRouteImg},
-        #{walkStartTime},
-        #{walkEndTime},
-        #{walkDistance},
-        #{walkHeartRate},
-        #{stepCount}
-        )
+        user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance )
+        VALUES(
+        #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance})
     </insert>
+
+
+    <select id="selectWalks"
+            parameterType="map"
+            resultType="com.d208.fitmily.walk.dto.WalkResponseDto">
+        SELECT
+        w.walk_id, w.user_id, u.user_nickname, w.walk_route_img, w.walk_start_time, w.walk_end_time, w.walk_distance,
+        w.walk_calories FROM walk w
+        LEFT JOIN user u
+        ON u.user_id = w.user_id
+        <where>
+            <if test="userId != null">
+                AND w.user_id = #{userId}
+            </if>
+            <if test="start != null"><![CDATA[
+        AND w.walk_start_time >= #{start}
+      ]]></if>
+            <if test="end != null"><![CDATA[
+        AND w.walk_end_time   <= #{end}
+      ]]></if>
+        </where>
+        ORDER BY w.walk_start_time DESC
+    </select>
+
+<!-- CURDATE() 는서버의 현재 날짜 불러옴-->
+    <select id="walkGoalExists"
+            parameterType="int"
+            resultType="boolean">
+        SELECT
+        EXISTS (SELECT 1
+                FROM exercise_goal
+                WHERE user_id = #{userId} AND exercise_goal_name = 'walk' AND DATE(exercise_goal_created_at) = CURDATE()
+                )
+    </select>
+
 
 </mapper>

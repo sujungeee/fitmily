@@ -8,7 +8,18 @@ public enum ErrorCode {
     USERNAME_DUPLICATED(4001, "이미 사용 중인 아이디입니다.", HttpStatus.BAD_REQUEST),
     INVALID_TOKEN(4011, "토큰이 없습니다.", HttpStatus.UNAUTHORIZED),
     REFRESH_TOKEN_MISMATCH(4012, "토큰이 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
-    USER_NOT_FOUND(4002, "유저 아이디가 없습니다.", HttpStatus.UNAUTHORIZED)
+    USER_NOT_FOUND(4002, "유저 아이디가 없습니다.", HttpStatus.UNAUTHORIZED),
+
+    // 채팅 관련 오류 코드
+    CHAT_ROOM_NOT_FOUND(4101, "채팅방을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    CHAT_MESSAGE_NOT_FOUND(4102, "메시지를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    CHAT_ACCESS_DENIED(4103, "채팅방 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
+    CHAT_MESSAGE_SEND_FAILED(4104, "메시지 전송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    // FCM 관련 오류 코드
+    FCM_TOKEN_REGISTRATION_FAILED(4201, "FCM 토큰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FCM_NOTIFICATION_FAILED(4202, "FCM 알림 전송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FCM_TOKEN_INVALID(4203, "유효하지 않은 FCM 토큰입니다.", HttpStatus.BAD_REQUEST);
 
     ;
     private final int        code;
