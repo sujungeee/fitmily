@@ -8,6 +8,7 @@ import com.d208.fitmily.common.exception.BusinessException;
 import com.d208.fitmily.common.exception.ErrorCode;
 import com.d208.fitmily.family.mapper.FamilyMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
 
     private final MessageRepository messageRepository;
-    private final FamilyMapper familyMapper; // 더미 매퍼 사용
+    private final FamilyMapper familyMapper;
     private final RedisTemplate<String, Object> redisTemplate;
     private final SimpMessagingTemplate messagingTemplate;
 
+    /**
+     * 채팅 메시지 목록 조회
+     * @param familyId 가족 ID
+     * @param userId 사용자 ID
+     * @param before 특정 시간 이전의 메시지 조회 (페이징)
+     * @param limit 한 번에 조회할 메시지 수
+     * @return 메시지 목록과 추가 메시지 존재 여부
+     */
     public ChatMessagesResponseDTO getMessages(String familyId, String userId, String before, int limit) {
         // 접근 권한 확인
         if (!familyMapper.checkFamilyMembership(familyId, userId)) {
@@ -34,7 +44,7 @@ public class ChatService {
         // 메시지 조회
         List<ChatMessage> messages;
         if (before != null && !before.isEmpty()) {
-            Date beforeDate = new Date(before);
+            Date beforeDate = new Date(Long.parseLong(before));
             messages = messageRepository.findByFamilyIdAndSentAtBeforeOrderBySentAtDesc(familyId, beforeDate, limit);
         } else {
             messages = messageRepository.findByFamilyIdOrderBySentAtDesc(familyId, limit);
@@ -49,11 +59,27 @@ public class ChatService {
         }
 
         // 읽음 처리
-        List<String> messageIds = messages.stream()
-                .map(ChatMessage::getMessageId)
-                .collect(Collectors.toList());
+        if (!messages.isEmpty()) {
+            String newestMessageId = messages.get(0).getMessageId();
 
-        processReadReceipts(messageIds, userId, familyId);
+            try {
+                // 현재 조회된 메시지 중 가장 최신 메시지 ID를 마지막 읽은 메시지로 설정
+                redisTemplate.opsForValue().set("read:" + familyId + ":" + userId, newestMessageId);
+
+                // 안 읽은 메시지 수 초기화
+                redisTemplate.opsForValue().set("unread:" + familyId + ":" + userId, "0");
+
+                // 읽음 처리 업데이트
+                List<String> messageIds = messages.stream()
+                        .map(ChatMessage::getMessageId)
+                        .collect(Collectors.toList());
+
+                processReadReceipts(messageIds, userId, familyId);
+
+            } catch (Exception e) {
+                log.error("Redis 읽음 상태 업데이트 실패: {}", e.getMessage());
+            }
+        }
 
         // DTO 변환
         List<ChatMessageDTO> messageDTOs = messages.stream()
@@ -63,34 +89,32 @@ public class ChatService {
         return new ChatMessagesResponseDTO(messageDTOs, hasMore);
     }
 
-    // Redis 작업 예외 처리 메서드 추가
-    private void safeRedisOperation(Runnable operation) {
-        try {
-            operation.run();
-        } catch (Exception e) {
-            // Redis 오류 무시하고 계속 진행
-            System.out.println("Redis 작업 실패 : " + e.getMessage());
-        }
-    }
-
-    // 메서드 내부에서 Redis 호출 부분 수정
+    /**
+     * 메시지 읽음 처리
+     * @param messageIds 읽은 메시지 ID 목록
+     * @param userId 사용자 ID
+     * @param familyId 가족 ID
+     */
     private void processReadReceipts(List<String> messageIds, String userId, String familyId) {
         if (messageIds.isEmpty()) return;
 
-        // MongoDB 읽음 상태 업데이트
-        messageRepository.updateReadStatus(messageIds, userId, familyId);
-
-        // 읽음 상태 변경 브로드캐스트 (Redis 오류 무시)
         try {
+            // MongoDB 읽음 상태 업데이트
+            messageRepository.updateReadStatus(messageIds, userId, familyId);
+
+            // 읽음 상태 변경 브로드캐스트
             messagingTemplate.convertAndSend(
                     "/topic/chat/family/" + familyId + "/read",
                     messageIds
             );
         } catch (Exception e) {
-            System.out.println("WebSocket 브로드캐스트 실패 (무시됨): " + e.getMessage());
+            log.error("읽음 처리 실패: {}", e.getMessage());
         }
     }
 
+    /**
+     * 모델 DTO 변환
+     */
     private ChatMessageDTO convertToDTO(ChatMessage message) {
         return ChatMessageDTO.builder()
                 .messageId(message.getMessageId())
@@ -108,30 +132,33 @@ public class ChatService {
 
         return ChatMessageDTO.SenderInfoDTO.builder()
                 .nickname(senderInfo.getNickname())
-                .profileColor(senderInfo.getProfileColor())
-                .profileImageUrl(senderInfo.getProfileImageUrl())
+                .familySequence(senderInfo.getFamilySequence())
                 .build();
     }
 
     private ChatMessageDTO.MessageContentDTO convertContentToDTO(ChatMessage.MessageContent content) {
         if (content == null) return null;
 
-//        List<ChatMessageDTO.MentionDTO> mentions = null;
-//        if (content.getMentions() != null) {
-//            mentions = content.getMentions().stream()
-//                    .map(mention -> ChatMessageDTO.MentionDTO.builder()
-//                            .userId(mention.getUserId())
-//                            .nickname(mention.getNickname())
-//                            .startIndex(mention.getStartIndex())
-//                            .endIndex(mention.getEndIndex())
-//                            .build())
-//                    .collect(Collectors.toList());
-//        }
-
         return ChatMessageDTO.MessageContentDTO.builder()
-                .type(content.getType())
+                .messageType(content.getMessageType())
                 .text(content.getText())
                 .imageUrl(content.getImageUrl())
                 .build();
+    }
+
+    /**
+     * 안 읽은 메시지 수 조회
+     * @param familyId 가족 ID
+     * @param userId 사용자 ID
+     * @return 안 읽은 메시지 수
+     */
+    public int getUnreadCount(String familyId, String userId) {
+        try {
+            String unreadCountStr = (String) redisTemplate.opsForValue().get("unread:" + familyId + ":" + userId);
+            return unreadCountStr != null ? Integer.parseInt(unreadCountStr) : 0;
+        } catch (Exception e) {
+            log.error("안 읽은 메시지 수 조회 실패: {}", e.getMessage());
+            return 0;
+        }
     }
 }
