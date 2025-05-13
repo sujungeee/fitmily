@@ -55,8 +55,8 @@ pipeline {
             script {
                 mattermostSend (color: 'good', 
                 message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_ID}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/xxx-your-webhook-endpoint', 
-                channel: 'fitmily-cicd-alerts'
+                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
+                channel: 'D208-Build-Bot'
                 )
             }
         }
