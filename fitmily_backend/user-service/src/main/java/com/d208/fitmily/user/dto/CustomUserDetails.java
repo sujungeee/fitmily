@@ -22,7 +22,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public Integer getId() {
-        return userEntity.getId();
+        return userEntity.getUserId();
     }
 
     @Override
@@ -47,6 +47,11 @@ public class CustomUserDetails implements UserDetails {
     public String getGender() {
         return userEntity.getGender();
     }
+
+    public String getgetZodiacName() { return userEntity.getZodiacName();}
+
+    public Integer getfamilyId() { return userEntity.getFamilyId();}
+
 
 
     @Override
