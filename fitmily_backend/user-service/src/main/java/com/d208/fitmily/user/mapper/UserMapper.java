@@ -2,6 +2,7 @@ package com.d208.fitmily.user.mapper;
 
 
 import com.d208.fitmily.user.entity.User;
+import com.d208.fitmily.walk.dto.UserDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -35,6 +36,11 @@ public interface UserMapper {
 
     // userId 로 조회
     User selectById(Integer userId);
+
+    //산책할때 userId로 필요 정보 조회
+    UserDto getUserDtoById(Integer userId);
+
+
 
 
 }
