@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,15 +44,46 @@ import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.NaverMap
+import com.naver.maps.map.NaverMapSdk
+import com.naver.maps.map.compose.ExperimentalNaverMapApi
+import com.naver.maps.map.compose.LocationTrackingMode
+import com.naver.maps.map.compose.MapProperties
+import com.naver.maps.map.compose.MapUiSettings
+import com.naver.maps.map.compose.Marker
+import com.naver.maps.map.compose.MarkerState
+import com.naver.maps.map.compose.NaverMap
+import com.naver.maps.map.compose.PathOverlay
+import com.naver.maps.map.compose.rememberCameraPositionState
+import com.naver.maps.map.compose.rememberFusedLocationSource
+import com.naver.maps.map.location.FusedLocationSource
 import com.ssafy.fitmily_android.presentation.ui.main.walk.component.StopWalkDialog
+import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun WalkScreen(
     navController: NavHostController
-) {
+)  {
+
+
     var isWalking = remember { mutableStateOf(true) }
     var isDialogOpen = remember { mutableStateOf(false) }
     var watching = remember { mutableStateOf(0) }
+
+    var path = remember { mutableStateOf(listOf<LatLng>()) }
+
+    val locationSource = rememberFusedLocationSource()
+
+
+
+    path.value = listOf(
+        LatLng(37.5665, 126.978),
+        LatLng(37.5651, 126.989),
+    )
+
 
     Column(
         modifier = Modifier
@@ -117,14 +150,25 @@ fun WalkScreen(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.TopEnd
         ) {
-            Image(
+            NaverMap(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                contentScale = ContentScale.FillBounds,
-                painter = painterResource(R.drawable.ic_launcher_background),
-                contentDescription = "walking",
-            )
+                    .fillMaxSize(),
+                locationSource = locationSource,
+                properties = MapProperties(
+                    locationTrackingMode = LocationTrackingMode.Follow,
+                ),
+                uiSettings = MapUiSettings(
+                    isLocationButtonEnabled = true,
+                ),
+            ){
+                if (path.value.size>2) {
+                    PathOverlay(
+                        coords = path.value,
+                        color = Color(0xFF3498DB),
+                        width = 10.dp,
+                    )
+                }
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth(0.5f),

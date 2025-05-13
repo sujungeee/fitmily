@@ -1,9 +1,15 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
+val properties = Properties()
+properties.load(FileInputStream(rootProject.file("local.properties")))
+val naverClientId: String = properties.getProperty("NAVER_CLIENT_ID")
 android {
     namespace = "com.ssafy.fitmily_android"
     compileSdk = 35
@@ -16,15 +22,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "NAVER_CLIENT_ID", naverClientId)
+        manifestPlaceholders["NAVER_CLIENT_ID"] =  naverClientId
     }
 
     buildTypes {
+
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
         }
     }
     compileOptions {
@@ -35,6 +46,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -65,4 +77,8 @@ dependencies {
 
     // 네이버 지도
     implementation("com.naver.maps:map-sdk:3.21.0")
+    implementation("io.github.fornewid:naver-map-compose:1.5.7")
+
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("io.github.fornewid:naver-map-location:21.0.2")
 }
