@@ -36,16 +36,17 @@ import java.util.List;
 public class WalkController {
 
     private final WalkService walkService;
-    private final SimpMessagingTemplate messagingTemplate;
+
     private final GpsRedisService gpsRedisService;
     private final SseService sseService;
 
     //산책 시작
     @MessageMapping("/walk/gps")  // /app/walk/gps 로 전송된 메시지를 처리함
-    public void handleGps(@Payload GpsDto gpsDto) {
-        gpsRedisService.saveGps(gpsDto);
-        String topic = "/topic/walk/gps/" + gpsDto.getUserId();
-        messagingTemplate.convertAndSend(topic, gpsDto); //브로드캐스팅 역할
+    public void handleGps(@Payload GpsDto gpsDto, @AuthenticationPrincipal CustomUserDetails principal) {
+
+        Integer userId = principal.getId();
+        walkService.processGps(userId, gpsDto);
+
     }
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")

@@ -6,6 +6,7 @@ import com.d208.fitmily.common.exception.ErrorCode;
 import com.d208.fitmily.jwt.JWTUtil;
 import com.d208.fitmily.user.dto.ReissueResponseDto;
 import com.d208.fitmily.user.mapper.UserMapper;
+import com.d208.fitmily.walk.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -101,7 +102,10 @@ public class UserService {
     public User getUserById(Integer userId){
         User user = userMapper.selectById(userId);
         return user;
+    }
 
+    public UserDto getUserDtoById(Integer userId) {
+        return userMapper.getUserDtoById(userId);
     }
 
     /* 아이디 중복 체크 */
