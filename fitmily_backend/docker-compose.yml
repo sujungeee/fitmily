@@ -120,7 +120,6 @@ services:
       - "8080:8080"
       - "50000:50000"
     environment:
-      # - JENKINS_OPTS="--prefix=/jenkins --httpPort=8080"
       - JENKINS_OPTS=--httpPort=8080
       - "JAVA_OPTS=-Dhudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds=180 -Dorg.apache.commons.jelly.tags.fmt.timeZone=Asia/Seoul"
       - TZ=Asia/Seoul
