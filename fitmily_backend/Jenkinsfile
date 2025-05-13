@@ -64,7 +64,7 @@ pipeline {
             script {
                 mattermostSend (color: 'danger', 
                 message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_ID}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/xxx-your-webhook-endpoint', 
+                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
                 channel: 'fitmily-cicd-alerts'
                 )
             }
