@@ -27,8 +27,7 @@ public class ChatMessageDTO {
     @AllArgsConstructor
     public static class SenderInfoDTO {
         private String nickname;
-        private String profileColor;
-        private String profileImageUrl;
+        private String familySequence;
     }
 
     @Data
@@ -36,7 +35,7 @@ public class ChatMessageDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageContentDTO {
-        private String type;
+        private String messageType;
         private String text;
         private String imageUrl;
 //        private List<MentionDTO> mentions;
