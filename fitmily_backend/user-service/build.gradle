@@ -31,9 +31,8 @@ dependencies {
 	//jdbc
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
-	// MongoDB 의존성 추가
+	// MongoDB
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-
 
 	//Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -77,6 +76,11 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.17.2'
 	compileOnly("org.springframework.boot:spring-boot-devtools")
 	implementation 'org.glassfish:jakarta.el:3.0.4'
+
+	// 테스트
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 }
 
