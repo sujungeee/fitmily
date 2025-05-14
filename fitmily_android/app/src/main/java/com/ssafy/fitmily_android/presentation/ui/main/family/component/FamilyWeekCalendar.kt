@@ -100,14 +100,15 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
+            .aspectRatio(0.6f)
+            .padding(bottom = 8.dp)
             .clickable { onClick(date) },
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 10.dp),
+            modifier = Modifier.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
                 text = days,
