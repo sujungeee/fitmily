@@ -21,9 +21,11 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 @Composable
 fun MyTodayExerciseHistory(
     totalExerciseCalorie: Int,
-    histories: List<ExerciseHistory>
+    histories: List<ExerciseHistory>,
+    modifier: Modifier
 ) {
     Column(
+        modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = "오늘의 운동 히스토리",

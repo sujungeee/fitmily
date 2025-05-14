@@ -2,6 +2,7 @@ package com.ssafy.fitmily_android.presentation.ui.main.my
 
 import android.util.Log
 import androidx.compose.animation.core.animateValueAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,8 +56,14 @@ fun MyScreen(
         ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
     )
 
-    Scaffold(
-        topBar = {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backGroundGray),
+    ) {
+
+        // TopBar 영역
+        item {
             MyTobBar(
                 profileImage = painterResource(id = R.drawable.my_unselected_icon),
                 nickname = "예지렐라",
@@ -64,72 +71,73 @@ fun MyScreen(
                     navController.navigate("my/notification")
                 }
             )
-        },
-        modifier = Modifier
-            .fillMaxSize(),
-        containerColor = backGroundGray
-    ) { innerPadding ->
+        }
 
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 28.dp)
-        ) {
+        /* 운동 현황 섹션 */
+        // 운동 현황 원형 그래프
+        item {
+            Spacer(Modifier.height(32.dp))
+            MyExerciseStatusGraph(
+                progress = 80f,
+                modifier = Modifier.padding(horizontal = 28.dp)
+            )
+        }
 
-            /* 운동 현황 섹션 */
-            // 운동 현황 원형 그래프
-            item {
-                Spacer(Modifier.height(32.dp))
-                MyExerciseStatusGraph(progress = 80f)
-            }
+        // 운동 당일 목표
+        item {
+            Spacer(Modifier.height(12.dp))
+            MyExerciseGoal(
+                goals = goals,
+                modifier = Modifier.padding(horizontal = 28.dp)
+            )
+        }
 
-            // 운동 당일 목표
-            item {
-                Spacer(Modifier.height(12.dp))
-                MyExerciseGoal(goals = goals)
-            }
+        // 건강 기록 + 목표 설정 + 운동 기록 버튼들
+        item {
+            Spacer(Modifier.height(12.dp))
+            MyRecordButtonRow(
+                onHealthClick = {
+                    navController.navigate("my/health")
+                },
+                onGoalClick = {
+                    navController.navigate("my/goal")
+                },
+                onExerciseClick = {
+                    navController.navigate("my/exercise")
+                },
+                modifier = Modifier.padding(horizontal = 28.dp)
+            )
+        }
 
-            // 건강 기록 + 목표 설정 + 운동 기록 버튼들
-            item {
-                Spacer(Modifier.height(12.dp))
-                MyRecordButtonRow(
-                    onHealthClick = {
-                        navController.navigate("my/health")
-                    },
-                    onGoalClick = {
-                        navController.navigate("my/goal")
-                    },
-                    onExerciseClick = {
-                        navController.navigate("my/exercise")
-                    }
-                )
-            }
+        /* 달성률 섹션 */
+        item {
+            Spacer(Modifier.height(32.dp))
+            MyAchievement(
+                data = weekData,
+                modifier = Modifier.padding(horizontal = 28.dp)
+            )
+        }
 
-            /* 달성률 섹션 */
-            item {
-                Spacer(Modifier.height(32.dp))
-                MyAchievement(data = weekData)
-            }
+        /* 오늘의 운동 히스토리 섹션 */
+        item {
+            Spacer(Modifier.height(32.dp))
+            MyTodayExerciseHistory(
+                totalExerciseCalorie = 6300,
+                histories = histories,
+                modifier = Modifier.padding(horizontal = 28.dp)
+            )
+        }
 
-            /* 오늘의 운동 히스토리 섹션 */
-            item {
-                Spacer(Modifier.height(32.dp))
-                MyTodayExerciseHistory(
-                    totalExerciseCalorie = 6300,
-                    histories = histories
-                )
-            }
-
-            /* 로그아웃 섹션 */
-            item {
-                MyLogout {
-                    /* TODO 로그아웃 로직 */
-                    Log.d("test1234", "로그아웃 버튼 눌림")
-                }
+        /* 로그아웃 섹션 */
+        item {
+            MyLogout {
+                /* TODO 로그아웃 로직 */
+                Log.d("test1234", "로그아웃 버튼 눌림")
             }
         }
     }
 }
+
 
 data class GoalItem(
     val name: String,

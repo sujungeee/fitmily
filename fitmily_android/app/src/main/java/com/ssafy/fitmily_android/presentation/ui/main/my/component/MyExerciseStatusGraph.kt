@@ -16,10 +16,11 @@ import com.ssafy.fitmily_android.ui.theme.mainBlack
 
 @Composable
 fun MyExerciseStatusGraph(
-    progress: Float
+    progress: Float,
+    modifier: Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
         // 운동 현황 타이틀
@@ -33,7 +34,7 @@ fun MyExerciseStatusGraph(
 
         // 운동 현황 그래프
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {

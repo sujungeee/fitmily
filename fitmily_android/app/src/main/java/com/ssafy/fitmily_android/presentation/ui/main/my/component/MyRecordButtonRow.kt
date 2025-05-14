@@ -12,10 +12,11 @@ import com.ssafy.fitmily_android.R
 fun MyRecordButtonRow(
     onHealthClick: () -> Unit,
     onGoalClick: () -> Unit,
-    onExerciseClick: () -> Unit
+    onExerciseClick: () -> Unit,
+    modifier: Modifier
 ) {
     Row(
-    modifier = Modifier
+    modifier = modifier
     .fillMaxWidth(),
     horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {

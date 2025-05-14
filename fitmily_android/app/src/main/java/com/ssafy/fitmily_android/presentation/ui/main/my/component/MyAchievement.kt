@@ -32,6 +32,7 @@ fun MyAchievement(
 ) {
 
     Column(
+        modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = "달성률 (지난 7일)",
@@ -42,7 +43,7 @@ fun MyAchievement(
         Spacer(Modifier.height(12.dp))
 
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .height(140.dp)
         ) {
