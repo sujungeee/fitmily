@@ -24,7 +24,7 @@ class WalkLiveWorker(private val context: Context) {
 
     private val locationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
-    private var MIN_INTERVAL_UPDATES: Long = (3000 * 60).toLong()
+    private var MIN_INTERVAL_UPDATES: Long = (100 * 60).toLong()
     private var MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 500
     init {
         WalkLiveData.lat = 0.0
@@ -44,24 +44,31 @@ class WalkLiveWorker(private val context: Context) {
         }
 
         locationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+            Log.d(TAG, "startLocationUpdates: ${location.toString()}")
             if (location != null) {
                 WalkLiveData.apply{
                     lat = location.latitude
                     lon = location.longitude
-                    accuracy = location.accuracy.toDouble()
+                    speed = location.accuracy.toDouble()
                 }
             }
             Log.d(TAG, "startLocationUpdates: ${WalkLiveData.lat.toString()}")
-            val data = GpsDto(
+            val data =  GpsDto(
                 WalkLiveData.lat,
                 WalkLiveData.lon,
+                WalkLiveData.speed,
                 System.currentTimeMillis().toString(),
             )
 
+            WalkLiveData.gpsList.value=WalkLiveData.gpsList.value.plus(data)
+
+            Log.d(TAG, "startLocationUpdates: ${WalkLiveData.gpsList.value}")
             val jsonMessage = Gson().toJson(data)
             try {
                 WebSocketManager.stompClient.send("/app/walk/gps", jsonMessage).subscribe()
+                Log.d(TAG, "startLocationUpdates: 스톰프 send")
             } catch (e: Exception) {
+                Log.d(TAG, "startLocationUpdates: ${e.message }")
             }
 
         }
@@ -81,6 +88,7 @@ class WalkLiveWorker(private val context: Context) {
 
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
+            Log.d(TAG, "onLocationResult: ${locationResult.locations[0].toString()}")
             if (locationResult.locations[0] != null) {
                 WalkLiveData.apply{
                     lat = locationResult.locations[0].latitude

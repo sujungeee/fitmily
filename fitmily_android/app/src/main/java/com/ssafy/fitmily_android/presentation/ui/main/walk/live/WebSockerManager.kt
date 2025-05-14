@@ -18,9 +18,10 @@ object WebSocketManager {
 
     var isConnected = false
 
-    val url = "wss://j12d208.p.ssafy.io/ws/chat"
+    val url = "ws://192.168.100.130:8081/api/ws-connect"
 
     var headerList: MutableList<StompHeader> = mutableListOf()
+
 
     private fun retryConnect() {
         if (!isConnected) {
@@ -33,12 +34,11 @@ object WebSocketManager {
 
     @SuppressLint("CheckResult")
     fun connectStomp() {
-
+        val TOKEN="eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ3MjAxNTcyLCJleHAiOjE3NDcyMDI0NzJ9.wyvfrAnQzuln--KyHGm5_NR4R4cbEFATIollT_1PmgE"
+        headerList.add(StompHeader("Authorization", "Bearer ${TOKEN}"))
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
-//        headerList.add(StompHeader("Authorization", "Bearer ${sharedPreferences.getAToken()}"))
-//        headerList.add(StompHeader("roomId", roomId))
-//        headerList.add(StompHeader("userId", sharedPreferences.getUser().userId.toString()))
-//
+
+
         val heartBeatHandler = Handler(Looper.getMainLooper())
         val heartBeatRunnable = object : Runnable {
             override fun run() {
@@ -59,7 +59,9 @@ object WebSocketManager {
                     Log.d(TAG, "connectStomp: OPENED")
 //                    subscribeAll()
 //                    heartBeatHandler.post(heartBeatRunnable)
-
+                    if (WebSocketManager.stompClient.isConnected) {
+                        WebSocketManager.subscribeStomp("/topic/walk/gps/1")
+                    }
                 }
 
                 LifecycleEvent.Type.ERROR -> {
@@ -77,13 +79,15 @@ object WebSocketManager {
 
             }
         }
-        stompClient.connect()
+        stompClient.connect(headerList)
 
     }
 
     @SuppressLint("CheckResult")
     fun subscribeStomp(topic: String) {
-        stompClient.topic(topic).subscribe { topicMessage ->
+
+        stompClient.topic(topic, headerList).subscribe { topicMessage ->
+            Log.d(TAG, "subscribeStomp: 응답 ")
             topicMessage.payload?.let { payload ->
                 val message = Gson().fromJson(
                     topicMessage.getPayload(),

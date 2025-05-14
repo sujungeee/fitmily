@@ -2,6 +2,7 @@ package com.ssafy.fitmily_android.presentation.ui.main.walk
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -48,16 +50,18 @@ import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.PathOverlay
 import com.naver.maps.map.compose.rememberFusedLocationSource
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.model.dto.GpsDto
 import com.ssafy.fitmily_android.presentation.ui.main.MainScreen
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ProfileItem
 import com.ssafy.fitmily_android.presentation.ui.main.walk.component.StopWalkDialog
+import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
 import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveService
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.ui.theme.secondaryBlue
 
-
+private const val TAG = "WalkScreen"
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun WalkScreen(
@@ -66,7 +70,7 @@ fun WalkScreen(
 
     val context = LocalContext.current
 
-    var isWalking = remember { mutableStateOf(true) }
+    var isWalking = remember { mutableStateOf(false) }
     var isDialogOpen = remember { mutableStateOf(false) }
     var watching = remember { mutableStateOf(0) }
 
@@ -74,11 +78,32 @@ fun WalkScreen(
 
     val locationSource = rememberFusedLocationSource()
 
-
-    path.value = listOf(
-        LatLng(37.5665, 126.978),
-        LatLng(37.5651, 126.989),
+    LaunchedEffect(WalkLiveData.gpsList.value) {
+        Log.d(TAG, "WalkScreen: ${WalkLiveData.gpsList.value}")
+        WalkLiveData.gpsList.value?.let { list ->
+            path.value = list.map {
+                LatLng(it.lat, it.lon)
+            }
+        }
+    }
+    var tmp =GpsDto(
+        0.0,
+        0.0,
+        0.0,
+        System.currentTimeMillis().toString(),
     )
+    WalkLiveData.gpsList.observeForever(
+        { list ->
+            Log.d(TAG, "WalkScreen: $list")
+            path.value = list.map {
+                LatLng(it.lat, it.lon)
+            }
+            tmp =GpsDto(list.last().lat, list.last().lon, list.last().speed, System.currentTimeMillis().toString())
+        }
+
+    )
+
+
 
 
     Column(
@@ -117,7 +142,7 @@ fun WalkScreen(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("1km", style = typography.titleMedium)
+                Text("${tmp.lat}", style = typography.titleMedium)
                 Text("거리", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -127,7 +152,7 @@ fun WalkScreen(
                     .background(mainGray)
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("10:00:22", style = typography.titleMedium)
+                Text("${tmp.lon}", style = typography.titleMedium)
                 Text("시간", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -204,21 +229,14 @@ fun WalkScreen(
         ) {
             Button(
                 onClick = {
-                    val intent = Intent(
-                        context,
-                        WalkLiveService::class.java
-                    )
                     if(isWalking.value){
                         isDialogOpen.value = true
 
                         //foregroundService 종료
                     }else {
                         isWalking.value = !isWalking.value
-
-
-
                         //foregroundService 시작
-                        startForegroundService(context,intent)
+                        WalkLiveData.startWalkLiveService(context)
                     }},
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
@@ -252,10 +270,7 @@ fun WalkScreen(
             onConfirmation = {
                 isWalking.value = !isWalking.value
                 isDialogOpen.value = false
-                context.stopService(Intent(
-                    context,
-                    WalkLiveService::class.java
-                ))
+                WalkLiveData.stopWalkLiveService(context)
             }
         )
     }

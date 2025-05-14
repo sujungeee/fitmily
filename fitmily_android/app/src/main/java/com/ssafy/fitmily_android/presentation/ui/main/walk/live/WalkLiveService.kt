@@ -39,9 +39,7 @@ class WalkLiveService: Service() {
             WebSocketManager.connectStomp()
         }
 
-        if (WebSocketManager.stompClient.isConnected) {
-            WebSocketManager.subscribeStomp("topic/walk/gps/1")
-        }
+
 
         // WalkLiveWorker를 시작, stompClient 보내서 send 할 수 있게끔
         walkLiveWorker = WalkLiveWorker(this)
