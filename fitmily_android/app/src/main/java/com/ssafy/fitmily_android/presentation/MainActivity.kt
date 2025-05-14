@@ -25,4 +25,5 @@ class MainActivity : ComponentActivity() {
             NaverMapSdk.NcpKeyClient(BuildConfig.NAVER_CLIENT_ID)
 
     }
+
 }

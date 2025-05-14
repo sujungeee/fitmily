@@ -16,13 +16,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,16 +75,17 @@ fun DashBoardItem(item: String) {
         ) {
             ProfileItem()
 
-            Button(
+            TextButton(
                 onClick = { /*TODO*/ },
                 colors = ButtonDefaults.buttonColors(
-                    mainBlue
+                    mainWhite
                 )
             ) {
                 Text(
+                    modifier = Modifier.background(mainBlue, shape = RoundedCornerShape(100.dp)).padding(4.dp),
                     text = "콕 찌르기",
                     style = typography.bodyMedium,
-                    color = Color.White,
+                    color = mainWhite,
                 )
             }
         }
@@ -120,7 +124,7 @@ fun DashBoardItem(item: String) {
 
                     Text(
                         text = "80%",
-                        style = typography.bodyLarge,
+                        style = typography.bodyMedium,
                     )
 
                 }
@@ -138,19 +142,34 @@ fun GoalItem(index: Int) {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(
-            modifier = Modifier.size(40.dp),
-            checked = true,
-            enabled = false,
-            onCheckedChange = { /*TODO*/ },
-            colors = CheckboxDefaults.colors(
-                disabledCheckedColor = mainBlue,
-                disabledUncheckedColor = mainGray
+        Box(
+            modifier = Modifier
+                .padding(8.dp)
+                .size(16.dp)
+                .background(mainGray, shape = RoundedCornerShape(100.dp))
+        ){
+            Icon(
+                modifier = Modifier
+                    .size(16.dp)
+                    .background(mainBlue, shape = RoundedCornerShape(100.dp)),
+                contentDescription = null,
+                tint = Color.White,
+                imageVector = androidx.compose.material.icons.Icons.Default.Check
             )
-        )
+        }
+//        Checkbox(
+//            modifier = Modifier.padding(6.dp).size(20.dp),
+//            checked = true,
+//            enabled = false,
+//            onCheckedChange = { /*TODO*/ },
+//            colors = CheckboxDefaults.colors(
+//                disabledCheckedColor = mainBlue,
+//                disabledUncheckedColor = mainGray
+//            )
+//        )
         Text(
             text = "${index}번째 목표 달성 완료",
-            style = typography.bodyMedium,
+            style = typography.bodySmall,
             maxLines = 1,
         )
     }
