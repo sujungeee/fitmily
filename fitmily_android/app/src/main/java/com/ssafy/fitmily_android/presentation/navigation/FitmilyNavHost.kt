@@ -1,15 +1,14 @@
 package com.ssafy.fitmily_android.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun FitmilyNavHost (
-    startDestination : RootNavGraph
+    navController: NavHostController
+    , startDestination : RootNavGraph
 ){
-    val navController = rememberNavController()
-
     NavHost(
         navController = navController
         , startDestination = startDestination.route

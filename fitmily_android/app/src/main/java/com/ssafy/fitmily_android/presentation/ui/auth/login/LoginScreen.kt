@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.navigation.RootNavGraph
@@ -32,13 +35,29 @@ import com.ssafy.fitmily_android.presentation.ui.components.InputTextField
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
 import com.ssafy.fitmily_android.ui.theme.mainBlue
+import com.ssafy.fitmily_android.util.datastore.AuthDataStore
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
     navController: NavHostController
+    , loginViewModel: LoginViewModel = hiltViewModel()
 ) {
-    // TODO: uistate 분리
+    val uiState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.loginSideEffect) {
+        when (uiState.loginSideEffect) {
+            is LoginSideEffect.NavigateToMain -> {
+                navController.navigate("main") {
+                    popUpTo(RootNavGraph.AuthNavGraph.route) {
+                        inclusive = true
+                    }
+                }
+            }
+            null -> Unit
+        }
+    }
+
     var id by remember { mutableStateOf("") }
     var pwd by remember { mutableStateOf("") }
 
@@ -95,13 +114,11 @@ fun LoginScreen(
             )
 
             ActivateButton(
-                onClick = {
-                    // TODO: 로그인 성공시 main으로 navigate
-                    navController.navigate("main") {
-                        popUpTo(RootNavGraph.AuthNavGraph.route) {
-                            inclusive = true
-                        }
-                    }
+                modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 28.dp)
+                , onClick = {
+                    loginViewModel.login(id, pwd)
                 }
                 , text = "로그인"
             )

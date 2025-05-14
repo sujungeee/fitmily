@@ -1,5 +1,7 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my
 
+import android.util.Log
+import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,12 +12,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyAchievement
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseGoal
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseStatusGraph
+import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyLogout
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyRecordButtonRow
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTobBar
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTodayExerciseHistory
@@ -33,21 +38,21 @@ fun MyScreen(
     )
 
     val weekData = listOf(
-        AchievementDay("일", 0.7f),
-        AchievementDay("월", 0.9f),
-        AchievementDay("화", 0.5f),
-        AchievementDay("수", 0.8f),
-        AchievementDay("목", 0.6f),
-        AchievementDay("금", 1.0f),
-        AchievementDay("토", 0.4f),
+        AchievementDay("5/10", 0.7f),
+        AchievementDay("5/11", 0.9f),
+        AchievementDay("5/12", 0.5f),
+        AchievementDay("5/13", 0.8f),
+        AchievementDay("5/14", 0.6f),
+        AchievementDay("5/15", 1.0f),
+        AchievementDay("5/16", 0.4f),
     )
 
     val histories = listOf(
-        ExerciseHistory(R.drawable.health, "21시 33분", "런지", 10f, "회"),
-        ExerciseHistory(R.drawable.health, "20시 33분", "산책", 1.2f, "km"),
-        ExerciseHistory(R.drawable.health, "19시 33분", "런지", 10f, "회"),
-        ExerciseHistory(R.drawable.health, "19시 33분", "런지", 10f, "회"),
-        ExerciseHistory(R.drawable.health, "19시 33분", "런지", 10f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "산책", 170, 1.5f, "km"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
+        ExerciseHistory(R.drawable.sample_walk, "런지", 170, 12f, "회"),
     )
 
     Scaffold(
@@ -88,12 +93,15 @@ fun MyScreen(
             item {
                 Spacer(Modifier.height(12.dp))
                 MyRecordButtonRow(
-                    // TODO 건강 기록 화면으로 가기
-                    onHealthClick = { },
-                    // TODO 목표 설정 화면으로 가기
-                    onGoalClick = { },
-                    // TODO 운동 기록 화면으로 가기
-                    onExerciseClick = { }
+                    onHealthClick = {
+                        navController.navigate("my/health")
+                    },
+                    onGoalClick = {
+                        navController.navigate("my/goal")
+                    },
+                    onExerciseClick = {
+                        navController.navigate("my/exercise")
+                    }
                 )
             }
 
@@ -107,9 +115,17 @@ fun MyScreen(
             item {
                 Spacer(Modifier.height(32.dp))
                 MyTodayExerciseHistory(
-                    totalExerciseTime = "6시간 23분",
+                    totalExerciseCalorie = 6300,
                     histories = histories
                 )
+            }
+
+            /* 로그아웃 섹션 */
+            item {
+                MyLogout {
+                    /* TODO 로그아웃 로직 */
+                    Log.d("test1234", "로그아웃 버튼 눌림")
+                }
             }
         }
     }
@@ -129,8 +145,8 @@ data class AchievementDay(
 
 data class ExerciseHistory(
     val iconRes: Int,
-    val time: String,
     val exerciseName: String,
-    val exerciseCount: Float,
+    val exerciseCalorie: Int,
+    val exerciseValue: Float,
     val unit: String
 )

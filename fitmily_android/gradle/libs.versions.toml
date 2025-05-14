@@ -15,6 +15,10 @@ wearToolingPreview = "1.0.0"
 coreSplashscreen = "1.0.1"
 appcompat = "1.6.1"
 material = "1.10.0"
+serialization = "2.0.21"
+kapt = "2.0.21"
+ksp = "2.0.21-1.0.27"
+daggerHilt = "2.56.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,4 +48,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-
+kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt"}
+devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }

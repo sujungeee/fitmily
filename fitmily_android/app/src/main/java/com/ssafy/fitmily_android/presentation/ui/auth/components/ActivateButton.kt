@@ -16,15 +16,14 @@ import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun ActivateButton (
-    onClick: () -> Unit
+    modifier : Modifier
+    , onClick: () -> Unit
     , text: String
 ) {
     Button (
         onClick = onClick
-        , modifier = Modifier
-            .fillMaxWidth()
+        , modifier = modifier
             .height(48.dp)
-            .padding(horizontal = 28.dp)
         , shape = RoundedCornerShape(16.dp)
         , colors = ButtonDefaults.buttonColors(mainBlue)
     ) {

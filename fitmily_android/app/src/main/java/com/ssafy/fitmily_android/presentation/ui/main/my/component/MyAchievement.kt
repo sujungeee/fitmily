@@ -31,9 +31,6 @@ fun MyAchievement(
     modifier: Modifier = Modifier
 ) {
 
-//    val maxY = (data.maxOfOrNull { it.percent } ?: 0f).coerceAtLeast(100f)
-//    val yStep = 100f
-
     Column(
     ) {
         Text(
