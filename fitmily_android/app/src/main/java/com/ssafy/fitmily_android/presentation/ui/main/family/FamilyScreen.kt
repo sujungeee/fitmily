@@ -34,27 +34,24 @@ fun FamilyScreen(
         "용성예신" to familySixth
     )
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
 
-        Column(
+        // 월간 캘린더 영역
+        FamilyCalendar(
+            modifier = Modifier.weight(1f),
+            onDayClick = { day ->
+                navController.navigate("family/detail")
+            }
+        )
+
+        // 가족 정보 영역
+        FamilyNameDotFlowRow(
+            nameColorList,
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-
-            FamilyCalendar(
-                modifier = Modifier.weight(1f),
-                onDayClick = { day ->
-                    navController.navigate("family/detail")
-                }
-            )
-            FamilyNameDotFlowRow(
-                nameColorList,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-        }
+                .fillMaxWidth()
+        )
     }
 }
