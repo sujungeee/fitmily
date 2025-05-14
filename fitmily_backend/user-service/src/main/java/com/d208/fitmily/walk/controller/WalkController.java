@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -42,11 +43,11 @@ public class WalkController {
 
     //산책 시작
     @MessageMapping("/walk/gps")  // /app/walk/gps 로 전송된 메시지를 처리함
-    public void handleGps(@Payload GpsDto gpsDto, @AuthenticationPrincipal CustomUserDetails principal) {
-
-        Integer userId = principal.getId();
-        walkService.processGps(userId, gpsDto);
-
+    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
+        if (principal instanceof Authentication auth && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
+            Integer userId = userDetails.getId();
+            walkService.processGps(userId, gpsDto);
+        }
     }
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
