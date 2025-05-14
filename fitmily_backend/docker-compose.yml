@@ -3,19 +3,17 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_ROOT_PASSWORD: rootrootroot
       MYSQL_DATABASE: mydb
       MYSQL_USER: d208
-      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_PASSWORD: 208208208
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
-    secrets:
-      - mysql_password
-      - mysql_root_password
+    # secrets 섹션 제거
 
   mongodb:
     image: mongo:latest
@@ -47,50 +45,38 @@ services:
   springboot-app:
     build: ./user-service
     container_name: springboot-app
-    restart: on-failure  # always 대신 on-failure로 변경하여 무한 재시작 방지
+    restart: on-failure
     ports:
       - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      # - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-      # - SPRING_JWT_SECRET=${JWT_SECRET}
-    volumes:
-      - ./secrets/mysql_password.txt:/run/secrets/mysql_password:ro
-      - ./secrets/jwt_secret.txt:/run/secrets/jwt_secret:ro
+      - MYSQL_PASSWORD=208208208
+      - JWT_SECRET=vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+    # volumes와 secrets 모두 제거
     depends_on:
       - mysql
       - redis
       - rabbitmq
     networks:
       - app-network
-    secrets:
-      - mysql_password
-      - jwt_secret
     entrypoint: >
-      sh -c "export MYSQL_PASSWORD=$$(cat /run/secrets/mysql_password) &&
-            export JWT_SECRET=$$(cat /run/secrets/jwt_secret) &&
-            java -jar app.jar"
-
+      sh -c "java -jar app.jar"
 
   nginx:
     image: nginx:latest
     container_name: nginx
-    restart: always  # 서버 재시작이나 충돌시 항상 재시작
+    restart: always
     ports:
       - "80:80"
-      - "443:443"  # HTTPS 포트 추가
+      - "443:443"
     volumes:
-      # - ./nginx/conf.d:/etc/nginx/conf.d
-      - /home/ubuntu/S12P31D208/S12P31D208/fitmily_backend/nginx/conf.d:/etc/nginx/conf.d  # 절대경로로 변경했음.
+      - /home/ubuntu/S12P31D208/S12P31D208/fitmily_backend/nginx/conf.d:/etc/nginx/conf.d
       - /etc/letsencrypt/live/k12d208.p.ssafy.io:/etc/nginx/certs:ro
       - /etc/letsencrypt/archive/k12d208.p.ssafy.io:/etc/nginx/archive:ro
-      # - /etc/letsencrypt/live/k12d208.p.ssafy.io:/etc/nginx/certs  # 인증서 경로 마운트
-      # - /etc/letsencrypt/archive:/etc/nginx/archive  # 필요한 경우
     depends_on:
       - springboot-app
     networks:
       - app-network
-
 
   prometheus:
     image: prom/prometheus
@@ -113,11 +99,10 @@ services:
       - app-network
 
   jenkins:
-    # image: jenkins/jenkins:lts-jdk17
-    image: custom-jenkins:latest  # 커스텀 이미지 사용
+    image: custom-jenkins:latest
     container_name: jenkins
     user: root
-    restart: always  # 서버 재시작이나 충돌시 항상 재시작
+    restart: always
     ports:
       - "8080:8080"
       - "50000:50000"
@@ -144,10 +129,4 @@ volumes:
   grafana_data:
   jenkins_home:
 
-secrets:
-  mysql_password:
-    file: ./secrets/mysql_password.txt
-  mysql_root_password:
-    file: ./secrets/mysql_root_password.txt
-  jwt_secret:
-    file: ./secrets/jwt_secret.txt
+# 전체 secrets 섹션 제거
