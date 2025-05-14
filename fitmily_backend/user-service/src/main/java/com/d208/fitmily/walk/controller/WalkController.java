@@ -15,13 +15,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.security.Principal;
@@ -43,9 +44,14 @@ public class WalkController {
 
     //산책 시작
     @MessageMapping("/walk/gps")  // /app/walk/gps 로 전송된 메시지를 처리함
-    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
-        if (principal instanceof Authentication auth && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
+    public void handleGps(@Payload GpsDto gpsDto, Message<?> message) {
+        System.out.println("🚨 컨트롤러 진입 성공!");
+
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        if (accessor.getUser() instanceof Authentication auth &&
+                auth.getPrincipal() instanceof CustomUserDetails userDetails) {
             Integer userId = userDetails.getId();
+            System.out.println("walk 컨트롤러로 들어옴");
             walkService.processGps(userId, gpsDto);
         }
     }

@@ -5,6 +5,7 @@ import com.d208.fitmily.health.dto.HealthResponseDto;
 import com.d208.fitmily.health.dto.UpdateHealthRequestDto;
 import com.d208.fitmily.health.dto.UpdateHealthResponseDto;
 import com.d208.fitmily.health.mapper.HealthMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HealthService {
     private final HealthMapper healthMapper;
+    private ObjectMapper objectMapper;
 
     // 건강상태 추가
     public void addHealth(Integer userId, AddHealthRequestDto dto){
@@ -24,7 +26,9 @@ public class HealthService {
         dto.setUserId(userId);
         dto.setBmi((float) (Math.floor(bmi * 10) / 10));
 
-//        Health health = Health.builder()
+        int result = healthMapper.insertHealth(dto);
+    }
+    //        Health health = Health.builder()
 //                .userId(userId)
 //                .bmi((float) (Math.floor(bmi * 10) / 10))
 //                .height(dto.getHeight())
@@ -32,9 +36,6 @@ public class HealthService {
 //                .otherDiseases(dto.getOtherDiseases())
 //                .fiveMajorDiseases(dto.getFiveMajorDiseases())
 //                .build();
-
-        int result = healthMapper.insertHealth(dto);
-    }
 
     //건강 상태 조회
     public HealthResponseDto getLatestHealth(Integer userId){
