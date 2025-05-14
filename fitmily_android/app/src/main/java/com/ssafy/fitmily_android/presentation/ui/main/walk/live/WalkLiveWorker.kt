@@ -1,0 +1,105 @@
+package com.ssafy.fitmily_android.presentation.ui.main.walk.live
+
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.icu.text.DateFormat
+import android.location.Location
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Granularity
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import android.os.Looper
+import android.util.Log
+import com.google.gson.Gson
+import com.naver.maps.map.util.FusedLocationSource
+import com.ssafy.fitmily_android.model.dto.GpsDto
+
+private const val TAG = "WalkLiveWorker"
+class WalkLiveWorker(private val context: Context) {
+
+    private val locationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+
+    private var MIN_INTERVAL_UPDATES: Long = (100 * 60).toLong()
+    private var MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 500
+    init {
+        WalkLiveData.lat = 0.0
+        WalkLiveData.lon = 0.0
+    }
+
+    fun startLocationUpdates() {
+        if(ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED){
+            return
+        }
+
+        locationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+            Log.d(TAG, "startLocationUpdates: ${location.toString()}")
+            if (location != null) {
+                WalkLiveData.apply{
+                    lat = location.latitude
+                    lon = location.longitude
+                    speed = location.accuracy.toDouble()
+                }
+            }
+            Log.d(TAG, "startLocationUpdates: ${WalkLiveData.lat.toString()}")
+            val data =  GpsDto(
+                WalkLiveData.lat,
+                WalkLiveData.lon,
+                WalkLiveData.speed,
+                System.currentTimeMillis().toString(),
+            )
+
+            WalkLiveData.gpsList.value=WalkLiveData.gpsList.value.plus(data)
+
+            Log.d(TAG, "startLocationUpdates: ${WalkLiveData.gpsList.value}")
+            val jsonMessage = Gson().toJson(data)
+            try {
+                WebSocketManager.stompClient.send("/app/walk/gps", jsonMessage).subscribe()
+                Log.d(TAG, "startLocationUpdates: 스톰프 send")
+            } catch (e: Exception) {
+                Log.d(TAG, "startLocationUpdates: ${e.message }")
+            }
+
+        }
+
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, MIN_INTERVAL_UPDATES).apply{
+            setMinUpdateDistanceMeters(MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat())
+            setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
+            setWaitForAccurateLocation(true)
+        }.build()
+
+        locationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private val locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            Log.d(TAG, "onLocationResult: ${locationResult.locations[0].toString()}")
+            if (locationResult.locations[0] != null) {
+                WalkLiveData.apply{
+                    lat = locationResult.locations[0].latitude
+                    lon = locationResult.locations[0].longitude
+                    lastUpdatedTime = System.currentTimeMillis()
+                }
+            }
+        }
+    }
+    fun removeLocationUpdates() {
+        locationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+}

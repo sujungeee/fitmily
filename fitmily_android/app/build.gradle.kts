@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +9,9 @@ plugins {
     alias(libs.plugins.dagger.hilt.android)
 }
 
+val properties = Properties()
+properties.load(FileInputStream(rootProject.file("local.properties")))
+val naverClientId: String = properties.getProperty("NAVER_CLIENT_ID")
 android {
     namespace = "com.ssafy.fitmily_android"
     compileSdk = 35
@@ -17,6 +23,9 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "NAVER_CLIENT_ID", naverClientId)
+        manifestPlaceholders["NAVER_CLIENT_ID"] =  naverClientId
     }
 
     buildTypes {
@@ -37,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -62,9 +72,6 @@ dependencies {
 
     // navigation
     implementation("androidx.navigation:navigation-compose:2.8.9")
-
-    // 네이버 지도
-    implementation("com.naver.maps:map-sdk:3.21.0")
 
     // dagger hilt
     implementation("com.google.dagger:hilt-android:2.56.2")
@@ -97,4 +104,20 @@ dependencies {
 
     // WheelPicker
     implementation("com.github.commandiron:WheelPickerCompose:1.1.11")
+
+
+    // 네이버 지도
+    implementation("com.naver.maps:map-sdk:3.21.0")
+    implementation("io.github.fornewid:naver-map-compose:1.5.7")
+
+    // 위치 서비스
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("io.github.fornewid:naver-map-location:21.0.2")
+
+    // stomp
+    implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+
+    //RxJava
+    implementation ("io.reactivex.rxjava2:rxjava:2.2.5")
+    implementation ("io.reactivex.rxjava2:rxandroid:2.1.0")
 }

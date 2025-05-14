@@ -84,8 +84,8 @@ fun WalkHistoryDetailScreen(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(horizontalAlignment = Alignment.Start) {
-                Text("1km", style = typography.titleLarge)
-                Text("거리", style = typography.bodyLarge, color = Color.Gray)
+                Text("1km", style = typography.titleMedium)
+                Text("거리", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
                 modifier = Modifier
@@ -94,8 +94,8 @@ fun WalkHistoryDetailScreen(
                     .background(mainGray)
             )
             Column(horizontalAlignment = Alignment.Start) {
-                Text("10:00:22", style = typography.titleLarge)
-                Text("시간", style = typography.bodyLarge, color = Color.Gray)
+                Text("10:00:22", style = typography.titleMedium)
+                Text("시간", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
                 modifier = Modifier
@@ -104,39 +104,8 @@ fun WalkHistoryDetailScreen(
                     .background(mainGray)
             )
             Column(horizontalAlignment = Alignment.Start) {
-                Text("90", style = typography.titleLarge)
-                Text("심박수", style = typography.bodyLarge, color = Color.Gray)
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 32.dp),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            Column(horizontalAlignment = Alignment.Start) {
-                Text("1km", style = typography.titleLarge)
-                Text("거리", style = typography.bodyLarge, color = Color.Gray)
-            }
-            Spacer(
-                modifier = Modifier
-                    .width(1.dp)
-                    .height(60.dp)
-                    .background(mainGray)
-            )
-            Column(horizontalAlignment = Alignment.Start) {
-                Text("10:00:22", style = typography.titleLarge)
-                Text("시간", style = typography.bodyLarge, color = Color.Gray)
-            }
-            Spacer(
-                modifier = Modifier
-                    .width(1.dp)
-                    .height(60.dp)
-                    .background(mainGray)
-            )
-            Column(horizontalAlignment = Alignment.Start) {
-                Text("90", style = typography.titleLarge)
-                Text("심박수", style = typography.bodyLarge, color = Color.Gray)
+                Text("90", style = typography.titleMedium)
+                Text("심박수", style = typography.bodyMedium, color = Color.Gray)
             }
         }
 

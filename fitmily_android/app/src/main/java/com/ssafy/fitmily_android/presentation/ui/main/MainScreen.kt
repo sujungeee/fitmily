@@ -32,7 +32,6 @@ fun MainScreen(parentNavController: NavHostController) {
             else -> false
         }
     }
-
     Scaffold(
         bottomBar = {
             if (isBottomVisible.value) {

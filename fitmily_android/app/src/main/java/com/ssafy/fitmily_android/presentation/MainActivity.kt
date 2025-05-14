@@ -1,6 +1,7 @@
 package com.ssafy.fitmily_android.presentation.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
@@ -9,12 +10,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
+import com.naver.maps.map.NaverMapSdk
+import com.ssafy.fitmily_android.BuildConfig
 import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.presentation.navigation.FitmilyNavHost
 import com.ssafy.fitmily_android.presentation.navigation.RootNavGraph
 import com.ssafy.fitmily_android.ui.theme.FitmilyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "MainActivity"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,5 +57,9 @@ class MainActivity : ComponentActivity() {
                 FitmilyNavHost(navController, RootNavGraph.MainNavGraph) // TODO: 통신 성공 시 delete
             }
         }
+        Log.d(TAG, "onCreate: ${BuildConfig.NAVER_CLIENT_ID}")
+        NaverMapSdk.getInstance(this).client = NaverMapSdk.NcpKeyClient(BuildConfig.NAVER_CLIENT_ID)
+
+
     }
 }

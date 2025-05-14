@@ -58,9 +58,11 @@ fun ChallengeCard(navController: NavHostController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.End
         ) {
+
+            Spacer(Modifier.size(8.dp))
             Text(
                 text = "현재 순위",
-                style = typography.bodyLarge,
+                style = typography.bodyMedium,
                 color = mainDarkGray
             )
             Spacer(Modifier.size(8.dp))
@@ -74,10 +76,10 @@ fun ChallengeCard(navController: NavHostController) {
                     ) {
                         Text(
                             text = "${index + 1}위",
-                            style = typography.bodyLarge,
+                            style = typography.bodyMedium,
                         )
                         Spacer(Modifier.size(8.dp))
-                        ProfileItem()
+                        ProfileItem(textStyle = typography.bodyMedium)
                     }
                 }
             }

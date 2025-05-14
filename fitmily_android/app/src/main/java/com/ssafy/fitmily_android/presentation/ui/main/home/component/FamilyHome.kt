@@ -32,7 +32,7 @@ fun FamilyHome(navController: NavHostController) {
                 Text(
                     modifier = Modifier.padding(horizontal = 28.dp),
                     text = "Fitmily",
-                    style = typography.titleLarge,
+                    style = typography.headlineMedium,
                     color = mainBlue
                 )
 
