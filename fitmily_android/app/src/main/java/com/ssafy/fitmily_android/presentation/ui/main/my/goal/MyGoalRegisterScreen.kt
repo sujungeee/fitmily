@@ -2,11 +2,13 @@ package com.ssafy.fitmily_android.presentation.ui.main.my.goal
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -42,71 +44,86 @@ fun MyGoalRegisterScreen(
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backGroundGray),
-        topBar = { MyGoalTopBar(navController) },
-        bottomBar = {
-            MyButton(
-                text = "추가하기",
-                onClick = {
-                    /* TODO 목표 리스트에 추가하기 */
-                    navController.popBackStack()
-                },
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-        }
-    ) { innerPadding ->
-
-        Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 28.dp),
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(80.dp))
 
-            // 운동 이미지
-            MyExerciseImage(exerciseName = "산책")
-
-            Spacer(modifier = Modifier.height(80.dp))
-
-            // 운동 선택 영역
-            MyExerciseInputText(
-                onClick = {
-                    showBottomSheet = true
-                    Log.d("test1234", "운동 선택 클릭됌")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // 운동 목표 영역
-            MyExerciseValueInputText()
-        }
-
-        if(showBottomSheet) {
-
-            LaunchedEffect(Unit) {
-                if(showBottomSheet) {
-                    sheetState.show()
-                }
-                else {
-                    sheetState.hide()
-                }
+            // TopBar 영역
+            item {
+                MyGoalTopBar(navController)
             }
 
-            MyExerciseSelectBottomSheet(
-                selectedExercise = selectedExercise,
-                onItemSelected = { selectedExercise ->
-                    /*  TODO 선택된 운동 처리 */
-                    showBottomSheet = false
-                },
-                onDismiss = { showBottomSheet = false },
-                sheetState = sheetState
-            )
+            // 운동 이미지
+            item {
+                Spacer(modifier = Modifier.height(80.dp))
+                MyExerciseImage(
+                    exerciseName = "산책",
+                    modifier = Modifier
+                        .padding(horizontal = 28.dp)
+                )
+            }
+
+            // 운동 선택 영역
+            item {
+                Spacer(modifier = Modifier.height(80.dp))
+                MyExerciseInputText(
+                    onClick = {
+                        showBottomSheet = true
+                        Log.d("test1234", "운동 선택 클릭됌")
+                    },
+                    modifier = Modifier.padding(horizontal = 28.dp)
+                )
+            }
+
+            // 운동 목표 영역
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+                MyExerciseValueInputText(
+                    modifier = Modifier.padding(horizontal = 28.dp)
+                )
+                Spacer(modifier = Modifier.height(80.dp))
+            }
         }
+
+        MyButton(
+            text = "추가하기",
+            onClick = {
+                /* TODO 목표 리스트에 추가하기 */
+                navController.popBackStack()
+            },
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+    }
+
+    if(showBottomSheet) {
+
+        LaunchedEffect(Unit) {
+            if(showBottomSheet) {
+                sheetState.show()
+            }
+            else {
+                sheetState.hide()
+            }
+        }
+
+        MyExerciseSelectBottomSheet(
+            selectedExercise = selectedExercise,
+            onItemSelected = { selectedExercise ->
+                /*  TODO 선택된 운동 처리 */
+                showBottomSheet = false
+            },
+            onDismiss = { showBottomSheet = false },
+            sheetState = sheetState
+        )
     }
 }

@@ -19,13 +19,15 @@ import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 
 @Composable
-fun MyExerciseTimeInputText() {
+fun MyExerciseTimeInputText(
+    modifier: Modifier
+) {
 
     /* TODO 추후 UI STATE로 추출 */
     var inputValue by remember { mutableStateOf("") }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 14.dp)
             .drawBehind {

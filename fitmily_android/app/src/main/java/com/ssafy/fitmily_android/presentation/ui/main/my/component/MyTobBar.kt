@@ -59,7 +59,6 @@ fun MyTobBar(
                 text = nickname,
                 color = mainBlack,
                 style = Typography.headlineLarge,
-                fontSize = 24.sp
             )
             Spacer(modifier = Modifier.weight(1f))
             // 알람 아이콘

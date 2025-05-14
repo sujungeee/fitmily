@@ -31,10 +31,11 @@ import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun FamilyExerciseItem(
-    familyExercise: FamilyExercise
+    familyExercise: FamilyExercise,
+    modifier: Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(color = mainWhite, shape = RoundedCornerShape(16.dp))
             .padding(12.dp)

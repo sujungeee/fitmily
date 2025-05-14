@@ -1,6 +1,7 @@
 package com.kizitonwose.calendar.sample.compose
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -29,7 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ssafy.fitmily_android.ui.theme.Typography
+import com.ssafy.fitmily_android.ui.theme.mainBlue
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun SimpleCalendarTitle(
@@ -39,8 +42,13 @@ fun SimpleCalendarTitle(
     goToPrevious: () -> Unit,
     goToNext: () -> Unit,
 ) {
+
+    val formatter = DateTimeFormatter.ofPattern("yyyy.MM")
+    val monthText = currentMonth.format(formatter)
+
     Row(
-        modifier = modifier.height(40.dp),
+        modifier = modifier
+            .padding(top = 32.dp, bottom = 24.dp, start = 28.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
 //        CalendarNavigationIcon(
@@ -53,9 +61,9 @@ fun SimpleCalendarTitle(
             modifier = Modifier
                 .weight(1f)
                 .testTag("MonthTitle"),
-            text = "$currentMonth",
-            style = Typography.headlineMedium,
-            textAlign = TextAlign.Center
+            text = monthText,
+            style = Typography.headlineLarge,
+            textAlign = TextAlign.Start
         )
 //        CalendarNavigationIcon(
 //            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

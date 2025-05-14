@@ -30,7 +30,7 @@ fun MyExerciseTopBar (
         modifier = Modifier
             .fillMaxWidth()
             .background(mainWhite)
-            .padding(top = 32.dp, bottom = 12.dp)
+            .padding(top = 32.dp, bottom = 24.dp)
         ,
     ) {
         IconButton(

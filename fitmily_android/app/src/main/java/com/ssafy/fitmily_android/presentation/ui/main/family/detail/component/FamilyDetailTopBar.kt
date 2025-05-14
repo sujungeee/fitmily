@@ -2,6 +2,7 @@ package com.ssafy.fitmily_android.presentation.ui.main.my.notification.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,13 +23,14 @@ import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.ibmFontFamily
 import com.ssafy.fitmily_android.ui.theme.mainBlack
+import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun FamilyDetailTopBar (
     navController: NavHostController,
     text: String,
-    onClickBottomSheet: () -> Unit
+    onClickBottomSheet: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -36,29 +38,16 @@ fun FamilyDetailTopBar (
             .background(mainWhite)
         ,
     ) {
-        IconButton(
-            onClick = {
-                navController.popBackStack()
-            }
-            , modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 28.dp, top = 10.dp, bottom = 10.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.back_icon),
-                contentDescription = "뒤로가기"
-            )
-        }
-
         Row(
             modifier = Modifier
-                .align(Alignment.Center)
+                .padding(top = 32.dp, bottom = 24.dp, start = 28.dp)
                 .clickable { onClickBottomSheet() },
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
         ) {
             Text(
                 text = text,
-                style = Typography.headlineMedium,
+                style = Typography.headlineLarge,
                 color = mainBlack,
             )
             Icon(
