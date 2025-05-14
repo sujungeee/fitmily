@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// 산책중인 가족 구성원 정보 DTO
+
 public class UserDto {
     private Integer userId;
     private Integer userFamilySequence;

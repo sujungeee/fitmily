@@ -105,7 +105,7 @@ public class UserService {
     }
 
     public UserDto getUserDtoById(Integer userId) {
-        return userMapper.getUserDtoById(userId);
+        return userMapper.getUserDtoById(userId); // ✅ 정확히 Dto 반환
     }
 
     /* 아이디 중복 체크 */
