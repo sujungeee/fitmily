@@ -23,7 +23,7 @@ public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoDBConfig.class);
 
-    @Value("${spring.data.mongodb.uri:mongodb://localhost:27017/fitmily}")
+    @Value("${spring.data.mongodb.uri:mongodb://mongodb:27017/fitmily}")
     private String mongoUri;
 
     @Value("${spring.data.mongodb.database:fitmily}")
