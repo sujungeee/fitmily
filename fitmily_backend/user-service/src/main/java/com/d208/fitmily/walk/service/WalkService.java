@@ -97,6 +97,7 @@ public class WalkService {
         // 데이터 전송
         String topic = "/topic/walk/gps/" + userId;
         messagingTemplate.convertAndSend(topic, gpsDto);
+        System.out.println("산책 데이터 전송");
     }
 
     // 산책중인 가족 구성원 조회

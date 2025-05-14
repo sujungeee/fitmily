@@ -32,7 +32,6 @@ public class HealthController {
     }
 
 
-
     @Operation(summary = "건강 상태 조회", description = "- JWT에서 추출한 userId로 건강 상태를 조회합니다.")
     @GetMapping("health")
     public ApiResponse<HealthResponseDto> gethealth(@AuthenticationPrincipal CustomUserDetails principal){
