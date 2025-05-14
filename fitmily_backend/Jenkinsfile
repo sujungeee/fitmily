@@ -59,31 +59,25 @@ pipeline {
         stage('Docker Build & Deploy') {
             steps {
                 dir('fitmily_backend') {
-                    // 환경 변수로 시크릿 직접 전달
                     withCredentials([
                         string(credentialsId: 'mysql-password', variable: 'MYSQL_PWD'),
                         string(credentialsId: 'mysql-root-password', variable: 'MYSQL_ROOT_PWD'),
                         string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET_KEY')
                     ]) {
                         sh '''
-                            # 파일 존재 확인
-                            ls -la secrets/
+                            # 환경 변수로 직접 전달
+                            export MYSQL_PASSWORD="$MYSQL_PWD"
+                            export MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PWD" 
+                            export JWT_SECRET="$JWT_SECRET_KEY"
                             
-                            # 직접 환경 변수 주입
-                            MYSQL_PASSWORD="$MYSQL_PWD" \
-                            MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PWD" \
-                            JWT_SECRET="$JWT_SECRET_KEY" \
-                            /usr/local/bin/docker-compose build || docker compose build
-                            
-                            MYSQL_PASSWORD="$MYSQL_PWD" \
-                            MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PWD" \
-                            JWT_SECRET="$JWT_SECRET_KEY" \
-                            /usr/local/bin/docker-compose up -d || docker compose up -d
+                            /usr/local/bin/docker-compose build
+                            /usr/local/bin/docker-compose up -d
                         '''
                     }
                 }
             }
         }
+
 
         
         stage('Update Nginx Config') {
