@@ -79,6 +79,14 @@ dependencies {
     implementation("com.naver.maps:map-sdk:3.21.0")
     implementation("io.github.fornewid:naver-map-compose:1.5.7")
 
+    // 위치 서비스
     implementation ("com.google.android.gms:play-services-location:21.0.1")
     implementation ("io.github.fornewid:naver-map-location:21.0.2")
+
+    // stomp
+    implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+
+    //RxJava
+    implementation ("io.reactivex.rxjava2:rxjava:2.2.5")
+    implementation ("io.reactivex.rxjava2:rxandroid:2.1.0")
 }
