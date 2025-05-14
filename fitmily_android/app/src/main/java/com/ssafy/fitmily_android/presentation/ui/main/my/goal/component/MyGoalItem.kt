@@ -28,7 +28,9 @@ fun MyGoalItem(
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = mainWhite,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 28.dp)
     ) {
         Row(
             modifier = Modifier
