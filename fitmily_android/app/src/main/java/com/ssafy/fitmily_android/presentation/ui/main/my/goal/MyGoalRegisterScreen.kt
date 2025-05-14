@@ -69,7 +69,11 @@ fun MyGoalRegisterScreen(
             Spacer(modifier = Modifier.height(80.dp))
 
             // 운동 이미지
-            MyExerciseImage(exerciseName = "산책")
+            MyExerciseImage(
+                exerciseName = "산책",
+                modifier = Modifier
+                    .padding(horizontal = 28.dp)
+            )
 
             Spacer(modifier = Modifier.height(80.dp))
 
@@ -78,13 +82,16 @@ fun MyGoalRegisterScreen(
                 onClick = {
                     showBottomSheet = true
                     Log.d("test1234", "운동 선택 클릭됌")
-                }
+                },
+                modifier = Modifier.padding(horizontal = 28.dp)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // 운동 목표 영역
-            MyExerciseValueInputText()
+            MyExerciseValueInputText(
+                modifier = Modifier.padding(horizontal = 28.dp)
+            )
         }
 
         if(showBottomSheet) {

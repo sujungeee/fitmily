@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -15,7 +16,8 @@ import com.ssafy.fitmily_android.R
 
 @Composable
 fun MyExerciseImage(
-    exerciseName: String
+    exerciseName: String,
+    modifier: Modifier
 ) {
 
     val exerciseMap = mapOf(
@@ -34,7 +36,7 @@ fun MyExerciseImage(
     val imageResId = exerciseMap[exerciseName] ?: R.drawable.sample_walk
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(200.dp)
             .clip(RoundedCornerShape(16.dp)),
     ) {
