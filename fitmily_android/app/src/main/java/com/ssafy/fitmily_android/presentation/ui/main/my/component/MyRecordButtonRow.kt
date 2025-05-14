@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.R
 
 @Composable
@@ -16,7 +17,7 @@ fun MyRecordButtonRow(
     Row(
     modifier = Modifier
     .fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceBetween
+    horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         MyRecordButton(
             iconRes = R.drawable.health,

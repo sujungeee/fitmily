@@ -28,10 +28,10 @@ fun MyRecordButton(
     modifier: Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .background(mainWhite, shape = RoundedCornerShape(16.dp))
             .clickable { onClick() }
-            .padding(20.dp),
+            .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
