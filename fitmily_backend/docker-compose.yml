@@ -13,7 +13,6 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
-    # secrets 섹션 제거
 
   mongodb:
     image: mongo:latest
@@ -50,9 +49,8 @@ services:
       - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - MYSQL_PASSWORD=208208208
-      - JWT_SECRET=vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
-    # volumes와 secrets 모두 제거
+      - SPRING_DATASOURCE_PASSWORD=208208208
+      - SPRING_JWT_SECRET=vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
     depends_on:
       - mysql
       - redis
@@ -128,5 +126,3 @@ volumes:
   mongodb_data:
   grafana_data:
   jenkins_home:
-
-# 전체 secrets 섹션 제거
