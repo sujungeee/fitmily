@@ -4,7 +4,6 @@ pipeline {
     environment {
         GIT_AUTHOR_ID = ''
         GIT_AUTHOR_EMAIL = ''
-        // Jenkins 워크스페이스 경로 사용
         WORKSPACE_PATH = "${WORKSPACE}/fitmily_backend"
     }
     
@@ -25,10 +24,11 @@ pipeline {
             }
         }
         
-        // 시크릿 파일 생성
-        stage('Prepare Secrets') {
+        // 시크릿 파일 생성 및 Docker Compose 파일 수정
+        stage('Prepare Build Environment') {
             steps {
                 dir('fitmily_backend') {
+                    // 시크릿 파일 생성
                     sh 'mkdir -p secrets'
                     withCredentials([
                         string(credentialsId: 'mysql-password', variable: 'MYSQL_PWD'),
@@ -41,6 +41,10 @@ pipeline {
                             echo "$JWT_SECRET_KEY" > secrets/jwt_secret.txt
                             chmod 600 secrets/*.txt
                             ls -la secrets/
+                            
+                            # 절대 경로로 docker-compose.yml 임시 수정
+                            sed -i 's|file: ./secrets/|file: ${WORKSPACE}/fitmily_backend/secrets/|g' docker-compose.yml
+                            cat docker-compose.yml | grep secrets
                         """
                     }
                 }
@@ -65,11 +69,16 @@ pipeline {
                         string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET_KEY')
                     ]) {
                         sh '''
-                            # 환경 변수로 직접 전달
+                            # 환경 변수로 직접 전달 + 디버그 출력
                             export MYSQL_PASSWORD="$MYSQL_PWD"
                             export MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PWD" 
                             export JWT_SECRET="$JWT_SECRET_KEY"
                             
+                            echo "Working directory: $(pwd)"
+                            echo "Secret files:"
+                            ls -la secrets/
+                            
+                            /usr/local/bin/docker-compose down || true
                             /usr/local/bin/docker-compose build
                             /usr/local/bin/docker-compose up -d
                         '''
@@ -77,8 +86,6 @@ pipeline {
                 }
             }
         }
-
-
         
         stage('Update Nginx Config') {
             steps {
