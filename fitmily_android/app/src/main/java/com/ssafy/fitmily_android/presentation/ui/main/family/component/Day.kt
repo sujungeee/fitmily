@@ -37,7 +37,6 @@ fun Day(
         modifier = Modifier
             .aspectRatio(0.6f)
             .testTag("MonthDay")
-            .clip(CircleShape)
             .background(color = if (isSelected) mainBlue else Color.Transparent)
             .clickable(
                 enabled = day.position == DayPosition.MonthDate,

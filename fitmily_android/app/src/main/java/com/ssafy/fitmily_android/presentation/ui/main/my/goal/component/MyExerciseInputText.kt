@@ -23,14 +23,15 @@ import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 
 @Composable
 fun MyExerciseInputText(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier
 ) {
 
     /* TODO 추후 UI STATE로 추출 */
     var selectedExercise by remember { mutableStateOf<String?>(null) }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
             .padding(vertical = 14.dp)

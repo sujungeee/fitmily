@@ -52,77 +52,74 @@ fun FamilyDetailScreen(
         FamilyMemberStats("용성예신", familyThird, 38, 1550, "6시간 23분"),
     )
 
-    Scaffold(
+    LazyColumn(
         modifier = Modifier
-            .fillMaxSize(),
-        topBar = {
+            .fillMaxSize()
+    ) {
+
+        // Topbar 영역
+        item {
             FamilyDetailTopBar(
                 navController = navController,
                 text = monthText,
                 onClickBottomSheet = { showBottomSheet = true }
             )
         }
-    ) { innerPadding ->
 
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            // 주간 캘린더 영역
-            item {
-                FamilyWeekCalendar(
-                    onWeekRangeChange = { month ->
-                        monthText = month
-                    }
+        // 주간 캘린더 영역
+        item {
+            FamilyWeekCalendar(
+                onWeekRangeChange = { month ->
+                    monthText = month
+                }
+            )
+        }
+
+        // 날짜 영역
+        item {
+            Column(
+                modifier = Modifier.padding(horizontal = 28.dp)
+            ) {
+                Spacer(Modifier.height(32.dp))
+                Text(
+                    text = dateText,
+                    style = Typography.titleLarge,
+                    color = mainBlack
                 )
-            }
-
-            // 해당 날짜별 가족 운동 대시보드
-            item {
-                Column(
-                    modifier = Modifier.padding(horizontal = 28.dp)
-                ) {
-                    Spacer(Modifier.height(32.dp))
-                    Text(
-                        text = dateText,
-                        style = Typography.titleLarge,
-                        color = mainBlack
-                    )
-                    Spacer(Modifier.height(32.dp))
-                }
-            }
-
-            items(statsList) { stats ->
-                Box(
-                    modifier = Modifier.padding(horizontal = 28.dp)
-                ) {
-                    FamilyStatsItem(
-                        stats = stats,
-                        onClick = {
-                            navController.navigate("family/exercise")
-                        }
-                    )
-                }
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(32.dp))
             }
         }
 
-        FamilyDateBottomSheet(
-            visible = showBottomSheet,
-            selectedDate = selectedDate,
-            onDateChange = { selectedDate = it },
-            onTodayClick = { selectedDate = LocalDate.now()},
-            onConfirmClick = {
-                /* TODO 날짜 선택 확정 로직 */
-                monthText = "${selectedDate.year}.${selectedDate.monthValue}"
-                showBottomSheet = false
-            },
-            onDismissClick = { showBottomSheet = false }
-
-        )
+        // 해당 날짜별 가족 운동 대시보드
+        items(statsList) { stats ->
+            Box(
+                modifier = Modifier.padding(horizontal = 28.dp)
+            ) {
+                FamilyStatsItem(
+                    stats = stats,
+                    onClick = {
+                        navController.navigate("family/exercise")
+                    }
+                )
+            }
+            Spacer(Modifier.height(20.dp))
+        }
     }
+
+    FamilyDateBottomSheet(
+        visible = showBottomSheet,
+        selectedDate = selectedDate,
+        onDateChange = { selectedDate = it },
+        onTodayClick = { selectedDate = LocalDate.now()},
+        onConfirmClick = {
+            /* TODO 날짜 선택 확정 로직 */
+            monthText = "${selectedDate.year}.${selectedDate.monthValue}"
+            showBottomSheet = false
+        },
+        onDismissClick = { showBottomSheet = false }
+    )
 }
+
 
 data class FamilyMemberStats(
     val name: String,

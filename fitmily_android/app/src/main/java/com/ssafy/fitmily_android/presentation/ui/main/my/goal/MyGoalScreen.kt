@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,24 +37,15 @@ fun MyGoalScreen(
     var showEditDialog by remember { mutableStateOf(false) }
     var selectedGoal by remember { mutableStateOf<GoalItem?>(null) }
 
-    Scaffold(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backGroundGray),
-        topBar = { MyGoalTopBar(navController) },
-        bottomBar = {
-            MyButton(
-                text = "목표 추가",
-                onClick = { navController.navigate("my/goal/register") },
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-        }
-    ) { innerPadding ->
+            .background(backGroundGray)
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            contentPadding = PaddingValues(top = 32.dp, start = 28.dp, end = 28.dp),
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
 
@@ -67,7 +60,13 @@ fun MyGoalScreen(
                 GoalItem("런지", 0f, 30f, "회"),
             )
 
-            items (goals) { goal ->
+            // Topbar 영역
+            item {
+                MyGoalTopBar(navController)
+                Spacer(Modifier.height(32.dp))
+            }
+
+            items(goals) { goal ->
                 MyGoalItem(
                     goal = goal,
                     onEditClick = {
@@ -78,6 +77,12 @@ fun MyGoalScreen(
                 )
             }
         }
+
+        MyButton(
+            text = "목표 추가",
+            onClick = { navController.navigate("my/goal/register") },
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
 
         if(showEditDialog && selectedGoal != null) {
             MyGoalEditDialog(

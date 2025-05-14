@@ -38,47 +38,45 @@ fun FamilyExerciseScreen(
         FamilyExercise(R.drawable.sample_walk, "산책", "km", 10f, 100, 3400, 20),
     )
 
-    Scaffold(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(backGroundGray),
-        topBar = {
+            .background(backGroundGray)
+    ) {
+
+        // Topbar 영역
+        item {
             FamilyExerciseTopBar(
                 navController = navController,
                 text = "예지렐라"
             )
-        },
-    ) { innerPadding ->
+        }
 
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 28.dp)
-        ) {
-
-            // 날짜
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp)
-                ) {
-                    Text(
-                        text = date,
-                        color = mainBlack,
-                        style = Typography.labelLarge
-                    )
-                }
+        // 날짜
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 32.dp, horizontal = 28.dp)
+            ) {
+                Text(
+                    text = date,
+                    color = mainBlack,
+                    style = Typography.labelLarge
+                )
             }
+        }
 
-            items(familyExercises) { exercise ->
-                FamilyExerciseItem(exercise)
-                Spacer(Modifier.height(20.dp))
-            }
+        items(familyExercises) { exercise ->
+            FamilyExerciseItem(
+                exercise,
+                modifier = Modifier.padding(horizontal = 28.dp)
+            )
+            Spacer(Modifier.height(20.dp))
         }
     }
 }
+
 
 data class FamilyExercise(
     val exerciseImg: Int,
