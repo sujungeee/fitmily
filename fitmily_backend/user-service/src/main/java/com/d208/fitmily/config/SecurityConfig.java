@@ -58,6 +58,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/reissue").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
                         .requestMatchers("/api/users/check-id").permitAll()
+
+                        // swagger 설정
                         .requestMatchers( "/swagger-ui/**").permitAll()
                         .requestMatchers( "/v3/api-docs/**").permitAll()
                         .requestMatchers( "/api-docs/**").permitAll()

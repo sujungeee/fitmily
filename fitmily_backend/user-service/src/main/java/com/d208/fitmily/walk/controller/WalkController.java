@@ -93,7 +93,7 @@ public class WalkController {
     }
 
     @Operation(summary = "산책 SSE 연결 ")
-    @GetMapping(value = "families/{familyId}/walks/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/families/{familyId}/walks/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter getWalkSubscribe(@PathVariable Integer familyId) {
         return sseService.connectFamilyEmitter(familyId);
     }
