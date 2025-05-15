@@ -3,18 +3,22 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: rootrootroot
       MYSQL_DATABASE: mydb
       MYSQL_USER: d208
-      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_PASSWORD: 208208208
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
-    secrets:
-      - mysql_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   mongodb:
     image: mongo:latest
@@ -46,50 +50,44 @@ services:
   springboot-app:
     build: ./user-service
     container_name: springboot-app
-    restart: always  # 서버 재시작이나 충돌시 항상 재시작
+    restart: on-failure
     ports:
       - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-      - SPRING_JWT_SECRET=${JWT_SECRET}
-    volumes:
-      - ./secrets/mysql_password.txt:/run/secrets/mysql_password:ro
-      - ./secrets/jwt_secret.txt:/run/secrets/jwt_secret:ro
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/mydb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=d208
+      - SPRING_DATASOURCE_PASSWORD=208208208
+      - SPRING_JWT_SECRET=vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
     depends_on:
-      - mysql
-      - redis
-      - rabbitmq
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
     networks:
       - app-network
-    secrets:
-      - mysql_password
-      - jwt_secret
     entrypoint: >
-      sh -c "export MYSQL_PASSWORD=$$(cat /run/secrets/mysql_password) &&
-            export JWT_SECRET=$$(cat /run/secrets/jwt_secret) &&
-            java -jar app.jar"
-
+      sh -c "echo 'Waiting for MySQL to be ready...' && 
+             sleep 10 &&
+             java -jar app.jar"
 
   nginx:
     image: nginx:latest
     container_name: nginx
-    restart: always  # 서버 재시작이나 충돌시 항상 재시작
+    restart: always
     ports:
       - "80:80"
-      - "443:443"  # HTTPS 포트 추가
+      - "443:443"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /home/ubuntu/S12P31D208/S12P31D208/fitmily_backend/nginx/conf.d:/etc/nginx/conf.d
       - /etc/letsencrypt/live/k12d208.p.ssafy.io:/etc/nginx/certs:ro
       - /etc/letsencrypt/archive/k12d208.p.ssafy.io:/etc/nginx/archive:ro
-      # - /home/ubuntu/S12P31D208/S12P31D208/fitmily_backend/nginx/conf.d:/etc/nginx/conf.d  # 절대경로로 변경했음.
-      # - /etc/letsencrypt/live/k12d208.p.ssafy.io:/etc/nginx/certs  # 인증서 경로 마운트
-      # - /etc/letsencrypt/archive:/etc/nginx/archive  # 필요한 경우
     depends_on:
       - springboot-app
     networks:
       - app-network
-
 
   prometheus:
     image: prom/prometheus
@@ -112,11 +110,10 @@ services:
       - app-network
 
   jenkins:
-    # image: jenkins/jenkins:lts-jdk17
-    image: custom-jenkins:latest  # 커스텀 이미지 사용
+    image: custom-jenkins:latest
     container_name: jenkins
     user: root
-    restart: always  # 서버 재시작이나 충돌시 항상 재시작
+    restart: always
     ports:
       - "8080:8080"
       - "50000:50000"
@@ -142,9 +139,3 @@ volumes:
   mongodb_data:
   grafana_data:
   jenkins_home:
-
-secrets:
-  mysql_password:
-    file: ./secrets/mysql_password.txt
-  jwt_secret:
-    file: ./secrets/jwt_secret.txt
