@@ -12,7 +12,7 @@ import lombok.Setter;
 public class LoginRequestDTO {
 
 
-    private String login_id;
+    private String loginId;
     private String password;
 
 }
