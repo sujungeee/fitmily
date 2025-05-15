@@ -28,6 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.navigation.RootNavGraph
 import com.ssafy.fitmily_android.presentation.ui.auth.components.ActivateButton
@@ -35,7 +37,6 @@ import com.ssafy.fitmily_android.presentation.ui.components.InputTextField
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
 import com.ssafy.fitmily_android.ui.theme.mainBlue
-import com.ssafy.fitmily_android.util.datastore.AuthDataStore
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -46,15 +47,26 @@ fun LoginScreen(
     val uiState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.loginSideEffect) {
-        when (uiState.loginSideEffect) {
-            is LoginSideEffect.NavigateToMain -> {
-                navController.navigate("main") {
-                    popUpTo(RootNavGraph.AuthNavGraph.route) {
-                        inclusive = true
+        for(sideEffect in uiState.loginSideEffect ?: return@LaunchedEffect) {
+            when (sideEffect) {
+                is LoginSideEffect.InitFCM -> {
+                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            return@OnCompleteListener
+                        }
+                        val token = task.result
+                        loginViewModel.sendFcmToken(token)
+                    })
+                }
+
+                is LoginSideEffect.NavigateToMain -> {
+                    navController.navigate("main") {
+                        popUpTo(RootNavGraph.AuthNavGraph.route) {
+                            inclusive = true
+                        }
                     }
                 }
             }
-            null -> Unit
         }
     }
 
@@ -115,8 +127,8 @@ fun LoginScreen(
 
             ActivateButton(
                 modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 28.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 28.dp)
                 , onClick = {
                     loginViewModel.login(id, pwd)
                 }
