@@ -45,7 +45,7 @@ object NetworkModule {
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient) : Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://p31d208.p.ssafy.io/api/") // TODO: edit
+            .baseUrl("https://k12d208.p.ssafy.io/api/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
