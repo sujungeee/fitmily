@@ -5,8 +5,12 @@ import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.service.FamilyService;
 import com.d208.fitmily.global.config.SecurityConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/api/family")
@@ -44,6 +48,20 @@ public class FamilyController {
         );
 
         return ResponseEntity.ok(new FamilyDetailResponse(familyData));
+    }
+
+    @GetMapping("/{familyId}/dashboard")
+    public ResponseEntity<FamilyDashboardResponse> getFamilyDashboard(
+            @PathVariable int familyId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        // 날짜 파라미터가 없으면 오늘 날짜 사용
+        String dateStr = (date != null)
+                ? date.format(DateTimeFormatter.ISO_DATE)
+                : LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+        FamilyDashboardResponse response = familyService.getFamilyDashboard(familyId, dateStr);
+        return ResponseEntity.ok(response);
     }
 
 }
