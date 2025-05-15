@@ -1,7 +1,5 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startForegroundService
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.naver.maps.geometry.LatLng
@@ -50,12 +47,10 @@ import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.PathOverlay
 import com.naver.maps.map.compose.rememberFusedLocationSource
 import com.ssafy.fitmily_android.R
-import com.ssafy.fitmily_android.model.dto.GpsDto
-import com.ssafy.fitmily_android.presentation.ui.main.MainScreen
+import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ProfileItem
 import com.ssafy.fitmily_android.presentation.ui.main.walk.component.StopWalkDialog
 import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
-import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveService
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
@@ -86,7 +81,7 @@ fun WalkScreen(
             }
         }
     }
-    var tmp =GpsDto(
+    var tmp = GpsDto(
         0.0,
         0.0,
         System.currentTimeMillis().toString(),
@@ -97,7 +92,7 @@ fun WalkScreen(
             path.value = list.map {
                 LatLng(it.lat, it.lon)
             }
-            tmp =GpsDto(list.last().lat, list.last().lon, System.currentTimeMillis().toString())
+            tmp = GpsDto(list.last().lat, list.last().lon, System.currentTimeMillis().toString())
         }
     )
 
