@@ -1,8 +1,7 @@
 package com.d208.fitmily.domain.user.service;
 
 
-import com.d208.fitmily.global.common.exception.BusinessException;
-import com.d208.fitmily.global.common.exception.ErrorCode;
+
 import com.d208.fitmily.global.jwt.JWTUtil;
 import com.d208.fitmily.domain.user.dto.ReissueResponseDto;
 import com.d208.fitmily.domain.user.mapper.UserMapper;
