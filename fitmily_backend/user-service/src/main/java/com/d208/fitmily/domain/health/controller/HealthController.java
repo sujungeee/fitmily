@@ -43,7 +43,7 @@ public class HealthController {
     @PatchMapping("health")
     public ResponseEntity<UpdateHealthRequestDto> updateHealth(
             @RequestBody UpdateHealthRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) throws JsonProcessingException {
 
         healthService.updateHealth(principal.getId(), dto);
         return ResponseEntity.ok(null);

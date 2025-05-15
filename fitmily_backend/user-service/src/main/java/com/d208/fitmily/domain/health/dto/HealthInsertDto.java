@@ -1,9 +1,14 @@
 package com.d208.fitmily.domain.health.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
+@Setter
+@Getter
 public class HealthInsertDto {
+    private Integer healthId;
     private Integer userId;
     private Float height;
     private Float weight;
