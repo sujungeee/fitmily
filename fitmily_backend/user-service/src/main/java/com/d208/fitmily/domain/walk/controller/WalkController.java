@@ -53,7 +53,7 @@ public class WalkController {
         return ResponseEntity.ok(gpsList);
     }
 
-    
+
     @Operation(summary = "산책 종료", description = "산책 중지 시점 데이터를 저장합니다. ")
     @PostMapping("/walks/end")
     public ResponseEntity<Void> endWalk(@RequestBody EndWalkRequestDto dto,
