@@ -36,6 +36,35 @@ public class WalkService {
     private final SseService sseService;
 
 
+    // 산책 시작했을때
+    public void processGps( Integer userId,GpsDto gpsDto){
+
+        boolean isFirst = !redisTemplate.hasKey("walk:gps:" + userId); //키가 없으면, 산책 시작
+        gpsRedisService.saveGps(userId, gpsDto); //gps redis에 저장
+
+        if (isFirst){
+            UserDto user = userService.getUserDtoById(userId);
+
+            Integer familyId = user.getFamilyId();
+
+            WalkStartDto data = WalkStartDto.builder()
+                    .userId(user.getUserId())
+                    .userNickname(user.getUserNickname())
+                    .userZodiacName(user.getUserZodiacName())
+                    .userFamilySequence(user.getUserFamilySequence())
+                    .build();
+
+            //sse 전송
+            sseService.sendFamilyWalkingEvent(familyId, data);
+        }
+
+        // 데이터 전송
+        String topic = "/topic/walk/gps/" + userId;
+        messagingTemplate.convertAndSend(topic, gpsDto);
+        System.out.println("산책 데이터 전송");
+    }
+
+
     // 산책 중지 (칼로리 계산에서 막힘 일단 패스 )
     @Transactional
     public void endWalk(Integer userId, EndWalkRequestDto dto){
@@ -70,32 +99,6 @@ public class WalkService {
         return walkMapper.walkGoalExists(userId);
     }
 
-    // 산책 시작했을때
-    public void processGps(Integer userId, GpsDto gpsDto){
-
-        boolean isFirst = !redisTemplate.hasKey("walk:gps:" + userId); //키가 없으면, 산책 시작
-        gpsRedisService.saveGps(userId, gpsDto); //gps redis에 저장
-
-        if (isFirst){
-            UserDto user = userService.getUserDtoById(userId);
-
-            Integer familyId = user.getFamilyId();
-
-            WalkStartDto data = WalkStartDto.builder()
-                    .userId(user.getUserId())
-                    .userNickname(user.getUserNickname())
-                    .userZodiacName(user.getUserZodiacName())
-                    .build();
-
-            //sse 전송
-            sseService.sendFamilyWalkingEvent(familyId, data);
-        }
-
-        // 데이터 전송
-        String topic = "/topic/walk/gps/" + userId;
-        messagingTemplate.convertAndSend(topic, gpsDto);
-    }
-
     // 산책중인 가족 구성원 조회
 //    public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
 //
@@ -107,8 +110,8 @@ public class WalkService {
 //            if (redisTemplate.hasKey("walk:gps:" + userId)) {
 //                result.add(UserDto.builder()
 //                        .userId(user.getUserId())
-////                        .name(user.getName())
-////                        .profileImg(user.getProfileImg())
+//                        .name(user.getName())
+//                        .profileImg(user.getProfileImg())
 //                        .build());
 //            }
 //        }

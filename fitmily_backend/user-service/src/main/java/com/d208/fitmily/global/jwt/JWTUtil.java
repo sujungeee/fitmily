@@ -62,7 +62,7 @@ public class JWTUtil {
                 .compact();
     }
     public String createAccessToken(Integer userId, String role) {
-        return createJwt(userId, role, "access", 1000L * 60 * 15); // 15분
+        return createJwt(userId, role, "access", 1000L * 60 * 60); // 15분
     }
 
     public String createRefreshToken(Integer userId) {

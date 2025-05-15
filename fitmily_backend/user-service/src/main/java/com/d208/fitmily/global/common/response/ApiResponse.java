@@ -21,6 +21,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> ok(T data, String message) {
         return new ApiResponse<>(true, HttpStatus.OK.value(), message, data);
     }
+
     // 에러 응답
     public static <T> ApiResponse<T> error(int code, String message) {
         return new ApiResponse<>(false, code, message, null);
