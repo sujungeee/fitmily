@@ -1,10 +1,8 @@
 package com.d208.fitmily.domain.health.service;
 
-import com.d208.fitmily.domain.health.dto.AddHealthRequestDto;
-import com.d208.fitmily.domain.health.dto.HealthResponseDto;
-import com.d208.fitmily.domain.health.dto.UpdateHealthRequestDto;
-import com.d208.fitmily.domain.health.dto.UpdateHealthResponseDto;
+import com.d208.fitmily.domain.health.dto.*;
 import com.d208.fitmily.domain.health.mapper.HealthMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,29 +10,33 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HealthService {
     private final HealthMapper healthMapper;
+    private final ObjectMapper objectMapper;
 
     // 건강상태 추가
-    public void addHealth(Integer userId, AddHealthRequestDto dto){
-
-        //bmi 계산해서 넣음
-        float heightM = dto.getHeight() / 100f;
-        float bmi = dto.getWeight() / (heightM * heightM);
-
-
-        dto.setUserId(userId);
-        dto.setBmi((float) (Math.floor(bmi * 10) / 10));
-
-//        Health health = Health.builder()
-//                .userId(userId)
-//                .bmi((float) (Math.floor(bmi * 10) / 10))
-//                .height(dto.getHeight())
-//                .weight(dto.getWeight())
-//                .otherDiseases(dto.getOtherDiseases())
-//                .fiveMajorDiseases(dto.getFiveMajorDiseases())
-//                .build();
-
-        int result = healthMapper.insertHealth(dto);
-    }
+//    public void addHealth(Integer userId, AddHealthRequestDto dto){
+//
+//
+//        //bmi 계산해서 넣음
+//        float heightM = dto.getHeight() / 100f;
+//        float bmi = dto.getWeight() / (heightM * heightM);
+//
+//
+//        dto.setUserId(userId);
+//        dto.setBmi((float) (Math.floor(bmi * 10) / 10));
+//
+//        String otherJson  = objectMapper.writeValueAsString(dto.getOtherDiseases());
+//        String majorJson  = objectMapper.writeValueAsString(dto.getFiveMajorDiseases());
+//
+//        HealthInsertDto insertDto = new HealthInsertDto();
+//        insertDto.setUserId(userId);
+//        insertDto.setHeight(dto.getHeight());
+//        insertDto.setWeight(dto.getWeight());
+//        insertDto.setBmi(bmi);
+//        insertDto.setHealthOtherDiseasesJson(otherJson);
+//        insertDto.setHealthFiveMajorDiseasesJson(majorJson);
+//
+//        int result = healthMapper.insertHealth(dto);
+//    }
 
     //건강 상태 조회
     public HealthResponseDto getLatestHealth(Integer userId){
