@@ -5,6 +5,7 @@ import com.d208.fitmily.health.dto.HealthResponseDto;
 import com.d208.fitmily.health.dto.UpdateHealthRequestDto;
 import com.d208.fitmily.health.dto.UpdateHealthResponseDto;
 import com.d208.fitmily.health.mapper.HealthMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class HealthService {
     private ObjectMapper objectMapper;
 
     // 건강상태 추가
-    public void addHealth(Integer userId, AddHealthRequestDto dto){
+    public void addHealth(Integer userId, AddHealthRequestDto dto) throws JsonProcessingException {
 
         //bmi 계산해서 넣음
         float heightM = dto.getHeight() / 100f;
@@ -25,6 +26,12 @@ public class HealthService {
 
         dto.setUserId(userId);
         dto.setBmi((float) (Math.floor(bmi * 10) / 10));
+
+        String otherDiseasesJson = objectMapper.writeValueAsString(dto.getHealthOtherDiseases());
+        String majorDiseasesJson = objectMapper.writeValueAsString(dto.getHealthFiveMajorDiseases());
+
+        dto.setHealthOtherDiseasesJson(otherDiseasesJson);
+        dto.setHealthFiveMajorDiseasesJson(majorDiseasesJson);
 
         int result = healthMapper.insertHealth(dto);
     }

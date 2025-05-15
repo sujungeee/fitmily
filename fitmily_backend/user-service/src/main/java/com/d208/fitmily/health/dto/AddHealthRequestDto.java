@@ -30,4 +30,7 @@ public class AddHealthRequestDto {
     private List<String> healthOtherDiseases;
     private List<String> healthFiveMajorDiseases;
 
+    private String healthOtherDiseasesJson;
+    private String healthFiveMajorDiseasesJson;
+
 }
