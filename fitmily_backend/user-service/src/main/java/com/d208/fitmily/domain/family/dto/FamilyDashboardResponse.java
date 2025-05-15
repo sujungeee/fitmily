@@ -25,7 +25,9 @@ public class FamilyDashboardResponse {
     public static class FamilyMember {
         private int userId;
         private String userNickname;
-        private List<ExerciseGoalInfo> goals;
+        private String userZodiacName;
+        private int userFamilySequence;
+        private List<ExerciseInfo> exercises;  // goals → exercises
         private int totalProgressRate;
     }
 
@@ -34,10 +36,11 @@ public class FamilyDashboardResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class ExerciseGoalInfo {
-        private int exerciseGoalId;
-        private String exerciseGoalName;
-        private int exerciseGoalValue;
-        private int exerciseGoalProgress;
+    public static class ExerciseInfo {
+        private int exerciseId;
+        private String exerciseName;
+        private Integer exerciseTime;  // 운동 시간
+        private int exerciseCount;     // 운동 횟수
+        private int exerciseCalories;  // 소모 칼로리
     }
 }
