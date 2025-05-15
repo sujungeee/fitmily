@@ -25,11 +25,11 @@ fun HomeScreen(
         AloneHome()
     }
 
-    if(WalkLiveData.isServiceRunning.value) {
-        Log.d(TAG, "HomeScreen: ")
-        navController.navigate("walk/main")
-        Log.d(TAG, "HomeScreen: ${WalkLiveData.lat}, ${WalkLiveData.lon}, ${WalkLiveData.speed}, ${WalkLiveData.lastUpdatedTime}")
-    }
+//    if(WalkLiveData.isServiceRunning.value) {
+//        Log.d(TAG, "HomeScreen: ")
+//        navController.navigate("walk/main")
+//        Log.d(TAG, "HomeScreen: ${WalkLiveData.lat}, ${WalkLiveData.lon}, ${WalkLiveData.speed}, ${WalkLiveData.lastUpdatedTime}")
+//    }
 
 }
 
