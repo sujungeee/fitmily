@@ -6,6 +6,7 @@ import com.d208.fitmily.domain.health.service.HealthService;
 import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.domain.user.service.UserService;
 import com.d208.fitmily.domain.walk.dto.*;
+import com.d208.fitmily.walk.dto.*;
 import com.d208.fitmily.domain.walk.entity.Walk;
 import com.d208.fitmily.domain.walk.mapper.WalkMapper;
 import lombok.RequiredArgsConstructor;
