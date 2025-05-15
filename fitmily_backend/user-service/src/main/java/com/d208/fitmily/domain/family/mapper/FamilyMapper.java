@@ -34,6 +34,12 @@ public interface FamilyMapper {
     @Update("UPDATE user SET family_id = #{familyId} WHERE user_id = #{userId}")
     void updateUserFamilyId(@Param("userId") int userId, @Param("familyId") int familyId);
 
+    /**
+     * 패밀리 ID로 패밀리 조회
+     */
+    @Select("SELECT * FROM family WHERE family_id = #{familyId}")
+    Family findById(@Param("familyId") int familyId);
+    
 
     /**
      * 가족 구성원 확인
