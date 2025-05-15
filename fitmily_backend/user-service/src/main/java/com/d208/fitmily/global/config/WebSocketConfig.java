@@ -1,5 +1,6 @@
 package com.d208.fitmily.global.config;
 
+import com.d208.fitmily.global.handler.DelegatingStompHandler;
 import com.d208.fitmily.global.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final DelegatingStompHandler delegatingStompHandler;
+
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WebSocketConfig.class);
 
     private final StompHandler stompHandler;
