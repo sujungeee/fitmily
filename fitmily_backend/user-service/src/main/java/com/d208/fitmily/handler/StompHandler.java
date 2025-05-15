@@ -34,7 +34,7 @@ public class StompHandler implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         // 디버깅 로깅 추가
-        System.out.println("STOMP Command: " + accessor.getCommand());
+//        System.out.println("STOMP Command: " + accessor.getCommand());
 
         // 메서드 전체에서 사용할 sessionId 변수
         String sessionId = accessor.getSessionId();
@@ -43,7 +43,16 @@ public class StompHandler implements ChannelInterceptor {
         if (accessor.getUser() == null &&
                 (StompCommand.SUBSCRIBE.equals(accessor.getCommand()) ||
                         StompCommand.SEND.equals(accessor.getCommand()))) {
+            System.out.println("🔄 사용자 인증 정보 복원 시도");
 
+            Object authObj = accessor.getSessionAttributes().get("user");
+
+            if (authObj instanceof Authentication auth) {
+                accessor.setUser(auth);
+                System.out.println("✅ 사용자 인증 정보 복원 성공");
+            } else {
+                System.out.println("❌ 사용자 인증 정보 복원 실패 (세션에 없음)");
+            }
 
             // Redis에서 세션 ID로 사용자 정보 조회 (새로 추가)
             String userIdStr = (String) redisTemplate.opsForValue().get("ws:session:" + sessionId);
@@ -70,10 +79,14 @@ public class StompHandler implements ChannelInterceptor {
 
         // WebSocket 연결 시 JWT 토큰 검증
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            System.out.println("🔥 STOMP CONNECT 도착");
+
             String authHeader = accessor.getFirstNativeHeader("Authorization");
+            System.out.println("🧾 Authorization 헤더: " + authHeader);
 
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
+                System.out.println("🔓 토큰 추출: " + token.substring(0, 10) + "...");
 
                 if (!jwtUtil.validateToken(token)) {
                     throw new BusinessException(ErrorCode.INVALID_TOKEN);
@@ -81,6 +94,7 @@ public class StompHandler implements ChannelInterceptor {
 
                 Integer userId = jwtUtil.getUserId(token);
                 String role = jwtUtil.getRole(token);
+                System.out.println("✅ 토큰 OK, userId: " + userId + ", role: " + role);
 
                 User user = new User();
                 user.setUserId(userId);
@@ -88,9 +102,7 @@ public class StompHandler implements ChannelInterceptor {
                 user.setRole(role);
 
                 CustomUserDetails userDetails = new CustomUserDetails(user);
-//                System.out.println("UserDetails 생성 완료: " + userDetails);
 
-                // 명시적으로 권한 설정 (이 부분이 중요합니다)
                 SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
                 Collection<SimpleGrantedAuthority> authorities = Collections.singletonList(authority);
 
@@ -102,6 +114,8 @@ public class StompHandler implements ChannelInterceptor {
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 accessor.setUser(auth);
 
+                accessor.getSessionAttributes().put("user", auth);
+                System.out.println("✅ WebSocket 세션에 인증 정보 저장 완료");
 
                 // Redis에 세션 ID와 사용자 ID 매핑 저장 (새로 추가)
                 redisTemplate.opsForValue().set("ws:session:" + sessionId, userId.toString());

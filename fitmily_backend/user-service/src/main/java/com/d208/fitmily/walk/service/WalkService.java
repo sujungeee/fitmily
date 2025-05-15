@@ -54,6 +54,7 @@ public class WalkService {
                     .userId(user.getUserId())
                     .userNickname(user.getUserNickname())
                     .userZodiacName(user.getUserZodiacName())
+                    .userFamilySequence(user.getUserFamilySequence())
                     .build();
 
             //sse 전송
