@@ -47,7 +47,7 @@ public class WalkController {
     public void handleGps(@Payload GpsDto gpsDto, Message<?> message) {
         System.out.println("🚨 컨트롤러 진입 성공!");
 
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message); //instanceof 타입확인 하고 형변환까지 해줌
         if (accessor.getUser() instanceof Authentication auth &&
                 auth.getPrincipal() instanceof CustomUserDetails userDetails) {
             Integer userId = userDetails.getId();
