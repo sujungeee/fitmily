@@ -3,7 +3,6 @@ package com.ssafy.fitmily_android.presentation.ui.main.walk.live
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.icu.text.DateFormat
 import android.location.Location
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Granularity
@@ -16,7 +15,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.gson.Gson
-import com.ssafy.fitmily_android.model.dto.GpsDto
+import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 
 private const val TAG = "WalkLiveWorker"
 class WalkLiveWorker(private val context: Context) {

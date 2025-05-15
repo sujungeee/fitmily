@@ -1,13 +1,11 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk.live
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.google.gson.Gson
-import com.ssafy.fitmily_android.model.dto.GpsDto
-import io.reactivex.Scheduler
+import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 import io.reactivex.schedulers.Schedulers
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
@@ -22,7 +20,7 @@ object WebSocketManager {
     var isConnected = false
 
     val url = "ws://192.168.100.130:8081/api/ws-connect"
-    val TOKEN="eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ3MjY5NDgyLCJleHAiOjE3NDcyNzMwODJ9.SVVgiqNGoyqNzLZCNmqjKQ_czGxpczqXHlORasADCEg"
+    val TOKEN="eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ3MjgzNjg3LCJleHAiOjE3NDcyODcyODd9.VEDTuuHFWil2ipdMN_ZvgXeQ079sVP-lvsiBLU1LyK0"
     var headerList: MutableList<StompHeader> = mutableListOf(
         StompHeader("Authorization", "Bearer ${TOKEN}")
     )
