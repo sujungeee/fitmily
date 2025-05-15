@@ -11,6 +11,11 @@ import java.util.List;
 public interface FamilyMapper {
 
     /**
+     * 가족 생성
+     */
+    void createFamily(Family family);
+
+    /**
      * 가족 구성원 확인
      */
     @Select("SELECT COUNT(*) FROM user WHERE family_id = #{familyId} AND user_id = #{userId}")
