@@ -1,7 +1,6 @@
 pipeline {
     agent any
     
-    // 변수 선언 추가
     environment {
         GIT_AUTHOR_ID = ''
         GIT_AUTHOR_EMAIL = ''
@@ -9,7 +8,6 @@ pipeline {
     
     stages {
         stage('Checkout') {
-            // 기존 코드 유지
             steps {
                 git branch: 'backend', credentialsId: 'gitlab-credentials', url: 'https://lab.ssafy.com/s12-final/S12P31D208.git'
                 
@@ -26,7 +24,6 @@ pipeline {
         }
         
         stage('Build SpringBoot') {
-            // 기존 코드 유지
             steps {
                 dir('fitmily_backend/user-service') {
                     sh 'chmod +x ./gradlew || true'
@@ -36,7 +33,6 @@ pipeline {
         }
 
         stage('Docker Build & Deploy') {
-            // 기존 코드 유지
             steps {
                 dir('fitmily_backend') {
                     sh '/usr/local/bin/docker-compose build || docker compose build'
@@ -45,20 +41,17 @@ pipeline {
             }
         }
         
-        // 새로운 단계 추가: Nginx 설정 적용 및 재시작
         stage('Update Nginx Config') {
             steps {
-                // Nginx 설정 파일 확인 및 재시작
                 dir('fitmily_backend') {
                     sh 'echo "Applying latest Nginx configuration..."'
-                    sh 'ls -la nginx/conf.d/'  // 설정 파일 존재 확인
+                    sh 'ls -la nginx/conf.d/'
                     sh '/usr/local/bin/docker-compose restart nginx || docker compose restart nginx'
                 }
             }
         }
 
         stage('Health Check') {
-            // 기존 코드 유지
             steps {
                 sh 'sleep 15'
                 sh 'curl -f http://localhost:8080/actuator/health || true'
@@ -66,23 +59,30 @@ pipeline {
         }
     }
     
-    // post 섹션 유지
     post {
         success {
             script {
-                mattermostSend (color: 'good', 
-                message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
-                channel: 'D208-Build-Bot'
+                mattermostSend (
+                    color: 'good', 
+                    message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
+                    endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
+                    channel: 'D208-Build-Bot'
                 )
+                
+                // 성공 시 Docker 볼륨 백업 실행
+                sh '''
+                    echo "🔄 배포 성공! Docker 볼륨 백업을 시작합니다..."
+                    /home/ubuntu/docker-backup.sh
+                '''
             }
         }
         failure {
             script {
-                mattermostSend (color: 'danger', 
-                message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
-                endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
-                channel: 'D208-Build-Bot'
+                mattermostSend (
+                    color: 'danger', 
+                    message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${env.GIT_AUTHOR_NAME}(${env.GIT_AUTHOR_EMAIL})\n(<${env.BUILD_URL}|Details>)", 
+                    endpoint: 'https://meeting.ssafy.com/hooks/93zyedse8b8m7dmkjfwk6rhtfo', 
+                    channel: 'D208-Build-Bot'
                 )
             }
         }
