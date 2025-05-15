@@ -21,6 +21,10 @@ public enum ErrorCode {
     FCM_NOTIFICATION_FAILED(4202, "FCM 알림 전송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FCM_TOKEN_INVALID(4203, "유효하지 않은 FCM 토큰입니다.", HttpStatus.BAD_REQUEST),
 
+    // 패밀리 관련
+    INVALID_INVITE_CODE(4301, "유효하지 않은 초대 코드입니다", HttpStatus.BAD_REQUEST),
+    FAMILY_MEMBER_LIMIT_EXCEEDED(4302, "패밀리 최대 인원(6명)을 초과했습니다", HttpStatus.BAD_REQUEST);
+
     ;
     private final int        code;
     private final String     message;
