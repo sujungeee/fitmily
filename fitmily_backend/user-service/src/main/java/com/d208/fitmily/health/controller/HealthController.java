@@ -25,8 +25,9 @@ public class HealthController {
 
 
     @Operation(summary = "건강 상태 등록", description = "- JWT에서 추출한 userId로 건강 상태를 저장합니다.")
-    @PostMapping("health") //주소 아직 안정함
+    @PostMapping("health")
     public ApiResponse<Void> addHealth(@RequestBody AddHealthRequestDto dto, @AuthenticationPrincipal CustomUserDetails principal) throws JsonProcessingException {
+        System.out.println("등록 컨트롤러 진입");
         healthService.addHealth(principal.getId(),dto);
         return ApiResponse.ok(null, "건강 상태가 등록되었습니다");
     }
