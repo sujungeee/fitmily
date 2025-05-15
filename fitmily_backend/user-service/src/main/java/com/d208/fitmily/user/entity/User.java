@@ -15,7 +15,7 @@ public class User {
     private String password;
     private String nickname;
     private String birth;
-    private String gender;
+    private Integer gender;
     private String refreshToken;
     private String zodiacName;
     private Integer familySequence;

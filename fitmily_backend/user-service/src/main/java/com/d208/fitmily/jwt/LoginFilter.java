@@ -37,7 +37,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             // 여기 DTO 이름 수정!!
             LoginRequestDTO loginRequestDTO = objectMapper.readValue(request.getInputStream(), LoginRequestDTO.class);
 
-            String loginId = loginRequestDTO.getLogin_id();
+            String loginId = loginRequestDTO.getLoginId();
             String password = loginRequestDTO.getPassword();
 
             System.out.println("유저네임 : " + loginId);
