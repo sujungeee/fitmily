@@ -34,4 +34,12 @@ public class User {
     public int getUserFamilySequence() {
         return familySequence;
     }
+
+    public String getUserBirth() {
+        return birth;
+    }
+
+    public int getUserGender() {
+        return gender;
+    }
 }

@@ -3,11 +3,18 @@ package com.d208.fitmily.domain.family.service;
 import com.d208.fitmily.domain.exercise.entity.Exercise;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
 import com.d208.fitmily.domain.family.dto.FamilyDashboardResponse;
+import com.d208.fitmily.domain.family.dto.FamilyHealthStatusResponse;
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.mapper.FamilyMapper;
+import com.d208.fitmily.domain.health.dto.HealthResponseDto;
+import com.d208.fitmily.domain.health.mapper.HealthMapper;
 import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.global.common.exception.CustomException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +31,9 @@ public class FamilyService {
 
     private final FamilyMapper familyMapper;
     private final ExerciseMapper exerciseMapper;
+    private final HealthMapper healthMapper;
+    private final ObjectMapper objectMapper;
+
     private static final int MAX_FAMILY_MEMBERS = 6;
 
     @Transactional
@@ -140,6 +150,73 @@ public class FamilyService {
                 .date(date)
                 .members(memberList)
                 .build();
+    }
+
+    /**
+     * 패밀리 건강 상태 조회
+     */
+    @Transactional(readOnly = true)
+    public FamilyHealthStatusResponse getFamilyHealthStatus(int familyId) {
+        // 패밀리 존재 확인
+        Family family = familyMapper.findById(familyId);
+        if (family == null) {
+            throw new CustomException(ErrorCode.FAMILY_NOT_FOUND);
+        }
+
+        // 패밀리 구성원 목록 조회
+        List<User> familyMembers = familyMapper.findFamilyMembers(familyId);
+
+        // 각 구성원의 건강 정보 조회
+        List<FamilyHealthStatusResponse.MemberHealthInfo> memberHealthInfoList = new ArrayList<>();
+
+        for (User member : familyMembers) {
+            // 사용자의 최신 건강 정보 조회 (기존 HealthMapper 사용)
+            HealthResponseDto healthInfo = healthMapper.selectLatestByUserId(member.getUserId());
+
+            // 건강 정보가 없는 사용자는 건너뜀
+            if (healthInfo == null) {
+                continue;
+            }
+
+            // JSON 문자열을 리스트로 변환
+            List<String> fiveMajorDiseases = parseJsonList(healthInfo.getHealthFiveMajorDiseases());
+            List<String> otherDiseases = parseJsonList(healthInfo.getHealthOtherDiseases());
+
+            // 사용자 건강 정보 생성
+            FamilyHealthStatusResponse.MemberHealthInfo memberHealthInfo = FamilyHealthStatusResponse.MemberHealthInfo.builder()
+                    .userId(member.getUserId())
+                    .userNickname(member.getUserNickname())
+                    .userBirth(member.getUserBirth())
+                    .userGender(member.getUserGender())
+                    .healthHeight(healthInfo.getHealthHeight())
+                    .healthWeight(healthInfo.getHealthWeight())
+                    .healthBmi(healthInfo.getHealthBmi())
+                    .healthFiveMajorDiseases(fiveMajorDiseases)
+                    .healthOtherDiseases(otherDiseases)
+                    .build();
+
+            memberHealthInfoList.add(memberHealthInfo);
+        }
+
+        // 응답 데이터 생성
+        return FamilyHealthStatusResponse.builder()
+                .members(memberHealthInfoList)
+                .build();
+    }
+
+    /**
+     * JSON 문자열을 List<String>으로 변환
+     */
+    private List<String> parseJsonList(String json) {
+        if (json == null || json.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<String>>() {});
+        } catch (JsonProcessingException e) {
+            return Collections.emptyList();
+        }
     }
 
 }

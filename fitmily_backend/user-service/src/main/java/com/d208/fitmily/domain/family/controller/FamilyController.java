@@ -64,4 +64,10 @@ public class FamilyController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{familyId}/health-status")
+    public ResponseEntity<FamilyHealthStatusResponse> getFamilyHealthStatus(@PathVariable int familyId) {
+        FamilyHealthStatusResponse response = familyService.getFamilyHealthStatus(familyId);
+        return ResponseEntity.ok(response);
+    }
+
 }
