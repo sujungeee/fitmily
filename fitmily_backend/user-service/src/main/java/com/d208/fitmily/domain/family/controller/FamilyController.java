@@ -1,9 +1,7 @@
 package com.d208.fitmily.domain.family.controller;
 
-import com.d208.fitmily.domain.family.dto.CreateFamilyRequest;
-import com.d208.fitmily.domain.family.dto.CreateFamilyResponse;
-import com.d208.fitmily.domain.family.dto.JoinFamilyRequest;
-import com.d208.fitmily.domain.family.dto.JoinFamilyResponse;
+import com.d208.fitmily.domain.family.dto.*;
+import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.service.FamilyService;
 import com.d208.fitmily.global.config.SecurityConfig;
 import lombok.RequiredArgsConstructor;
@@ -35,4 +33,17 @@ public class FamilyController {
         JoinFamilyResponse response = new JoinFamilyResponse(new JoinFamilyResponse.FamilyData(familyId));
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{familyId}")
+    public ResponseEntity<FamilyDetailResponse> getFamily(@PathVariable int familyId) {
+        Family family = familyService.getFamily(familyId);
+
+        FamilyDetailResponse.FamilyData familyData = new FamilyDetailResponse.FamilyData(
+                family.getFamilyName(),
+                family.getFamilyInviteCode()
+        );
+
+        return ResponseEntity.ok(new FamilyDetailResponse(familyData));
+    }
+
 }
