@@ -62,6 +62,12 @@ object NetworkModule {
 
     @Singleton
     @Provides
+    fun provideMyHealthService(retrofit: Retrofit): MyHealthService {
+        return retrofit.create(MyHealthService::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun provideWalkService(retrofit: Retrofit): WalkService {
         return retrofit.create(WalkService::class.java)
     }
@@ -70,12 +76,5 @@ object NetworkModule {
     @Provides
     fun provideHomeService(retrofit: Retrofit): HomeService {
         return retrofit.create(HomeService::class.java)
-    }
-
-    // TODO: add
-    @Singleton
-    @Provides
-    fun provideMyHealthService(retrofit: Retrofit): MyHealthService {
-        return retrofit.create(MyHealthService::class.java)
     }
 }
