@@ -6,7 +6,7 @@ import com.d208.fitmily.domain.chat.entity.ChatMessage;
 import com.d208.fitmily.domain.chat.repository.MessageRepository;
 import com.d208.fitmily.global.common.exception.BusinessException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
-import com.d208.fitmily.family.mapper.FamilyMapper;
+import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
