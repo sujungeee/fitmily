@@ -47,7 +47,7 @@ public interface FamilyMapper {
     @Select("SELECT * FROM user WHERE family_id = #{familyId}")
     List<User> findFamilyMembers(@Param("familyId") int familyId);
 
-
+    //
     /**
      * 가족 구성원 확인
      */
