@@ -4,8 +4,7 @@ import com.d208.fitmily.domain.chat.dto.ChatMessageDTO;
 import com.d208.fitmily.domain.chat.dto.ChatMessagesResponseDTO;
 import com.d208.fitmily.domain.chat.entity.ChatMessage;
 import com.d208.fitmily.domain.chat.repository.MessageRepository;
-import com.d208.fitmily.global.common.exception.BusinessException;
-import com.d208.fitmily.global.common.exception.ErrorCode;
+
 import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +36,9 @@ public class ChatService {
      */
     public ChatMessagesResponseDTO getMessages(String familyId, String userId, String before, int limit) {
         // 접근 권한 확인
-        if (!familyMapper.checkFamilyMembership(familyId, userId)) {
-            throw new BusinessException(ErrorCode.CHAT_ACCESS_DENIED);
-        }
+//        if (!familyMapper.checkFamilyMembership(familyId, userId)) {
+//            throw new BusinessException(ErrorCode.CHAT_ACCESS_DENIED);
+//        }
 
         // 메시지 조회
         List<ChatMessage> messages;

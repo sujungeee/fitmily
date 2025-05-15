@@ -1,7 +1,5 @@
 package com.d208.fitmily.domain.health.controller;
 
-
-import com.d208.fitmily.global.common.response.ApiResponse;
 import com.d208.fitmily.domain.health.dto.AddHealthRequestDto;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 import com.d208.fitmily.domain.health.dto.UpdateHealthRequestDto;
@@ -24,12 +22,12 @@ public class HealthController {
     private final HealthService healthService;
 
 
-//    @Operation(summary = "건강 상태 등록", description = "- JWT에서 추출한 userId로 건강 상태를 저장합니다.")
-//    @PostMapping("health") //주소 아직 안정함
-//    public ResponseEntity<Void> addHealth(@RequestBody AddHealthRequestDto dto, @AuthenticationPrincipal CustomUserDetails principal) throws JsonProcessingException {
-//        healthService.addHealth(principal.getId(),dto);
-//        return ResponseEntity.ok(null);
-//    }
+    @Operation(summary = "건강 상태 등록", description = "- JWT에서 추출한 userId로 건강 상태를 저장합니다.")
+    @PostMapping("health") //주소 아직 안정함
+    public ResponseEntity<Void> addHealth(@RequestBody AddHealthRequestDto dto, @AuthenticationPrincipal CustomUserDetails principal) throws JsonProcessingException {
+        healthService.addHealth(principal.getId(),dto);
+        return ResponseEntity.ok(null);
+    }
 
 
 
@@ -43,11 +41,11 @@ public class HealthController {
 
     @Operation(summary = "건강 상태 수정", description = "- 건강상태를 수정합니다")
     @PatchMapping("health")
-    public ApiResponse<UpdateHealthRequestDto> updateHealth(
+    public ResponseEntity<UpdateHealthRequestDto> updateHealth(
             @RequestBody UpdateHealthRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails principal) {
 
         healthService.updateHealth(principal.getId(), dto);
-        return ApiResponse.ok(null,"건강 상태가 수정되었습니다.");
+        return ResponseEntity.ok(null);
     }
 }
