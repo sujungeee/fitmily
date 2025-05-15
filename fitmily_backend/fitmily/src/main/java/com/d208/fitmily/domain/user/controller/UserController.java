@@ -7,6 +7,7 @@ import com.d208.fitmily.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -53,11 +54,11 @@ public class UserController {
         return ApiResponse.ok(null,"로그아웃 성공");
     }
 
-    @Operation(summary = "리이슈", description = "- access토큰 재발급")
+    @Operation(summary = "리이슈", description = "- 엑세스,리프레시 토큰 재발급")
     @PostMapping("/auth/reissue")
-    public ApiResponse<ReissueResponseDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
+    public ResponseEntity<ReissueResponseDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
         String refreshToken = reissueRequestDto.getRefresh_token();
         ReissueResponseDto newToken = userService.reissueAccessToken(refreshToken);
-        return ApiResponse.ok(newToken,"토큰 재발급 성공");
+        return ResponseEntity.ok(newToken);
     }
 }

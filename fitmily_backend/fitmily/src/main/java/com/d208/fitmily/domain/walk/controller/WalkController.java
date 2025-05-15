@@ -14,8 +14,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -37,13 +40,23 @@ public class WalkController {
     private final SseService sseService;
 
     //산책 시작
-    @MessageMapping("/walk/gps")  // /app/walk/gps 로 전송된 메시지를 처리함
-    public void handleGps(@Payload GpsDto gpsDto, @AuthenticationPrincipal CustomUserDetails principal) {
+    @MessageMapping("/walk/gps")
+    public void handleGps(@Payload GpsDto gpsDto, Message<?> message) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        System.out.println("📥 컨트롤러 진입, sessionId: " + accessor.getSessionId());
 
-        Integer userId = principal.getId();
-        walkService.processGps(userId, gpsDto);
+        if (accessor.getUser() instanceof Authentication auth &&
+                auth.getPrincipal() instanceof CustomUserDetails userDetails) {
 
+            Integer userId = userDetails.getId();
+            System.out.println("✅ [Controller] userId 추출 완료: " + userId);
+
+            walkService.processGps(userId, gpsDto);
+        } else {
+            System.out.println("❌ [Controller] 인증 실패 또는 사용자 정보 없음");
+        }
     }
+
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")
@@ -89,7 +102,7 @@ public class WalkController {
     }
 
     @Operation(summary = "산책 SSE 연결 ")
-    @GetMapping(value = "families/{familyId}/walks/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/families/{familyId}/walks/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter getWalkSubscribe(@PathVariable Integer familyId) {
         return sseService.connectFamilyEmitter(familyId);
     }

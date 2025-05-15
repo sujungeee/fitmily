@@ -44,7 +44,7 @@ public class CustomUserDetails implements UserDetails {
         return userEntity.getBirth();
     }
 
-    public String getGender() {
+    public Integer getGender() {
         return userEntity.getGender();
     }
 
