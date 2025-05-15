@@ -1,10 +1,11 @@
 package com.ssafy.fitmily_android.model.repositoryimpl
 
-import android.util.Log
 import com.ssafy.fitmily_android.domain.repository.AuthRepository
+import com.ssafy.fitmily_android.model.dto.request.FcmRequest
 import com.ssafy.fitmily_android.model.dto.request.JoinRequest
 import com.ssafy.fitmily_android.model.dto.request.LoginRequest
 import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
+import com.ssafy.fitmily_android.model.dto.response.FcmResponse
 import com.ssafy.fitmily_android.model.dto.response.LoginResponse
 import com.ssafy.fitmily_android.model.dto.response.ReissueResponse
 import com.ssafy.fitmily_android.model.service.AuthService
@@ -13,8 +14,8 @@ import jakarta.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val authService: AuthService
 ): AuthRepository {
-    override suspend fun login(id: String, pwd: String): LoginResponse {
-        return authService.login(LoginRequest(id, pwd))
+    override suspend fun login(userId: String, userPwd: String): LoginResponse {
+        return authService.login(LoginRequest(userId, userPwd))
     }
 
     override suspend fun logout(): Boolean {
@@ -29,7 +30,11 @@ class AuthRepositoryImpl @Inject constructor(
         return authService.checkDuplId(userId)
     }
 
-    override suspend fun join(userLoginId: String, userPw: String, userNickname: String, userBirth: String, userGender: Int): Boolean {
-        return authService.join(JoinRequest(userLoginId, userPw, userNickname, userBirth, userGender))
+    override suspend fun join(userId: String, userPwd: String, userNickname: String, userBirth: String, userGender: Int): Boolean {
+        return authService.join(JoinRequest(userId, userPwd, userNickname, userBirth, userGender))
+    }
+
+    override suspend fun sendFcmToken(userId: String, fcmToken: String): FcmResponse {
+        return authService.sendFcmToken(FcmRequest(userId, fcmToken))
     }
 }
