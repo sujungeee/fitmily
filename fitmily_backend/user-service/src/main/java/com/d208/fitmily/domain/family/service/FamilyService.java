@@ -2,6 +2,7 @@ package com.d208.fitmily.domain.family.service;
 
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.mapper.FamilyMapper;
+import com.d208.fitmily.global.common.exception.CustomException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,17 @@ public class FamilyService {
         familyMapper.incrementFamilyPeople(family.getFamilyId());
 
         return family.getFamilyId();
+    }
+
+    /**
+     * 패밀리 조회
+     */
+    public Family getFamily(int familyId) {
+        Family family = familyMapper.findById(familyId);
+        if (family == null) {
+            throw new CustomException(ErrorCode.FAMILY_NOT_FOUND);
+        }
+        return family;
     }
 
 }
