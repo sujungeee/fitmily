@@ -14,6 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final DelegatingStompHandler delegatingStompHandler;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WebSocketConfig.class);
 
     private final StompHandler stompHandler;
@@ -32,15 +33,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // WebSocket 연결 엔드포인트
         registry.addEndpoint("/api/ws-connect")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
-        log.info("WebSocket 엔드포인트 등록 완료: /api/ws-connect");
+                .setAllowedOriginPatterns("*");
+//                .withSockJS();
+        log.info("WebSocket 연결 완료: /api/ws-connect");
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         // STOMP 메시지 처리 전 인터셉터 등록
-        registration.interceptors(stompHandler);
-        log.info("StompHandler 인터셉터 등록 완료");
+        registration.interceptors(delegatingStompHandler);
+        System.out.println("인터셉터 등록 완료");
     }
 }
