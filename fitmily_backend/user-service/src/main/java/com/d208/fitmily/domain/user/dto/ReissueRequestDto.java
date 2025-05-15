@@ -11,5 +11,5 @@ import lombok.Setter;
 @Setter
 public class ReissueRequestDto {
 
-    private String Refresh_token;
+    private String refreshToken;
 }
