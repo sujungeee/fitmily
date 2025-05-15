@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
-@EnableMongoRepositories(basePackages = "com.d208.fitmily.chat.repository")
+@EnableMongoRepositories(basePackages = "com.d208.fitmily.domain.chat.repository")
 public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoDBConfig.class);
