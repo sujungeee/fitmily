@@ -1,6 +1,8 @@
 package com.ssafy.fitmily_android.model.repositoryimpl
 
 import com.ssafy.fitmily_android.domain.repository.MyHealthRepository
+import com.ssafy.fitmily_android.model.common.ApiResultHandler
+import com.ssafy.fitmily_android.model.common.Result
 import com.ssafy.fitmily_android.model.dto.request.my.MyHealthRequest
 import com.ssafy.fitmily_android.model.dto.response.my.MyHealthResponse
 import com.ssafy.fitmily_android.model.service.MyHealthService
@@ -10,8 +12,11 @@ import javax.inject.Inject
 class MyHealthRepositoryImpl @Inject constructor(
     private val myHealthService: MyHealthService
 ): MyHealthRepository {
-    override suspend fun getMyHealthInfo(): Response<MyHealthResponse> {
-        return myHealthService.getMyHealthInfo()
+
+    override suspend fun getMyHealthInfo(): Result<MyHealthResponse> {
+        return ApiResultHandler.handleApi {
+            myHealthService.getMyHealthInfo()
+        }
     }
 
     override suspend fun insertMyHealthInfo(
@@ -19,14 +24,17 @@ class MyHealthRepositoryImpl @Inject constructor(
         height: Float,
         otherDiseases: List<String>,
         weight: Float
-    ): Response<Any> {
-        val myHealthRequest = MyHealthRequest(
-            fiveMajorDiseases = fiveMajorDiseases,
-            height = height,
-            otherDiseases = otherDiseases,
-            weight = weight
-        )
-        return myHealthService.insertMyHealthInfo(myHealthRequest)
+    ): Result<Any> {
+
+        return ApiResultHandler.handleApi {
+            val myHealthRequest = MyHealthRequest(
+                fiveMajorDiseases = fiveMajorDiseases,
+                height = height,
+                otherDiseases = otherDiseases,
+                weight = weight
+            )
+            myHealthService.insertMyHealthInfo(myHealthRequest)
+        }
     }
 
     override suspend fun updateMyHealthInfo(
@@ -34,13 +42,16 @@ class MyHealthRepositoryImpl @Inject constructor(
         height: Float?,
         otherDiseases: List<String>?,
         weight: Float?
-    ): Response<Any> {
-        val myHealthRequest = MyHealthRequest(
-            fiveMajorDiseases = fiveMajorDiseases,
-            height = height,
-            otherDiseases = otherDiseases,
-            weight = weight
-        )
-        return myHealthService.updateMyHealthInfo(myHealthRequest)
+    ): Result<Any> {
+
+        return ApiResultHandler.handleApi {
+            val myHealthRequest = MyHealthRequest(
+                fiveMajorDiseases = fiveMajorDiseases,
+                height = height,
+                otherDiseases = otherDiseases,
+                weight = weight
+            )
+            myHealthService.updateMyHealthInfo(myHealthRequest)
+        }
     }
 }

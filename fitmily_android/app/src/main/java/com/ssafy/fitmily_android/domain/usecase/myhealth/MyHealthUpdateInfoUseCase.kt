@@ -1,6 +1,7 @@
 package com.ssafy.fitmily_android.domain.usecase.myhealth
 
 import com.ssafy.fitmily_android.domain.repository.MyHealthRepository
+import com.ssafy.fitmily_android.model.common.Result
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -12,7 +13,7 @@ class MyHealthUpdateInfoUseCase @Inject constructor(
         height: Float?,
         otherDiseases: List<String>?,
         weight: Float?
-    ): Response<Any> {
+    ): Result<Any> {
         return myHealthRepository.updateMyHealthInfo(
             fiveMajorDiseases = fiveMajorDiseases,
             height = height,

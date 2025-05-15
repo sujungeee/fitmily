@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.fitmily_android.domain.usecase.myhealth.MyHealthGetInfoUseCase
 import com.ssafy.fitmily_android.domain.usecase.myhealth.MyHealthInsertInfoUseCase
 import com.ssafy.fitmily_android.domain.usecase.myhealth.MyHealthUpdateInfoUseCase
+import com.ssafy.fitmily_android.model.common.Result
 import com.ssafy.fitmily_android.presentation.ui.state.Mode
 import com.ssafy.fitmily_android.presentation.ui.state.MyHealthSideEffect
 import com.ssafy.fitmily_android.presentation.ui.state.MyHealthUiState
@@ -34,104 +35,128 @@ class MyHealthViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-            runCatching {
-                Log.d("test1234", "getMyHealthInfo 불림")
-                myHealthGetInfoUseCase()
-            }.onSuccess { response ->
-                Log.d("test1234", "getMyHealthInfo 성공")
-                if (response.body() == null) {
-                    _myHealthUiState.update { state ->
-                        state.copy(
-                            mode = Mode.REGISTER,
-                            isLoading = false
-                        )
+
+            when(val result = myHealthGetInfoUseCase()) {
+
+                is Result.Success -> {
+
+                    val data = result.data
+
+                    if(data == null) {
+                        _myHealthUiState.update { state ->
+                            state.copy(
+                                mode = Mode.REGISTER,
+                                isLoading = false
+                            )
+                        }
                     }
-                } else {
+                    else {
+                        _myHealthUiState.update { state ->
+                            state.copy(
+                                mode = Mode.MODIFIER,
+                                height = data.height.toString(),
+                                weight = data.weight.toString(),
+                                selectedMajorDiseases = data.fiveMajorDiseases,
+                                otherDiseases = data.otherDiseases,
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+
+                is Result.Error -> {
                     _myHealthUiState.update { state ->
                         state.copy(
-                            mode = Mode.MODIFIER,
-                            height = response.body()!!.height.toString(),
-                            weight = response.body()!!.weight.toString(),
-                            selectedMajorDiseases = response.body()!!.fiveMajorDiseases,
-                            otherDiseases = response.body()!!.otherDiseases,
-                            isLoading = false
+                            isLoading = false,
+                            errorMessage = result.error?.message
                         )
                     }
                 }
-            }.onFailure { e ->
-                Log.d("test1234", "getMyHealthInfo 실패")
-                _myHealthUiState.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "정보 조회에 실패했습니다."
-                    )
+
+                is Result.NetworkError -> {
+                    _myHealthUiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            errorMessage = "네트워크 오류가 발생했습니다."
+                        )
+                    }
                 }
             }
         }
+
     }
 
     fun submitMyHealthInfo() {
-
         val state = _myHealthUiState.value
 
         viewModelScope.launch {
-            runCatching {
 
-                // 등록 모드라면
-                if(state.mode == Mode.REGISTER) {
-                    if(state.isRegisterEnabled) {
+            val result = if (state.mode == Mode.REGISTER) {
+                if (state.isRegisterEnabled) {
 
-                        Log.d("test1234", "등록모드다잇")
-                        Log.d("test1234", "height : ${state.height}")
-                        Log.d("test1234", "weight : ${state.weight}")
-                        Log.d("test1234", "fiveMajorDiseases : ${state.selectedMajorDiseases}")
-                        Log.d("test1234", "otherDiseases : ${state.otherDiseases}")
+                    Log.d("test1234", "등록모드")
+                    Log.d("test1234", "height : ${state.height}")
+                    Log.d("test1234", "weight : ${state.weight}")
+                    Log.d("test1234", "fiveMajorDiseases : ${state.selectedMajorDiseases}")
+                    Log.d("test1234", "otherDiseases : ${state.otherDiseases}")
 
-                        myHealthInsertInfoUseCase(
-                            fiveMajorDiseases = state.selectedMajorDiseases,
-                            height = state.height.toFloat(),
-                            otherDiseases = state.otherDiseases,
-                            weight = state.weight.toFloat()
-                        )
-                    }
-                    else {
-                        Log.d("test1234", "등록모드인데 isRegisterEnabled가 false다")
-                    }
-                }
-                // 수정 모드라면
-                else {
-                    if(state.isRegisterEnabled) {
-
-                        Log.d("test1234", "수정모드다잇")
-                        Log.d("test1234", "height : ${state.height}")
-                        Log.d("test1234", "weight : ${state.weight}")
-                        Log.d("test1234", "fiveMajorDiseases : ${state.selectedMajorDiseases}")
-                        Log.d("test1234", "otherDiseases : ${state.otherDiseases}")
-
-                        myHealthUpdateInfoUseCase(
-                            fiveMajorDiseases = state.selectedMajorDiseases,
-                            height = state.height.toFloat(),
-                            otherDiseases = state.otherDiseases,
-                            weight = state.weight.toFloat()
-                        )
-                    }
-                    else {
-                        Log.d("test1234", "수정모드인데 isRegisterEnabled가 false다")
-                    }
-                }
-            }.onSuccess {
-                _myHealthUiState.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        myHealthSideEffect = MyHealthSideEffect.NavigateToMy
+                    myHealthInsertInfoUseCase(
+                        fiveMajorDiseases = state.selectedMajorDiseases,
+                        height = state.height.toFloat(),
+                        otherDiseases = state.otherDiseases,
+                        weight = state.weight.toFloat()
                     )
                 }
-            }.onFailure { e ->
-                _myHealthUiState.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "등록에 실패"
+                else return@launch
+            }
+            else {
+                if (state.isRegisterEnabled) {
+
+                    Log.d("test1234", "수정모드")
+                    Log.d("test1234", "height : ${state.height}")
+                    Log.d("test1234", "weight : ${state.weight}")
+                    Log.d("test1234", "fiveMajorDiseases : ${state.selectedMajorDiseases}")
+                    Log.d("test1234", "otherDiseases : ${state.otherDiseases}")
+
+                    myHealthUpdateInfoUseCase(
+                        fiveMajorDiseases = state.selectedMajorDiseases,
+                        height = state.height.toFloat(),
+                        otherDiseases = state.otherDiseases,
+                        weight = state.weight.toFloat()
                     )
+                }
+                else return@launch
+            }
+
+            when (result) {
+                is Result.Success -> {
+                    Log.d("test1234", "건강정보 등록/수정 성공")
+                    _myHealthUiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            myHealthSideEffect = MyHealthSideEffect.NavigateToMy
+                        )
+                    }
+                }
+
+                is Result.Error -> {
+                    Log.d("test1234", "건강정보 등록/수정 실패: ${result.error?.message}")
+                    _myHealthUiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            errorMessage = result.error?.message
+                        )
+                    }
+                }
+
+                is Result.NetworkError -> {
+                    Log.d("test1234", "네트워크 오류 발생")
+                    _myHealthUiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            errorMessage = "네트워크 오류가 발생했습니다."
+                        )
+                    }
                 }
             }
         }
