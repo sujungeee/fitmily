@@ -30,7 +30,7 @@ public class UserService {
     /* 회원가입 */ //
     public void joinprocess(JoinRequestDTO dto){
 
-        if (userMapper.existsByLoginId(dto.getLogin_id())) {
+        if (userMapper.existsByLoginId(dto.getLoginId())) {
             throw new BusinessException(ErrorCode.USERNAME_DUPLICATED);
         }
 
@@ -41,7 +41,7 @@ public class UserService {
 
 
         User user = new User();
-        user.setLoginId(dto.getLogin_id());
+        user.setLoginId(dto.getLoginId());
         user.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
         user.setNickname(dto.getNickname());
         user.setBirth(dto.getBirth());
@@ -102,7 +102,7 @@ public class UserService {
     }
 
     public UserDto getUserDtoById(Integer userId) {
-        return userMapper.getUserDtoById(userId);
+        return userMapper.getUserDtoById(userId); // ✅ 정확히 Dto 반환
     }
 
     /* 아이디 중복 체크 */
