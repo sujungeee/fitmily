@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.gms.google.services)
 }
 
 val properties = Properties()
@@ -59,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.messaging.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -120,4 +122,7 @@ dependencies {
     //RxJava
     implementation ("io.reactivex.rxjava2:rxjava:2.2.5")
     implementation ("io.reactivex.rxjava2:rxandroid:2.1.0")
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
 }
