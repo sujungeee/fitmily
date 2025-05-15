@@ -1,6 +1,6 @@
 package com.d208.fitmily.domain.user.controller;
 
-import com.d208.fitmily.global.common.response.ApiResponse;
+
 import com.d208.fitmily.domain.user.dto.*;
 import com.d208.fitmily.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
