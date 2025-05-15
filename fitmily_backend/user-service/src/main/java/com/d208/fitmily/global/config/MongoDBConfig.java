@@ -22,8 +22,11 @@ public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoDBConfig.class);
 
-    @Value("${spring.data.mongodb.uri:mongodb://mongodb:27017/fitmily}")
-    private String mongoUri;
+    @Value("${spring.data.mongodb.host:mongodb}")
+    private String mongoHost;
+
+    @Value("${spring.data.mongodb.port:27017}")
+    private String mongoPort;
 
     @Value("${spring.data.mongodb.database:fitmily}")
     private String databaseName;
@@ -33,12 +36,14 @@ public class MongoDBConfig {
      */
     @Bean
     public MongoClient mongoClient() {
+        // host와 port를 명시적으로 사용하는 방식으로 구성
+        String mongoUri = String.format("mongodb://%s:%s/%s", mongoHost, mongoPort, databaseName);
         ConnectionString connectionString = new ConnectionString(mongoUri);
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .build();
 
-        log.info("MongoDB 연결 설정 완료: {}", mongoUri.replaceAll("mongodb://.*@", "mongodb://*****:*****@"));
+        log.info("MongoDB 연결 설정 완료: {}", mongoUri);
         return MongoClients.create(mongoClientSettings);
     }
 
