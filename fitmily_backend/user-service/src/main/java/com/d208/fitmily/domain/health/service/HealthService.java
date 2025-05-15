@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -45,6 +46,16 @@ public class HealthService {
     //건강 상태 조회
     public HealthResponseDto getLatestHealth(Integer userId) {
         HealthResponseDto raw = healthMapper.selectLatestByUserId(userId);
+
+        if (raw == null) {
+            // 빈 DTO 생성 (null 대신)
+            return HealthResponseDto.builder()
+                    .otherDiseases("[]")
+                    .fiveMajorDiseases("[]")
+                    .otherDiseasesList(Collections.emptyList())
+                    .fiveMajorDiseasesList(Collections.emptyList())
+                    .build();
+        }
 
         try {
             if (raw.getOtherDiseases() != null) {
