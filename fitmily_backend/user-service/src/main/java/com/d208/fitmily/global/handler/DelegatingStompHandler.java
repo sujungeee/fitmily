@@ -1,5 +1,6 @@
-package com.d208.fitmily.handler;
+package com.d208.fitmily.global.handler;
 
+import com.d208.fitmily.global.handler.WalkStompHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
