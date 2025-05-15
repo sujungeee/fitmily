@@ -30,9 +30,9 @@ public class UserService {
     /* 회원가입 */ //
     public void joinprocess(JoinRequestDTO dto){
 
-        if (userMapper.existsByLoginId(dto.getLoginId())) {
-            throw new BusinessException(ErrorCode.USERNAME_DUPLICATED);
-        }
+//        if (userMapper.existsByLoginId(dto.getLoginId())) {
+//            throw new BusinessException(ErrorCode.USERNAME_DUPLICATED);
+//        }
 
         //생년월일별 띠 계산
         String birth = dto.getBirth();
@@ -58,9 +58,9 @@ public class UserService {
     @Transactional
     public void updateRefreshToken(Integer userId, String refreshToken) {
         int rows = userMapper.updateRefreshToken(userId, refreshToken);
-        if (rows == 0) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
-        }
+//        if (rows == 0) {
+//            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+//        }
     }
 
 
@@ -75,15 +75,15 @@ public class UserService {
     public ReissueResponseDto  reissueAccessToken(String refreshToken) {
 
         //  refreshToken 토큰 유효성 검사
-        if (!jwtUtil.validateToken(refreshToken)) {
-            throw new BusinessException(ErrorCode.INVALID_TOKEN);
-        }
+//        if (!jwtUtil.validateToken(refreshToken)) {
+//            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+//        }
 
         // refreshToken 토큰 매칭 검사
         Integer userId = jwtUtil.getUserId(refreshToken);
-        if (!userMapper.existsByIdAndRefreshToken(userId, refreshToken)) {
-            throw new BusinessException(ErrorCode.REFRESH_TOKEN_MISMATCH);
-        }
+//        if (!userMapper.existsByIdAndRefreshToken(userId, refreshToken)) {
+//            throw new BusinessException(ErrorCode.REFRESH_TOKEN_MISMATCH);
+//        }
 
         String newAccessToken = jwtUtil.createAccessToken(userId, "ROLE_USER");
         String newRefreshToken = jwtUtil.createRefreshToken(userId);
