@@ -1,7 +1,11 @@
 package com.d208.fitmily.domain.family.service;
 
+import com.d208.fitmily.domain.exercise.entity.Exercise;
+import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
+import com.d208.fitmily.domain.family.dto.FamilyDashboardResponse;
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.mapper.FamilyMapper;
+import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.global.common.exception.CustomException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -9,13 +13,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FamilyService {
 
     private final FamilyMapper familyMapper;
+    private final ExerciseMapper exerciseMapper;
     private static final int MAX_FAMILY_MEMBERS = 6;
 
     @Transactional
@@ -73,6 +81,65 @@ public class FamilyService {
             throw new CustomException(ErrorCode.FAMILY_NOT_FOUND);
         }
         return family;
+    }
+
+    /**
+     * 패밀리 홈 대시보드 조회 - Exercise 테이블 사용
+     */
+    @Transactional(readOnly = true)
+    public FamilyDashboardResponse getFamilyDashboard(int familyId, String date) {
+        // 패밀리 존재 확인
+        Family family = familyMapper.findById(familyId);
+        if (family == null) {
+            throw new CustomException(ErrorCode.FAMILY_NOT_FOUND);
+        }
+
+        // 패밀리 구성원 목록 조회
+        List<User> familyMembers = familyMapper.findFamilyMembers(familyId);
+
+        // 각 구성원의 운동 정보 조회
+        List<FamilyDashboardResponse.FamilyMember> memberList = new ArrayList<>();
+
+        for (User member : familyMembers) {
+            // 사용자의 해당 일자 운동 목록 조회
+            List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), date);
+
+            // 운동 정보 변환
+            List<FamilyDashboardResponse.ExerciseInfo> exerciseInfoList = exercises.stream()
+                    .map(exercise -> FamilyDashboardResponse.ExerciseInfo.builder()
+                            .exerciseId(exercise.getExerciseId())
+                            .exerciseName(exercise.getExerciseName())
+                            .exerciseTime(exercise.getExerciseTime())
+                            .exerciseCount(exercise.getExerciseCount())
+                            .exerciseCalories(exercise.getExerciseCalories())
+                            .build())
+                    .collect(Collectors.toList());
+
+            // 총 운동 칼로리 조회 (진행률 대체)
+            int totalCalories = exerciseMapper.calculateUserTotalCalories(member.getUserId(), date);
+
+            // 진행률 계산 (예: 목표 칼로리를 500으로 가정하고 비율 계산)
+            int targetCalories = 500; // 고정값 또는 DB에서 가져올 수 있음
+            int progressRate = Math.min(totalCalories * 100 / Math.max(1, targetCalories), 100);
+
+            // 구성원 정보 생성
+            FamilyDashboardResponse.FamilyMember memberInfo = FamilyDashboardResponse.FamilyMember.builder()
+                    .userId(member.getUserId())
+                    .userNickname(member.getUserNickname())
+                    .userZodiacName(member.getUserZodiacName())
+                    .userFamilySequence(member.getUserFamilySequence())
+                    .exercises(exerciseInfoList)  // goals → exercises
+                    .totalProgressRate(progressRate)
+                    .build();
+
+            memberList.add(memberInfo);
+        }
+
+        // 응답 데이터 생성
+        return FamilyDashboardResponse.builder()
+                .date(date)
+                .members(memberList)
+                .build();
     }
 
 }
