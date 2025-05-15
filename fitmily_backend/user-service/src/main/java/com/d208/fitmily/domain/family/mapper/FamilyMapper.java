@@ -1,16 +1,19 @@
-package com.d208.fitmily.family.mapper;
+package com.d208.fitmily.domain.family.mapper;
 
+import com.d208.fitmily.domain.family.entity.Family;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Mapper
 public interface FamilyMapper {
+
+    /**
+     * 가족 생성
+     */
+    void createFamily(Family family);
 
     /**
      * 가족 구성원 확인
