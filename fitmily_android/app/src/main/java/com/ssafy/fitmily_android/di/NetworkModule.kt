@@ -70,6 +70,4 @@ object NetworkModule {
     fun provideHomeService(retrofit: Retrofit): HomeService {
         return retrofit.create(HomeService::class.java)
     }
-
-    // TODO: add
 }
