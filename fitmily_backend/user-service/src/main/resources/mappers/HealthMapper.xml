@@ -6,13 +6,13 @@
 <mapper namespace="com.d208.fitmily.domain.health.mapper.HealthMapper">
 
     <insert id="insertHealth"
-            parameterType="com.d208.fitmily.domain.health.dto.AddHealthRequestDto"
+            parameterType="com.d208.fitmily.domain.health.dto.HealthInsertDto"
             useGeneratedKeys="true"
             keyProperty="healthId">
         INSERT INTO health(
         user_id, health_bmi, health_height, health_weight, health_other_diseases, health_five_major_diseases)
         VALUES(
-        #{userId}, #{bmi}, #{height}, #{weight}, #{otherDiseases}, #{fiveMajorDiseases})
+        #{userId}, #{bmi}, #{height}, #{weight}, #{healthOtherDiseasesJson}, #{healthFiveMajorDiseasesJson})
     </insert>
 
     <select id="selectLatestByUserId"
