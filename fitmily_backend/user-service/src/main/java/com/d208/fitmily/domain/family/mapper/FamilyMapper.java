@@ -39,7 +39,7 @@ public interface FamilyMapper {
      */
     @Select("SELECT * FROM family WHERE family_id = #{familyId}")
     Family findById(@Param("familyId") int familyId);
-    
+
 
     /**
      * 가족 구성원 확인
