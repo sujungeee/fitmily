@@ -17,15 +17,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ec.getStatus()).body(body);
     }
 
-    @ResponseBody
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleAll(Exception ex) {
-        ApiResponse<Void> body = ApiResponse.error(
-                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
-        );
-        return ResponseEntity
-                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(body);
-    }
+//    @ResponseBody
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ApiResponse<Void>> handleAll(Exception ex) {
+//        ApiResponse<Void> body = ApiResponse.error(
+//                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+//                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+//        );
+//        return ResponseEntity
+//                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+//                .body(body);
+//    }
 }
