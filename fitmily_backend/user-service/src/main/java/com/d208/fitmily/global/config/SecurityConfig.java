@@ -18,6 +18,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -54,8 +59,24 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
+        configuration.addAllowedOriginPattern("*"); // 모든 origin 허용 (운영환경에선 도메인 제한 필요) http://k12d208.p.ssafy.io
+        configuration.addAllowedMethod("*");        // GET, POST, PUT, DELETE 등 모두 허용
+        configuration.addAllowedHeader("*");        // 모든 헤더 허용
+        configuration.setAllowCredentials(false);    // 쿠키, 인증정보 포함 여부 (필요에 따라 true/false)
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+        http
+                .cors(withDefaults());
         //JWT 방식(상태 less)이라 csrf 공격에 방어하지 않아도됨
         http
                 .csrf((auth) -> auth.disable());
