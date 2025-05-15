@@ -3,10 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.d208.fitmily.health.mapper.HealthMapper">
+<mapper namespace="com.d208.fitmily.domain.health.mapper.HealthMapper">
 
     <insert id="insertHealth"
-            parameterType="com.d208.fitmily.health.dto.AddHealthRequestDto"
+            parameterType="com.d208.fitmily.domain.health.dto.AddHealthRequestDto"
             useGeneratedKeys="true"
             keyProperty="healthId">
         INSERT INTO health(
@@ -17,7 +17,7 @@
 
     <select id="selectLatestByUserId"
             parameterType="int"
-            resultType="com.d208.fitmily.health.dto.HealthResponseDto">
+            resultType="com.d208.fitmily.domain.health.dto.HealthResponseDto">
         SELECT
         health_id AS healthId,
         health_bmi AS bmi,
@@ -33,7 +33,7 @@
         LIMIT 1
     </select>
 
-    <update id="updateHealth" parameterType="com.d208.fitmily.health.dto.UpdateHealthResponseDto">
+    <update id="updateHealth" parameterType="com.d208.fitmily.domain.health.dto.UpdateHealthResponseDto">
         UPDATE health
         SET
         health_bmi = #{bmi},

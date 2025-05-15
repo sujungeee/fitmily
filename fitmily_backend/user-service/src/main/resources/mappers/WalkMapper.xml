@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.d208.fitmily.walk.mapper.WalkMapper">
+<mapper namespace="com.d208.fitmily.domain.walk.mapper.WalkMapper">
 
 <!--parameterType 는 {} 으로 넘길데이터의 type임 -->
 
@@ -21,7 +21,7 @@
 
     <select id="selectWalks"
             parameterType="map"
-            resultType="com.d208.fitmily.walk.dto.WalkResponseDto">
+            resultType="com.d208.fitmily.domain.walk.dto.WalkResponseDto">
         SELECT
         w.walk_id, w.user_id, u.user_nickname, w.walk_route_img, w.walk_start_time, w.walk_end_time, w.walk_distance,
         w.walk_calories FROM walk w
