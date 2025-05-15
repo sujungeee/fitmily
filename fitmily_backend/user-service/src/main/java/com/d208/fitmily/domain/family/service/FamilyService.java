@@ -46,12 +46,12 @@ public class FamilyService {
         // 초대 코드로 패밀리 조회
         Family family = familyMapper.findByInviteCode(inviteCode);
         if (family == null) {
-            throw new com.d208.fitmily.global.exception.CustomException(ErrorCode.INVALID_INVITE_CODE);
+            throw new com.d208.fitmily.global.common.exception.CustomException(ErrorCode.INVALID_INVITE_CODE);
         }
 
         // 최대 인원 체크 (6명)
         if (family.getFamilyPeople() >= MAX_FAMILY_MEMBERS) {
-            throw new com.d208.fitmily.global.exception.CustomException(ErrorCode.FAMILY_MEMBER_LIMIT_EXCEEDED);
+            throw new com.d208.fitmily.global.common.exception.CustomException(ErrorCode.FAMILY_MEMBER_LIMIT_EXCEEDED);
         }
 
         // 사용자 패밀리 업데이트
