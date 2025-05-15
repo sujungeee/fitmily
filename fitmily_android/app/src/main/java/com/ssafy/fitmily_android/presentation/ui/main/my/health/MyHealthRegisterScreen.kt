@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,26 +23,41 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.presentation.ui.components.InputTextField
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.health.component.Top5DiseaseChips
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.component.MyHealthTopBar
+import com.ssafy.fitmily_android.presentation.ui.state.MyHealthSideEffect
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 
 @Composable
 fun MyHealthRegisterScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    myHealthViewModel: MyHealthViewModel = hiltViewModel()
 ) {
 
-    /* TODO 추후 UI STATE로 추출 예정 */
-    var height by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
+    val myHealthUiState by myHealthViewModel.myHealthUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        myHealthViewModel.getMyHealthInfo()
+    }
+
+    LaunchedEffect(myHealthUiState.myHealthSideEffect) {
+        when(myHealthUiState.myHealthSideEffect) {
+
+            is MyHealthSideEffect.NavigateToMy -> {
+                navController.popBackStack()
+            }
+
+            null -> Unit
+        }
+    }
 
     val top5Diseases = listOf("암", "뇌혈관 질환", "심혈관 질환", "당뇨", "간 질환")
-    var selectedTop5Disease by remember { mutableStateOf(setOf<String>()) }
-
 
     Column(
         modifier = Modifier
@@ -73,8 +89,8 @@ fun MyHealthRegisterScreen(
                         title = "키",
                         description = "키를 입력해주세요.",
                         inputType = "number",
-                        value = height,
-                        onValueChange = { height = it }
+                        value = myHealthUiState.height,
+                        onValueChange = { myHealthViewModel.onHeightChanged(it) }
                     )
                 }
             }
@@ -91,8 +107,8 @@ fun MyHealthRegisterScreen(
                         title = "몸무게",
                         description = "몸무게를 입력해주세요.",
                         inputType = "number",
-                        value = weight,
-                        onValueChange = { weight = it }
+                        value = myHealthUiState.weight,
+                        onValueChange = { myHealthViewModel.onWeightChanged(it) }
                     )
                 }
             }
@@ -114,14 +130,9 @@ fun MyHealthRegisterScreen(
 
                     Top5DiseaseChips(
                         top5Diseases = top5Diseases,
-                        selectedDiseases = selectedTop5Disease,
+                        selectedDiseases = myHealthUiState.selectedMajorDiseases.toSet(),
                         onDiseaseSelected = { disease ->
-                            selectedTop5Disease = if (selectedTop5Disease.contains(disease)) {
-                                selectedTop5Disease - disease // 이미 선택되어 있으면 해제
-                            }
-                            else {
-                                selectedTop5Disease + disease // 아니면 추가
-                            }
+                            myHealthViewModel.onTop5DiseaseSelected(disease)
                         }
                     )
                 }
@@ -142,7 +153,10 @@ fun MyHealthRegisterScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    EtcDiseaseChips()
+                    EtcDiseaseChips(
+                        chips = myHealthUiState.otherDiseases,
+                        onChipsChanged = { myHealthViewModel.onOtherDiseaseSelected(it) }
+                    )
                 }
             }
         }
@@ -150,8 +164,7 @@ fun MyHealthRegisterScreen(
         MyButton(
             text = "건강 정보 등록하기",
             onClick = {
-                /* TODO 건강 정보 등록하기 로직 */
-                navController.popBackStack()
+                myHealthViewModel.submitMyHealthInfo()
             },
             modifier = Modifier.padding(bottom = 24.dp)
         )

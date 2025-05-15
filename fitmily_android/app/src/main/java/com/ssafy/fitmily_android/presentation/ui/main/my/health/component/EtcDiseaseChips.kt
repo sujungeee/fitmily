@@ -34,9 +34,9 @@ import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EtcDiseaseChips(
-    initialChips: List<String> = emptyList()
+    chips: List<String>,
+    onChipsChanged: (List<String>) -> Unit
 ) {
-    var chips by remember { mutableStateOf(initialChips) }
     var inputText by remember { mutableStateOf("") }
     var editingIndex by remember { mutableStateOf<Int?>(null) }
     val focusRequester = remember { FocusRequester() }
@@ -71,7 +71,8 @@ fun EtcDiseaseChips(
                         BasicTextField(
                             value = chipText,
                             onValueChange = { newValue ->
-                                chips = chips.toMutableList().also { it[index] = newValue }
+                                val newChips = chips.toMutableList().also { it[index] = newValue }
+                                onChipsChanged(newChips)
                             },
                             singleLine = true,
                             textStyle = TextStyle(
@@ -96,7 +97,8 @@ fun EtcDiseaseChips(
                         modifier = Modifier
                             .padding(start = 4.dp)
                             .clickable {
-                                chips = chips.toMutableList().also { it.removeAt(index) }
+                                val newChips = chips.toMutableList().also { it.removeAt(index) }
+                                onChipsChanged(newChips)
                                 if (editingIndex == index) editingIndex = null
                             }
                     )
@@ -143,7 +145,7 @@ fun EtcDiseaseChips(
                         inputFocused = state.isFocused
                         // 포커스 잃었을 때 값이 있으면 추가
                         if (!state.isFocused && inputText.isNotBlank()) {
-                            chips = chips + inputText
+                            onChipsChanged(chips + inputText)
                             inputText = ""
                         }
                     },
@@ -164,7 +166,7 @@ fun EtcDiseaseChips(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         if (inputText.isNotBlank()) {
-                            chips = chips + inputText
+                            onChipsChanged(chips + inputText)
                             inputText = ""
                             focusManager.clearFocus()
                         }
