@@ -1,7 +1,6 @@
 package com.ssafy.fitmily_android.di
 
 import com.ssafy.fitmily_android.model.service.AuthService
-import com.ssafy.fitmily_android.model.service.MyHealthService
 import com.ssafy.fitmily_android.model.service.HomeService
 import com.ssafy.fitmily_android.model.service.WalkService
 import com.ssafy.fitmily_android.network.AccessTokenInterceptor
@@ -58,12 +57,6 @@ object NetworkModule {
     @Provides
     fun provideAuthService(retrofit: Retrofit): AuthService {
         return retrofit.create(AuthService::class.java)
-    }
-
-    @Singleton
-    @Provides
-    fun provideMyHealthService(retrofit: Retrofit): MyHealthService {
-        return retrofit.create(MyHealthService::class.java)
     }
 
     @Singleton
