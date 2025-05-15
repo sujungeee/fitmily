@@ -1,7 +1,9 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my.health
 
 import EtcDiseaseChips
+import android.app.Activity
 import android.graphics.Paint.Align
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,6 +42,10 @@ fun MyHealthRegisterScreen(
     navController: NavHostController,
     myHealthViewModel: MyHealthViewModel = hiltViewModel()
 ) {
+
+    val context = LocalContext.current
+    val activity = context as? Activity
+    activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
     val myHealthUiState by myHealthViewModel.myHealthUiState.collectAsStateWithLifecycle()
 
