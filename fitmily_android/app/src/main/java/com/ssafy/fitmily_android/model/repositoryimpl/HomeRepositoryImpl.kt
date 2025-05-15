@@ -3,6 +3,7 @@ package com.ssafy.fitmily_android.model.repositoryimpl
 import com.google.gson.Gson
 import com.ssafy.fitmily_android.domain.repository.AuthRepository
 import com.ssafy.fitmily_android.domain.repository.HomeRepository
+import com.ssafy.fitmily_android.model.common.ApiResultHandler
 import com.ssafy.fitmily_android.model.common.Result
 import com.ssafy.fitmily_android.model.dto.request.LoginRequest
 import com.ssafy.fitmily_android.model.dto.request.home.FamilyCreateRequest
@@ -23,53 +24,45 @@ class HomeRepositoryImpl @Inject constructor(
     private val homeService: HomeService
 ): HomeRepository {
     override suspend fun createFamily(request: FamilyCreateRequest): Result<FamilyJoinResponse> {
-        return try {
-            val response = homeService.createFamily(request)
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    Result.Success(body)
-                } else {
-                    Result.Error(ErrorResponse(message = "응답 바디가 null입니다."))
-                }
-            } else {
-                val errorBody = response.errorBody()?.string()
-                val errorResponse = try {
-                    Gson().fromJson(errorBody, ErrorResponse::class.java)
-                } catch (e: Exception) {
-                    ErrorResponse(message = "에러 바디 파싱 실패")
-                }
-                Result.Error(errorResponse)
-            }
-        } catch (e: IOException) {
-            Result.NetworkError
-        } catch (e: Exception) {
-            Result.Error(ErrorResponse(message = e.message ?: "알 수 없는 오류"))
+        return ApiResultHandler.handleApi {
+            homeService.createFamily(request)
         }
     }
 
 
     override suspend fun joinFamily(request: FamilyJoinRequest): Result<FamilyJoinResponse> {
-        TODO("Not yet implemented")
+        return ApiResultHandler.handleApi {
+            homeService.joinFamily(request)
+        }
     }
 
     override suspend fun getFamily(familyId: Int): Result<FamilyResponse> {
-        TODO("Not yet implemented")
+        return ApiResultHandler.handleApi {
+            homeService.getFamily(familyId)
+        }
     }
 
     override suspend fun getDashboard(familyId: Int, today: String?): Result<FamilyTodayResponse> {
-        TODO("Not yet implemented")
+        return ApiResultHandler.handleApi {
+            homeService.getDashboard(familyId, today)
+        }
     }
 
     override suspend fun getFamilyHealth(familyId: Int): Result<FamilyHealthResponse> {
-        TODO("Not yet implemented")
+        return ApiResultHandler.handleApi {
+            homeService.getFamilyHealth(familyId)
+        }
     }
 
     override suspend fun getChallenge(): Result<ChallengeResponse> {
-        TODO("Not yet implemented")
+        return ApiResultHandler.handleApi {
+            homeService.getChallenge()
+        }
     }
 
     override suspend fun sendPoke(userId: Int): Result<Any> {
-        TODO("Not yet implemented")
+        return ApiResultHandler.handleApi {
+            homeService.sendPoke(userId)
+        }
     }
 }
