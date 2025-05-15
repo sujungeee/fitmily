@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c5cbf38b-820c-4c8f-b5f1-48994acc8996" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/SwaggerConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/SwaggerConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/FitmilyApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/FitmilyApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/controller/WalkController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/controller/WalkController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

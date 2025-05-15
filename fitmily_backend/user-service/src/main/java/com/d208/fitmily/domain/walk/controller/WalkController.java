@@ -53,13 +53,6 @@ public class WalkController {
         return ResponseEntity.ok(gpsList);
     }
 
-//    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
-//    @GetMapping("/api/family/{familyId}/walking-members")
-//    public ApiResponse<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
-//        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
-//        return ApiResponse.ok(walkingUsers, "산책중인 가족인원 조회완료");
-//    }
-
 
     @Operation(summary = "산책 종료", description = "산책 중지 시점 데이터를 저장합니다. ")
     @PostMapping("/walks/end")
@@ -68,7 +61,6 @@ public class WalkController {
         walkService.endWalk(principal.getId(),dto);
         return ResponseEntity.ok(null);
     }
-
 
     @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다. ")
     @GetMapping("/walks")
@@ -80,7 +72,6 @@ public class WalkController {
         List<WalkResponseDto> list = walkService.findWalks(userId, start, end);
         return ResponseEntity.ok(list);
     }
-
 
     @Operation(summary = "산책 목표 조회", description = "- 목표 존재하면 = true  \n- 목표존재하지 않으면 = false")
     @GetMapping("/walks/goal/exist")
@@ -95,5 +86,11 @@ public class WalkController {
         return sseService.connectFamilyEmitter(familyId);
     }
 
+//    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
+//    @GetMapping("/api/family/{familyId}/walking-members")
+//    public ApiResponse<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
+//        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
+//        return ApiResponse.ok(walkingUsers, "산책중인 가족인원 조회완료");
+//    }
 }
 
