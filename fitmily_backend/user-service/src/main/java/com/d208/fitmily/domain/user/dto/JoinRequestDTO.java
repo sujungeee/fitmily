@@ -11,6 +11,6 @@ public class JoinRequestDTO {
     private String password;
     private String nickname;
     private String birth;
-    private String gender;
+    private Integer gender;
 
 }
