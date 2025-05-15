@@ -56,7 +56,7 @@ public class UserController {
     @Operation(summary = "리이슈", description = "- access토큰 재발급")
     @PostMapping("/auth/reissue")
     public ResponseEntity<ReissueResponseDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
-        String refreshToken = reissueRequestDto.getRefresh_token();
+        String refreshToken = reissueRequestDto.getRefreshToken();
         ReissueResponseDto newToken = userService.reissueAccessToken(refreshToken);
         return ResponseEntity.ok(newToken);
     }
