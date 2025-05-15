@@ -1,11 +1,13 @@
-package com.ssafy.fitmily_android.presentation.ui.main.home
+package com.ssafy.fitmily_android.presentation.ui.main.walk
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class WalkViewModel @Inject constructor(
 ) : ViewModel() {
+
+
 
 }

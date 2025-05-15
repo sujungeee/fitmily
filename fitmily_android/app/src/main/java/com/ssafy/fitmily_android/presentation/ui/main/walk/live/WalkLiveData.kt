@@ -1,14 +1,11 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk.live
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.ssafy.fitmily_android.model.dto.GpsDto
+import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 
 
 object WalkLiveData {
