@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.icu.text.DateFormat
 import android.location.Location
-import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Granularity
 import com.google.android.gms.location.LocationCallback
@@ -15,8 +14,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.google.gson.Gson
-import com.naver.maps.map.util.FusedLocationSource
 import com.ssafy.fitmily_android.model.dto.GpsDto
 
 private const val TAG = "WalkLiveWorker"
@@ -24,8 +23,6 @@ class WalkLiveWorker(private val context: Context) {
 
     private val locationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
-    private var MIN_INTERVAL_UPDATES: Long = (100 * 60).toLong()
-    private var MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 500
     init {
         WalkLiveData.lat = 0.0
         WalkLiveData.lon = 0.0
@@ -52,29 +49,12 @@ class WalkLiveWorker(private val context: Context) {
                     speed = location.accuracy.toDouble()
                 }
             }
-            Log.d(TAG, "startLocationUpdates: ${WalkLiveData.lat.toString()}")
-            val data =  GpsDto(
-                WalkLiveData.lat,
-                WalkLiveData.lon,
-                WalkLiveData.speed,
-                System.currentTimeMillis().toString(),
-            )
 
-            WalkLiveData.gpsList.value=WalkLiveData.gpsList.value.plus(data)
-
-            Log.d(TAG, "startLocationUpdates: ${WalkLiveData.gpsList.value}")
-            val jsonMessage = Gson().toJson(data)
-            try {
-                WebSocketManager.stompClient.send("/app/walk/gps", jsonMessage).subscribe()
-                Log.d(TAG, "startLocationUpdates: 스톰프 send")
-            } catch (e: Exception) {
-                Log.d(TAG, "startLocationUpdates: ${e.message }")
-            }
 
         }
 
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, MIN_INTERVAL_UPDATES).apply{
-            setMinUpdateDistanceMeters(MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat())
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).apply{
+            setMinUpdateDistanceMeters(0f)
             setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
             setWaitForAccurateLocation(true)
         }.build()
@@ -88,13 +68,27 @@ class WalkLiveWorker(private val context: Context) {
 
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            Log.d(TAG, "onLocationResult: ${locationResult.locations[0].toString()}")
             if (locationResult.locations[0] != null) {
                 WalkLiveData.apply{
                     lat = locationResult.locations[0].latitude
                     lon = locationResult.locations[0].longitude
                     lastUpdatedTime = System.currentTimeMillis()
                 }
+                val data =  GpsDto(
+                    WalkLiveData.lat,
+                    WalkLiveData.lon,
+                    System.currentTimeMillis().toString(),
+                )
+
+                Log.d(TAG, "startLocationUpdates: ${WalkLiveData.gpsList.value}")
+                val jsonMessage = Gson().toJson(data)
+                try {
+                    WebSocketManager.stompClient.send("/app/walk/gps", jsonMessage).subscribe()
+                    Log.d(TAG, "startLocationUpdates: 스톰프 send")
+                } catch (e: Exception) {
+                    Log.d(TAG, "startLocationUpdates: ${e.message }")
+                }
+
             }
         }
     }

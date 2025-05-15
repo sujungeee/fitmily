@@ -1,8 +1,11 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk.live
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.ssafy.fitmily_android.model.dto.GpsDto
@@ -16,8 +19,8 @@ object WalkLiveData {
     val gpsList = MutableLiveData<List<GpsDto>>(
         listOf(
             // 초기 위치 데이터
-            GpsDto(37.5665, 126.978, 0.0, "2023-10-01T12:00:00Z"),
-            GpsDto(37.5651, 126.989, 0.0, "2023-10-01T12:01:00Z"),
+            GpsDto(37.5665, 126.978, "2023-10-01T12:00:00Z"),
+            GpsDto(37.5651, 126.989, "2023-10-01T12:01:00Z"),
         )
     )
     // 위치 데이터를 위한 변수들
@@ -30,6 +33,8 @@ object WalkLiveData {
     fun startWalkLiveService(context: Context) {
         // 서비스가 실행 중이지 않은 경우에만 서비스를 시작한다.
         // 중복 동작과 ANR 방지 목적이다.
+
+
         if(!isServiceRun(context)) {
             val intent = Intent(context, WalkLiveService::class.java)
             ContextCompat.startForegroundService(context, intent)
@@ -41,6 +46,7 @@ object WalkLiveData {
     fun stopWalkLiveService(context: Context) {
         val intent = Intent(context, WalkLiveService::class.java)
         context.stopService(intent)
+        WebSocketManager.unsubscribeStomp("/topic/walk/gps/1")
     }
 
     // 서비스의 실행 상태를 반환하는 메서드
