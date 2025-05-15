@@ -22,4 +22,16 @@ public class User {
     private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public String getUserNickname() {
+        return nickname;
+    }
+
+    public String getUserZodiacName() {
+        return zodiacName;
+    }
+
+    public int getUserFamilySequence() {
+        return familySequence;
+    }
 }
