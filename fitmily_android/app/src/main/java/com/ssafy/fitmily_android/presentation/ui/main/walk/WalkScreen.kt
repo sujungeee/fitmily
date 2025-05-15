@@ -89,7 +89,6 @@ fun WalkScreen(
     var tmp =GpsDto(
         0.0,
         0.0,
-        0.0,
         System.currentTimeMillis().toString(),
     )
     WalkLiveData.gpsList.observeForever(
@@ -98,13 +97,9 @@ fun WalkScreen(
             path.value = list.map {
                 LatLng(it.lat, it.lon)
             }
-            tmp =GpsDto(list.last().lat, list.last().lon, list.last().speed, System.currentTimeMillis().toString())
+            tmp =GpsDto(list.last().lat, list.last().lon, System.currentTimeMillis().toString())
         }
-
     )
-
-
-
 
     Column(
         modifier = Modifier
