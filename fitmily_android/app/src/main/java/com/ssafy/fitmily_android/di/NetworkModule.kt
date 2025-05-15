@@ -4,6 +4,7 @@ import com.ssafy.fitmily_android.model.service.AuthService
 import com.ssafy.fitmily_android.model.service.MyHealthService
 import com.ssafy.fitmily_android.model.service.HomeService
 import com.ssafy.fitmily_android.model.service.WalkService
+import com.ssafy.fitmily_android.model.service.MyHealthService
 import com.ssafy.fitmily_android.network.AccessTokenInterceptor
 import com.ssafy.fitmily_android.network.ReissueInterceptor
 import dagger.Module
@@ -77,5 +78,9 @@ object NetworkModule {
         return retrofit.create(HomeService::class.java)
     }
 
-    // TODO: add
+    @Singleton
+    @Provides
+    fun provideMyHealthService(retrofit: Retrofit): MyHealthService {
+        return retrofit.create(MyHealthService::class.java)
+    }
 }
