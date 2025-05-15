@@ -47,8 +47,8 @@ public class HealthService {
     public HealthResponseDto getLatestHealth(Integer userId) {
         HealthResponseDto raw = healthMapper.selectLatestByUserId(userId);
 
+        //등록된 db가 없을때
         if (raw == null) {
-            // 빈 DTO 생성 (null 대신)
             return HealthResponseDto.builder()
                     .otherDiseases("[]")
                     .fiveMajorDiseases("[]")
@@ -80,7 +80,7 @@ public class HealthService {
 
 
     //건강 상태 수정
-    public void updateHealth(Integer userId , UpdateHealthRequestDto dto){
+    public void updateHealth(Integer userId , UpdateHealthRequestDto dto) throws JsonProcessingException {
         HealthResponseDto existing = healthMapper.selectLatestByUserId(userId);
 
         Float height = dto.getHeight() != null ? dto.getHeight() : existing.getHeight();
@@ -88,12 +88,19 @@ public class HealthService {
         Float bmi = weight / ((height / 100f) * (height / 100f));
         bmi = (float) (Math.floor(bmi * 10) / 10);
 
+        // JSON 직렬화
+        String otherDiseasesJson = objectMapper.writeValueAsString(dto.getOtherDiseases());
+        String majorDiseasesJson = objectMapper.writeValueAsString(dto.getFiveMajorDiseases());
 
-        UpdateHealthResponseDto updateDto = new UpdateHealthResponseDto(
-                userId, bmi, height, weight,
-                dto.getOtherDiseases() != null ? dto.getOtherDiseases() : existing.getOtherDiseases(),
-                dto.getFiveMajorDiseases() != null ? dto.getFiveMajorDiseases() : existing.getFiveMajorDiseases()
-        );
+
+        UpdateHealthResponseDto updateDto = UpdateHealthResponseDto.builder()
+                .userId(userId)
+                .bmi(bmi)
+                .height(height)
+                .weight(weight)
+                .otherDiseases(otherDiseasesJson)
+                .fiveMajorDiseases(majorDiseasesJson)
+                .build();
 
         healthMapper.updateHealth(updateDto);
     }
