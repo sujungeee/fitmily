@@ -25,7 +25,7 @@ public class AddHealthRequestDto {
     private Float weight;
 
     @Schema(hidden = true)
-    private Float bmi;
+    private Integer bmi;
 
     private List<String> OtherDiseases;
     private List<String> FiveMajorDiseases;
