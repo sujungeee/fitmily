@@ -59,7 +59,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Integer userId = details.getId();
         String userNickname = details.getNickname();
         Integer familyId = details.getfamilyId();
-        String zodiacName = details.getgetZodiacName();
+        String zodiacName = details.getZodiacName();
 
 
         String role = authentication.getAuthorities().stream()
