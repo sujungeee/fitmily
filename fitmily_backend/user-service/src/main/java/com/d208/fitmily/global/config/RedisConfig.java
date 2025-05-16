@@ -13,9 +13,12 @@ public class RedisConfig {
 
     // 환경 설정 파일로부터 redis 호스트와 포트 주입받기
     @Value("${spring.data.redis.host:redis}")
+//    @Value("${spring.redis.host:redis}") //로컬
+
     private String redisHost;
 
     @Value("${spring.data.redis.port:6379}")
+//    @Value("${spring.redis.port:6379}") //로컬
     private int redisPort;
 
     @Bean

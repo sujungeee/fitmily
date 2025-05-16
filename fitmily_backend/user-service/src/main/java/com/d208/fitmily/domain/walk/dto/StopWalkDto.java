@@ -1,21 +1,21 @@
 package com.d208.fitmily.domain.walk.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
-@Setter
-@Getter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EndWalkRequestDto {
+public class StopWalkDto {
+    private Integer userId;
+    private String routeImg;
     private Timestamp startTime;
     private Timestamp endTime;
     private Float distance;
-    private String routeImg;
-
+    private Float calories;
 }

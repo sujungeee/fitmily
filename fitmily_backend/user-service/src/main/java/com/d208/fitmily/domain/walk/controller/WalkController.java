@@ -1,7 +1,7 @@
 package com.d208.fitmily.domain.walk.controller;
 
 
-import com.d208.fitmily.global.common.response.ApiResponse;
+
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import com.d208.fitmily.domain.walk.dto.EndWalkRequestDto;
 import com.d208.fitmily.domain.walk.dto.GpsDto;
@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,45 +48,36 @@ public class WalkController {
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")
-    public ApiResponse<List<GpsDto>> getGpsList(@PathVariable Integer userId) {
+    public ResponseEntity<List<GpsDto>> getGpsList(@PathVariable Integer userId) {
         List<GpsDto> gpsList = gpsRedisService.getGpsListByUserId(userId);
-        return ApiResponse.ok(gpsList,"산책 gps데이터 조회완료");
+        return ResponseEntity.ok(gpsList);
     }
-
-//    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
-//    @GetMapping("/api/family/{familyId}/walking-members")
-//    public ApiResponse<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
-//        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
-//        return ApiResponse.ok(walkingUsers, "산책중인 가족인원 조회완료");
-//    }
 
 
     @Operation(summary = "산책 종료", description = "산책 중지 시점 데이터를 저장합니다. ")
     @PostMapping("/walks/end")
-    public ApiResponse<Void> endWalk(@RequestBody EndWalkRequestDto dto,
+    public ResponseEntity<Void> endWalk(@RequestBody EndWalkRequestDto dto,
                                      @AuthenticationPrincipal CustomUserDetails principal) {
         walkService.endWalk(principal.getId(),dto);
-        return ApiResponse.ok(null,"산책이 종료됌");
+        return ResponseEntity.ok(null);
     }
-
 
     @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다. ")
     @GetMapping("/walks")
-    public ApiResponse<List<WalkResponseDto>> getWalks(
+    public ResponseEntity<List<WalkResponseDto>> getWalks(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime end
     ){
         List<WalkResponseDto> list = walkService.findWalks(userId, start, end);
-        return ApiResponse.ok(list, "산책 기록 조회 성공");
+        return ResponseEntity.ok(list);
     }
-
 
     @Operation(summary = "산책 목표 조회", description = "- 목표 존재하면 = true  \n- 목표존재하지 않으면 = false")
     @GetMapping("/walks/goal/exist")
-    public ApiResponse<Boolean> goalexist(@AuthenticationPrincipal CustomUserDetails principal){
+    public ResponseEntity<Boolean> goalexist(@AuthenticationPrincipal CustomUserDetails principal){
         boolean Existence = walkService.walkGoalExists(principal.getId());
-        return ApiResponse.ok(Existence, "산책 기록 조회 성공");
+        return ResponseEntity.ok(Existence);
     }
 
     @Operation(summary = "산책 SSE 연결 ")
@@ -94,5 +86,11 @@ public class WalkController {
         return sseService.connectFamilyEmitter(familyId);
     }
 
+//    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
+//    @GetMapping("/api/family/{familyId}/walking-members")
+//    public ApiResponse<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
+//        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
+//        return ApiResponse.ok(walkingUsers, "산책중인 가족인원 조회완료");
+//    }
 }
 

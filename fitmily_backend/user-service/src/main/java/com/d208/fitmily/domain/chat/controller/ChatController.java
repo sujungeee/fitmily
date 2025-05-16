@@ -2,11 +2,11 @@ package com.d208.fitmily.domain.chat.controller;
 
 import com.d208.fitmily.domain.chat.dto.ChatMessagesResponseDTO;
 import com.d208.fitmily.domain.chat.service.ChatService;
-import com.d208.fitmily.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,7 @@ public class ChatController {
 
     @Operation(summary = "메시지 목록 조회", description = "가족 채팅방의 메시지 목록을 조회합니다.")
     @GetMapping("/family/{familyId}/messages")
-    public ApiResponse<ChatMessagesResponseDTO> getMessages(
+    public ResponseEntity<ChatMessagesResponseDTO> getMessages(
             @PathVariable String familyId,
             @RequestParam(required = false) String before,
             @RequestParam(defaultValue = "20") int limit,
@@ -33,12 +33,12 @@ public class ChatController {
                 familyId, userId, before, limit);
 
         ChatMessagesResponseDTO response = chatService.getMessages(familyId, userId, before, limit);
-        return ApiResponse.ok(response, "메시지 조회 성공");
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "안 읽은 메시지 수 조회", description = "특정 가족 채팅방의 안 읽은 메시지 수를 조회합니다.")
     @GetMapping("/family/{familyId}/unread")
-    public ApiResponse<Integer> getUnreadCount(
+    public ResponseEntity<Integer> getUnreadCount(
             @PathVariable String familyId,
             Authentication authentication) {
 
@@ -46,7 +46,7 @@ public class ChatController {
         log.debug("안 읽은 메시지 수 조회 요청 - familyId: {}, userId: {}", familyId, userId);
 
         int unreadCount = chatService.getUnreadCount(familyId, userId);
-        return ApiResponse.ok(unreadCount, "안 읽은 메시지 수 조회 성공");
+        return ResponseEntity.ok(unreadCount);
     }
 
     // 사용자 ID 추출 메서드

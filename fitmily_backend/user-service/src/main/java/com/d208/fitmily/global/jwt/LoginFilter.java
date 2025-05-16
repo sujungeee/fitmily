@@ -85,12 +85,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         tokenMap.put("familyId", familyId);
         tokenMap.put("zodiacName", zodiacName);
 
-        Map<String, Object> responseMap = new LinkedHashMap<>();
-        responseMap.put("data", tokenMap);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        new ObjectMapper().writeValue(response.getWriter(), responseMap);
+        new ObjectMapper().writeValue(response.getWriter(), tokenMap);
 
         System.out.println("로그인 성공");
     }
