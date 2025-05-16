@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.d208.fitmily.domain.family.mapper.FamilyMapper">
-    <insert id="createFamily" parameterType="com.d208.fitmily.domain.family.entity.Family" useGeneratedKeys="true" keyProperty="familyId">
-        INSERT INTO family (
-            family_name,
-            family_invite_code,
-            family_people,
-            family_created_at,
-            family_updated_at
-        ) VALUES (
-                     #{familyName},
-                     #{familyInviteCode},
-                     #{familyPeople},
-                     #{familyCreatedAt},
-                     #{familyUpdatedAt}
-                 )
-    </insert>
+<!--    <insert id="createFamily" parameterType="com.d208.fitmily.domain.family.entity.Family" useGeneratedKeys="true" keyProperty="familyId">-->
+<!--        INSERT INTO family (-->
+<!--            family_name,-->
+<!--            family_invite_code,-->
+<!--            family_people,-->
+<!--            family_created_at,-->
+<!--            family_updated_at-->
+<!--        ) VALUES (-->
+<!--                     #{familyName},-->
+<!--                     #{familyInviteCode},-->
+<!--                     #{familyPeople},-->
+<!--                     #{familyCreatedAt},-->
+<!--                     #{familyUpdatedAt}-->
+<!--                 )-->
+<!--    </insert>-->
 </mapper>

@@ -23,11 +23,11 @@ public class HealthService {
 
         //bmi 계산해서 넣음
         float heightM = dto.getHeight() / 100f;
-        float bmi = dto.getWeight() / (heightM * heightM);
-
+        float bmiFloat = dto.getWeight() / (heightM * heightM);
+        int bmi = Math.round(bmiFloat);
 
         dto.setUserId(userId);
-        dto.setBmi((float) (Math.floor(bmi * 10) / 10));
+        dto.setBmi(bmi);
 
         String otherJson  = objectMapper.writeValueAsString(dto.getOtherDiseases());
         String majorJson  = objectMapper.writeValueAsString(dto.getFiveMajorDiseases());

@@ -1,26 +1,63 @@
 package com.d208.fitmily.domain.health.mapper;
 
-
-import com.d208.fitmily.domain.health.dto.AddHealthRequestDto;
 import com.d208.fitmily.domain.health.dto.HealthInsertDto;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 import com.d208.fitmily.domain.health.dto.UpdateHealthResponseDto;
-import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
-public interface HealthMapper  {
+public interface HealthMapper {
 
-    // 건강상태 추가
-//    int insertHealth(AddHealthRequestDto dto);
+    // 1. 건강상태 추가
+    @Insert("""
+        INSERT INTO health (
+            user_id,
+            health_bmi,
+            health_height,
+            health_weight,
+            health_other_diseases,
+            health_five_major_diseases
+        )
+        VALUES (
+            #{userId},
+            #{bmi},
+            #{height},
+            #{weight},
+            #{healthOtherDiseasesJson},
+            #{healthFiveMajorDiseasesJson}
+        )
+        """)
+    @Options(useGeneratedKeys = true, keyProperty = "healthId")
     void insertHealth(HealthInsertDto dto);
 
+    // 2. 최신 건강상태 조회
+    @Select("""
+        SELECT
+            health_id AS healthId,
+            health_bmi AS bmi,
+            health_height AS height,
+            health_weight AS weight,
+            health_other_diseases AS otherDiseases,
+            health_five_major_diseases AS fiveMajorDiseases,
+            health_created_at AS createdAt,
+            health_updated_at AS updatedAt
+        FROM health
+        WHERE user_id = #{userId}
+        ORDER BY health_created_at DESC
+        LIMIT 1
+        """)
+    HealthResponseDto selectLatestByUserId(@Param("userId") Integer userId);
 
-    //건강상태 조회
-    HealthResponseDto selectLatestByUserId(Integer userId);
-
-    //건강상태 수정(int 쓰는 이유: int는 update된 row 수를 반환, 예외처리 가능)
+    // 3. 건강상태 수정
+    @Update("""
+        UPDATE health
+        SET
+            health_bmi = #{bmi},
+            health_height = #{height},
+            health_weight = #{weight},
+            health_other_diseases = #{otherDiseases},
+            health_five_major_diseases = #{fiveMajorDiseases}
+        WHERE user_id = #{userId}
+        """)
     int updateHealth(UpdateHealthResponseDto dto);
-
-
-
 }
