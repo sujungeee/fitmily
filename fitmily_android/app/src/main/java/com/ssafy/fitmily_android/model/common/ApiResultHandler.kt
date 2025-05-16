@@ -11,11 +11,7 @@ object ApiResultHandler {
             val response = call()
             if (response.isSuccessful) {
                 val body = response.body()
-                if (body != null) {
-                    Result.Success(body)
-                } else {
-                    Result.Error(ErrorResponse(message = "응답 바디가 null입니다."))
-                }
+                Result.Success(body)
             } else {
                 val errorBody = response.errorBody()?.string()
                 val errorResponse = try {

@@ -1,7 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.home
 
 
-import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
@@ -17,16 +16,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.ssafy.fitmily_android.BuildConfig
-import com.ssafy.fitmily_android.presentation.ui.MainActivity
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.AloneHome
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.FamilyHome
-import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
 import com.ssafy.fitmily_android.util.LocationUtil
 import androidx.activity.compose.rememberLauncherForActivityResult as rememberLauncherForActivityResult1
 
@@ -38,7 +33,7 @@ fun HomeScreen(
 ) {
 
     val context = LocalContext.current
-    val homeUiState by homeVieModel.homeUiState.collectAsState()
+    val homeUiState by homeVieModel.uiState.collectAsState()
 
     var isInFamily = remember { mutableStateOf(true) }
 

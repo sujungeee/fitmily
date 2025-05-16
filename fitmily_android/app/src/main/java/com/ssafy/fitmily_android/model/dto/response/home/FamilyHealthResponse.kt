@@ -4,4 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class FamilyHealthResponse(
     @SerializedName("members") val familyHealthDto: List<FamilyHealthDto>
-)
+){
+    constructor() : this(
+        familyHealthDto = listOf()
+    )
+}

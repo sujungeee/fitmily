@@ -16,7 +16,10 @@ class ChatPagingSource(
         return try {
             val result = chatListUseCase(familyId) // TODO: page 추가
             if (result is Result.Success) {
-                val messages = result.data.messages
+                var messages = emptyList<ChatMessage>()
+                result.data?.let {
+                    messages = it.messages
+                }
                 val isEnd = messages.size < PAGE_SIZE // 다음 페이지 없으면 null
                 LoadResult.Page(
                     data = messages,
