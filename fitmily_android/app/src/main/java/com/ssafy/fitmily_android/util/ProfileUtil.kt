@@ -1,9 +1,15 @@
 package com.ssafy.fitmily_android.util
 
+import androidx.compose.ui.graphics.Color
 import com.ssafy.fitmily_android.R
-import androidx.core.graphics.toColorInt
+import com.ssafy.fitmily_android.ui.theme.familyFifth
+import com.ssafy.fitmily_android.ui.theme.familyFirst
+import com.ssafy.fitmily_android.ui.theme.familyFourth
+import com.ssafy.fitmily_android.ui.theme.familySecond
+import com.ssafy.fitmily_android.ui.theme.familySixth
+import com.ssafy.fitmily_android.ui.theme.familyThird
 
-class Profile {
+class ProfileUtil {
     // 활용: painterResource(typeToProfile("horse"))
     fun typeToProfile(iconType: String): Int? {
         val map = mapOf(
@@ -24,8 +30,16 @@ class Profile {
         return map[iconType]
     }
 
-    // 활용: Color(strToColorInt("#FFD074BE"))
-    fun strToColorInt(stringColor: String): Int {
-        return stringColor.toColorInt()
+    // 가족 순서에 따른 color
+    fun seqToColor(seq: Int): Color? {
+        when (seq) {
+            1 -> return familyFirst
+            2 -> return familySecond
+            3 -> return familyThird
+            4 -> return familyFourth
+            5 -> return familyFifth
+            6 -> return familySixth
+            else -> return null
+        }
     }
 }
