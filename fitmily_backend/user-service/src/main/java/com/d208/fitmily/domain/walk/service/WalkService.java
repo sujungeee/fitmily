@@ -1,12 +1,12 @@
 package com.d208.fitmily.domain.walk.service;
 
+import com.d208.fitmily.domain.walkchallenge.service.WalkChallengeService;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 //import com.d208.fitmily.health.entity.Health;
 import com.d208.fitmily.domain.health.service.HealthService;
 import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.domain.user.service.UserService;
 import com.d208.fitmily.domain.walk.dto.*;
-import com.d208.fitmily.domain.walk.entity.Walk;
 import com.d208.fitmily.domain.walk.mapper.WalkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,8 +18,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.time.Duration.between;
 
 
 @Service
@@ -33,6 +31,7 @@ public class WalkService {
     private final GpsRedisService gpsRedisService;
     private final SimpMessagingTemplate messagingTemplate;
     private final SseService sseService;
+    private final WalkChallengeService walkChallengeService;
 
 
     // 산책 중지 (칼로리 계산에서 막힘 일단 패스 )
@@ -57,6 +56,9 @@ public class WalkService {
                 .build();
 
         walkMapper.insertStopWalk(stopWalkDto);
+
+        // 산책 챌린지 거리 업데이트
+        walkChallengeService.updateChallengeDistance(stopWalkDto);
     }
 
     // 산책 기록 조회
