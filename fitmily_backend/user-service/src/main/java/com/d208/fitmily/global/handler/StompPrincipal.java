@@ -6,7 +6,7 @@ import java.security.Principal;
 
 
 @RequiredArgsConstructor
-public class StompPrincipal implements Principal {  //Principal은 "현재 인증된 사용자 누구냐? 를 나타냄을 커스텀함
+public class StompPrincipal implements Principal {  //Principal은 "현재 인증된 사용자 누구냐?
 
     private final String name; // userId를 문자열로 저장
 
