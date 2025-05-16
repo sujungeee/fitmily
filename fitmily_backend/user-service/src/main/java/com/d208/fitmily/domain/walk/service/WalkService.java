@@ -42,16 +42,21 @@ public class WalkService {
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
         float weight = health.getWeight();
-        long walkTime = between(dto.getStartTime(), dto.getEndTime()).toMinutes();
+//        long walkTime = between(dto.getStartTime(), dto.getEndTime()).toMinutes();
 
-        Walk walk = Walk.builder()
+        final double MET_WALKING = 3.5;
+        double caloriesBurned = MET_WALKING * weight * (MET_WALKING / 60.0); // kcal
+
+        StopWalkDto stopWalkDto = StopWalkDto.builder()
                 .userId(userId)
                 .routeImg(dto.getRouteImg())
                 .startTime(dto.getStartTime())
                 .endTime(dto.getEndTime())
                 .distance(dto.getDistance())
+                .calories((float) caloriesBurned)
                 .build();
-        walkMapper.insertStopWalk(walk);
+
+        walkMapper.insertStopWalk(stopWalkDto);
     }
 
     // 산책 기록 조회

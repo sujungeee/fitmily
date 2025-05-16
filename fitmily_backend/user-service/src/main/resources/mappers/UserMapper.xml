@@ -14,7 +14,7 @@
     </select>
 
     <!-- 2) findByLoginId -->
-    <select id="findByLoginId" resultType="User">
+    <select id="findByLoginId" resultType="com.d208.fitmily.domain.user.entity.User">
         SELECT
         user_id              AS userId,
         user_login_id        AS loginId,
@@ -66,7 +66,7 @@
     </update>
 
     <!--user 정보 조회-->
-    <select id="selectById" parameterType="int" resultType="User">
+    <select id="selectById" parameterType="int" resultType="com.d208.fitmily.domain.user.entity.User">
         SELECT
         user_id, user_login_id,user_birth ,user_gender
         FROM user
