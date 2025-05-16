@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -48,9 +49,9 @@ public class WalkController {
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")
-    public ResponseEntity<List<GpsDto>> getGpsList(@PathVariable Integer userId) {
+    public ResponseEntity<Map<String, Object>> getGpsList(@PathVariable Integer userId) {
         List<GpsDto> gpsList = gpsRedisService.getGpsListByUserId(userId);
-        return ResponseEntity.ok(gpsList);
+        return ResponseEntity.ok(Map.of("path", gpsList));
     }
 
 
@@ -64,13 +65,13 @@ public class WalkController {
 
     @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다. ")
     @GetMapping("/walks")
-    public ResponseEntity<List<WalkResponseDto>> getWalks(
+    public ResponseEntity<Map<String, Object>> getWalks(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime end
     ){
         List<WalkResponseDto> list = walkService.findWalks(userId, start, end);
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(Map.of("walk", list));
     }
 
     @Operation(summary = "산책 목표 조회", description = "- 목표 존재하면 = true  \n- 목표존재하지 않으면 = false")
