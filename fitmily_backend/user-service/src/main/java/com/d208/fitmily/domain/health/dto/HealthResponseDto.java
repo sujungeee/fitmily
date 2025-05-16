@@ -29,23 +29,4 @@ public class HealthResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public String getHealthFiveMajorDiseases() {
-        return fiveMajorDiseases;
-    }
-
-    public String getHealthOtherDiseases() {
-        return otherDiseases;
-    }
-
-    public float getHealthHeight() {
-        return height;
-    }
-
-    public float getHealthWeight() {
-        return weight;
-    }
-
-    public float getHealthBmi() {
-        return bmi;
-    }
 }
