@@ -1,109 +1,72 @@
 package com.ssafy.fitmily_android.presentation.ui.main.chat.components
 
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.ssafy.fitmily_android.MainApplication
+import com.ssafy.fitmily_android.presentation.ui.main.chat.ChatViewModel
+import com.ssafy.fitmily_android.util.ProfileUtil
 
 @Composable
 fun ChatContentField (
     modifier : Modifier
+    , chatViewModel: ChatViewModel = hiltViewModel()
 ) {
+    val scrollState = rememberLazyListState()
+    val uiState by chatViewModel.chatUiState.collectAsStateWithLifecycle()
+
+    val chatItems = uiState.chatPagingData.collectAsLazyPagingItems()
+    val serverChatSize = chatItems.itemCount
+    val socketChatSize = uiState.newMessages.size
+    val totalChatSize = serverChatSize + socketChatSize
+
+    var userId by remember { mutableStateOf(-1) }
+    LaunchedEffect(Unit) {
+        userId = MainApplication.getInstance().getDataStore().getUserId()
+    }
+
+    if (totalChatSize > 0) {
+        LaunchedEffect(totalChatSize) {
+            scrollState.scrollToItem(totalChatSize - 1)
+        }
+    }
+
+    // 채팅 리스트
     LazyColumn (
         modifier = modifier
+        , state = scrollState
     ) {
-        // TODO: delete
-        item {
-            ChatDateItem("2025.04.27 월요일")
-        }
-
-        item {
-            OthersChatMessageItem(
-                ChatMessage(
-                    profileColor = "#FFD074BE",
-                    profileIcon = "horse",
-                    nickname = "김엄마",
-                    message = "엄마zz 운동했다.zzzzzzzzzzzzz",
-                    imageUrl = null,
-                    unReadCount = 2,
-                    date = "2025-04-27T16:27:00"
-                )
+        items(chatItems.itemCount) { index ->
+            val chat = ChatMessage(
+                profileColor = ProfileUtil().seqToColor(chatItems[index]!!.senderInfo.familySequence)!!
+                , profileIcon = chatItems[index]!!.senderInfo.userZodiacName
+                , nickname = chatItems[index]!!.senderInfo.userNickname
+                , message = chatItems[index]!!.contentInfo.text
+                , imageUrl = chatItems[index]!!.contentInfo.imageUrl
+                , unReadCount = chatItems[index]!!.unReadCount
+                , date = chatItems[index]!!.sendAt
             )
-        }
-
-        item {
-            OthersChatMessageItem(
-                ChatMessage(
-                    profileColor = "#FFD074BE",
-                    profileIcon = "horse",
-                    nickname = "김엄마",
-                    message = "엄마zz 운동했다.zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
-                    imageUrl = null,
-                    unReadCount = 2,
-                    date = "2025-04-27T16:27:00"
-                )
-            )
-        }
-
-        item {
-            OthersChatMessageItem(
-                ChatMessage(
-                    profileColor = "#FFD074BE",
-                    profileIcon = "horse",
-                    nickname = "김엄마",
-                    message = "엄마zz 운동했다.zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
-                    imageUrl = null,
-                    unReadCount = 2,
-                    date = "2025-04-27T16:27:00"
-                )
-            )
-        }
-
-        item {
-            OthersChatMessageItem(
-                ChatMessage(
-                    profileColor = "#D074BE"
-                    , profileIcon =  "horse"
-                    , nickname =  "김엄마"
-                    , message = null
-                    , imageUrl = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fe.kakao.com%2Ft%2Fopanchu-usagi&psig=AOvVaw1IN0kv3unWDXaKWS-F6cen&ust=1746772423775000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJDQk7-gk40DFQAAAAAdAAAAABAI"
-                    , unReadCount = 2
-                    , date = "2025-04-27T16:27:00"
-                )
-            )
-        }
-
-        item {
-            MyChatMessageItem(
-                ChatMessage(
-                    profileColor = "#FFEE00"
-                    , profileIcon =  "rabbit"
-                    , nickname =  "김수미"
-                    , message = "엄마 잘했어요. 최고예요."
-                    , imageUrl = null
-                    , unReadCount = 3
-                    , date = "2025-04-27T16:28:00"
-                )
-            )
-        }
-
-        item {
-            MyChatMessageItem(
-                ChatMessage(
-                    profileColor = "#FFEE00"
-                    , profileIcon =  "rabbit"
-                    , nickname =  "김수미"
-                    , message = null
-                    , imageUrl = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fe.kakao.com%2Ft%2Fopanchu-usagi&psig=AOvVaw1IN0kv3unWDXaKWS-F6cen&ust=1746772423775000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJDQk7-gk40DFQAAAAAdAAAAABAI"
-                    , unReadCount = 3
-                    , date = "2025-04-27T16:28:00"
-                )
-            )
+            if (chatItems[index]?.senderId == userId) {
+                MyChatMessageItem(chat)
+            } else {
+                OthersChatMessageItem(chat)
+            }
         }
     }
 }
 
 data class ChatMessage(
-    val profileColor: String
+    val profileColor: Color
     , val profileIcon: String
     , val nickname: String
     , val message: String?
