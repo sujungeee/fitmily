@@ -44,15 +44,13 @@ public class WalkController {
     private final SseService sseService;
 
     @MessageMapping("/walk/gps")
-    public void handleGps(@Payload GpsDto gpsDto) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
-            Integer userId = userDetails.getId();
+    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
+        if (principal != null) {
+            Integer userId = Integer.parseInt(principal.getName());
             System.out.println("✅ [Controller] userId = " + userId);
             walkService.processGps(userId, gpsDto);
         } else {
-            System.out.println("❌ [Controller] 인증 실패 또는 사용자 정보 없음 → auth: " + auth);
+            System.out.println("❌ [Controller] 인증 실패: Principal 없음");
         }
     }
 
