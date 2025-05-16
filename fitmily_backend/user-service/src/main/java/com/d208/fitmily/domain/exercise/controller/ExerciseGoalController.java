@@ -27,7 +27,7 @@ public class ExerciseGoalController {
      * @param principal 인증된 사용자 정보
      * @return 운동 목표 응답
      */
-    @Operation(summary = "개인운동 목표 조회", description = "사용자의 모든 운동 목표를 조회합니다.")
+    @Operation(summary = "개인운동 목표 조회")
     @GetMapping
     public ResponseEntity<ExerciseGoalResponse> getGoals(@AuthenticationPrincipal CustomUserDetails principal) {
         if (principal == null) {
@@ -42,7 +42,7 @@ public class ExerciseGoalController {
     /**
      * 운동 목표 등록
      */
-    @Operation(summary = "운동 목표 등록", description = "새로운 운동 목표를 등록합니다.")
+    @Operation(summary = "운동 목표 등록")
     @PostMapping
     public ResponseEntity<Void> createGoal(
             @AuthenticationPrincipal CustomUserDetails principal,
@@ -66,7 +66,7 @@ public class ExerciseGoalController {
     /**
      * 운동 목표 수정
      */
-    @Operation(summary = "운동 목표 수정", description = "기존 운동 목표의 목표값을 수정합니다.")
+    @Operation(summary = "운동 목표 수정")
     @PatchMapping("/{goalId}")
     public ResponseEntity<Void> updateGoal(
             @AuthenticationPrincipal CustomUserDetails principal,
@@ -88,7 +88,7 @@ public class ExerciseGoalController {
      * @param goalId 목표 ID
      * @return 응답 상태
      */
-    @Operation(summary = "운동 목표 삭제", description = "운동 목표를 삭제합니다.")
+    @Operation(summary = "운동 목표 삭제")
     @DeleteMapping("/{goalId}")
     public ResponseEntity<Void> deleteGoal(
             @AuthenticationPrincipal CustomUserDetails principal,
