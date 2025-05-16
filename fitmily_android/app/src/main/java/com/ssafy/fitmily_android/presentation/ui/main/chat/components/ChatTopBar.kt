@@ -31,7 +31,7 @@ fun ChatTopBar (
         modifier = Modifier
             .fillMaxWidth()
             .background(mainWhite)
-            .padding(vertical = 10.dp)
+            .padding(vertical = 10.dp, horizontal = 28.dp)
     ) {
         IconButton(
             onClick = {
@@ -42,9 +42,6 @@ fun ChatTopBar (
                     launchSingleTop = true
                 }
             }
-            , modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 28.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.home_selected_icon),

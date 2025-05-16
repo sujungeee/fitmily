@@ -62,7 +62,7 @@ fun MyChatMessageItem(
                 ) {
                     Text(
                         text = myMessage.message
-                        , style = Typography.bodyMedium
+                        , style = Typography.bodySmall
                         , color = mainWhite
                     )
                 }
