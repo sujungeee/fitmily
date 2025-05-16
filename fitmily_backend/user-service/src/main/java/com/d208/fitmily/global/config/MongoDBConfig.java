@@ -1,0 +1,69 @@
+package com.d208.fitmily.global.config;
+
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+
+@Configuration
+@EnableMongoRepositories(basePackages = "com.d208.fitmily.domain.chat.repository")
+public class MongoDBConfig {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
+
+    @Value("${spring.data.mongodb.host:localhost}")
+    private String mongoHost;
+
+    @Value("${spring.data.mongodb.port:27017}")
+    private String mongoPort;
+
+    @Value("${spring.data.mongodb.database:fitmily}")
+    private String mongoDatabase;
+
+    @Bean
+    public MongoClient mongoClient() {
+        String mongoUri = String.format("mongodb://%s:%s/%s", mongoHost, mongoPort, mongoDatabase);
+        log.info("MongoDB 연결 설정 완료: {}", mongoUri);
+
+        ConnectionString connectionString = new ConnectionString(mongoUri);
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .build();
+
+        return MongoClients.create(settings);
+    }
+
+    @Bean
+    public MongoDatabaseFactory mongoDatabaseFactory() {
+        return new SimpleMongoClientDatabaseFactory(mongoClient(), mongoDatabase);
+    }
+
+    @Bean
+    public MongoMappingContext mongoMappingContext() {
+        return new MongoMappingContext();
+    }
+
+    @Bean
+    public MongoTemplate mongoTemplate() {
+        MappingMongoConverter converter = new MappingMongoConverter(
+                new DefaultDbRefResolver(mongoDatabaseFactory()), mongoMappingContext());
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+
+        log.info("MongoTemplate 생성 완료: 데이터베이스 이름 = {}", mongoDatabase);
+
+        return new MongoTemplate(mongoDatabaseFactory(), converter);
+    }
+}

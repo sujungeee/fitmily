@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.d208.fitmily.domain.user.mapper.UserMapper">
+
+    <!-- 1) existsByLoginId -->
+    <select id="existsByLoginId" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM user
+        WHERE user_login_id = #{loginId}
+        )
+    </select>
+
+    <!-- 2) findByLoginId -->
+    <select id="findByLoginId" resultType="User">
+        SELECT
+        user_id              AS userId,
+        user_login_id        AS loginId,
+        user_pw              AS password,
+        user_nickname        AS nickname,
+        user_birth           AS birth,
+        user_gender          AS gender,
+        user_refresh_token   AS refreshToken,
+        user_role            AS role
+        FROM user
+        WHERE user_login_id = #{loginId}
+    </select>
+
+    <!-- 3) insert -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user (
+        user_login_id, user_pw, user_nickname,
+        user_birth, user_gender, user_refresh_token,
+        user_zodiac_name, user_family_sequence,
+        user_created_at, user_updated_at
+        ) VALUES (
+        #{loginId}, #{password}, #{nickname},
+        #{birth}, #{gender}, #{refreshToken},
+        #{zodiacName}, #{familySequence},
+        NOW(), NOW()
+        )
+    </insert>
+
+    <!-- 4) updateRefreshToken -->
+    <update id="updateRefreshToken">
+        UPDATE user
+        SET user_refresh_token = #{refreshToken}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 5) existsByIdAndRefreshToken -->
+    <select id="existsByIdAndRefreshToken" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM user
+        WHERE user_id = #{userId}
+        AND user_refresh_token = #{refreshToken}
+        )
+    </select>
+
+    <update id="clearRefreshToken">
+        UPDATE user
+        SET user_refresh_token = NULL
+        WHERE user_id = #{userId}
+    </update>
+
+    <!--user 정보 조회-->
+    <select id="selectById" parameterType="int" resultType="User">
+        SELECT
+        user_id, user_login_id,user_birth ,user_gender
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="getUserDtoById" resultType="com.d208.fitmily.domain.walk.dto.UserDto">
+        SELECT
+        user_id AS userId,
+        user_family_sequence AS userFamilySequence,
+        user_zodiac_name AS userZodiacName,
+        user_nickname AS userNickname
+        family_id AS familyId
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+
+
+</mapper>
