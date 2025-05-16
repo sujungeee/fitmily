@@ -41,9 +41,6 @@ public class ExerciseGoalController {
 
     /**
      * 운동 목표 등록
-     * @param principal 인증된 사용자 정보
-     * @param request 운동 목표 등록 요청
-     * @return 응답 상태
      */
     @Operation(summary = "운동 목표 등록", description = "새로운 운동 목표를 등록합니다.")
     @PostMapping
@@ -57,10 +54,10 @@ public class ExerciseGoalController {
 
         Integer userId = principal.getId();
 
-        // ExerciseGoalRequest를 ExerciseGoalDto로 변환
+        // ExerciseGoalRequest를 ExerciseGoalDto로 변환 - 여기 변경 필요
         ExerciseGoalDto goalDto = new ExerciseGoalDto();
-        goalDto.setExercise_goal_name(request.getExercise_goal_name());
-        goalDto.setExercise_goal_value(request.getExercise_goal_value());
+        goalDto.setExerciseGoalName(request.getExerciseGoalName());
+        goalDto.setExerciseGoalValue(request.getExerciseGoalValue());
 
         exerciseGoalService.createGoal(userId, goalDto);
         return ResponseEntity.ok().build();
@@ -68,10 +65,6 @@ public class ExerciseGoalController {
 
     /**
      * 운동 목표 수정
-     * @param principal 인증된 사용자 정보
-     * @param goalId 목표 ID
-     * @param request 운동 목표 수정 요청
-     * @return 응답 상태
      */
     @Operation(summary = "운동 목표 수정", description = "기존 운동 목표의 목표값을 수정합니다.")
     @PatchMapping("/{goalId}")
@@ -85,7 +78,7 @@ public class ExerciseGoalController {
         }
 
         Integer userId = principal.getId();
-        exerciseGoalService.updateGoal(userId, goalId, request.getExercise_goal_value());
+        exerciseGoalService.updateGoal(userId, goalId, request.getExerciseGoalValue());
         return ResponseEntity.ok().build();
     }
 
