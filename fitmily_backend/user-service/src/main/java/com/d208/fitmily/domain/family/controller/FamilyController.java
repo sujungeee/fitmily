@@ -44,11 +44,13 @@ public class FamilyController {
 
         FamilyDetailResponse.FamilyData familyData = new FamilyDetailResponse.FamilyData(
                 family.getFamilyName(),
-                family.getFamilyInviteCode()
+                family.getFamilyInviteCode(),
+                family.getFamilyPeople()  // 패밀리 인원 수 추가
         );
 
         return ResponseEntity.ok(new FamilyDetailResponse(familyData));
     }
+
 
     @GetMapping("/{familyId}/dashboard")
     public ResponseEntity<FamilyDashboardResponse> getFamilyDashboard(
