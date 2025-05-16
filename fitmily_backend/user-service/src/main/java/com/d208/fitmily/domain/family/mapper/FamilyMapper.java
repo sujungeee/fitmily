@@ -2,10 +2,7 @@ package com.d208.fitmily.domain.family.mapper;
 
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.user.entity.User;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -15,6 +12,10 @@ public interface FamilyMapper {
     /**
      * 가족 생성
      */
+    // createFamily 메서드를 어노테이션으로 구현
+    @Insert("INSERT INTO family (family_name, family_invite_code, family_people, family_created_at, family_updated_at) " +
+            "VALUES (#{familyName}, #{familyInviteCode}, #{familyPeople}, #{familyCreatedAt}, #{familyUpdatedAt})")
+    @Options(useGeneratedKeys = true, keyProperty = "familyId")
     void createFamily(Family family);
 
     /**
