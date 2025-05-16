@@ -4,6 +4,7 @@ import com.d208.fitmily.domain.family.dto.*;
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.service.FamilyService;
 import com.d208.fitmily.global.config.SecurityConfig;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequestMapping("/api/family")
 @RequiredArgsConstructor
+@Tag(name = "패밀리 API", description = "패밀리 생성/가입, 조회 관련 API")
 public class FamilyController {
 
     private final FamilyService familyService;
