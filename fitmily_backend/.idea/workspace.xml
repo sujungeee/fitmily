@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ebe2f556-8f87-4bc3-b081-d6c1ac0eee32" name="변경" comment="">
-      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/dto/StopWalkDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/dto/EndWalkRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/dto/EndWalkRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/mapper/WalkMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/mapper/WalkMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/service/WalkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/service/WalkService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/SwaggerConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/SwaggerConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/mappers/WalkMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/resources/mappers/WalkMapper.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
