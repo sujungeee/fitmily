@@ -3,6 +3,7 @@ package com.ssafy.fitmily_android.di
 import com.ssafy.fitmily_android.model.service.AuthService
 import com.ssafy.fitmily_android.model.service.ChatService
 import com.ssafy.fitmily_android.model.service.HomeService
+import com.ssafy.fitmily_android.model.service.MyGoalService
 import com.ssafy.fitmily_android.model.service.MyHealthService
 import com.ssafy.fitmily_android.model.service.NotificationService
 import com.ssafy.fitmily_android.model.service.WalkService
@@ -116,6 +117,12 @@ object NetworkModule {
     @Provides
     fun provideChatService(@MainRetrofit retrofit: Retrofit): ChatService {
         return retrofit.create(ChatService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideMyGoalService(@MainRetrofit retrofit: Retrofit): MyGoalService {
+        return retrofit.create(MyGoalService::class.java)
     }
 
     @Singleton
