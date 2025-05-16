@@ -30,7 +30,7 @@ class WalkViewModel @Inject constructor(
             ViewModelResultHandler.handle(
                 result = result,
                 onSuccess = { data ->
-                    if(!data){
+                    if(!data!!){
                         _uiState.value = _uiState.value.copy(tstMessage = "목표가 설정되어 있지 않습니다.")
                     }
                 },
@@ -47,7 +47,7 @@ class WalkViewModel @Inject constructor(
             ViewModelResultHandler.handle(
                 result = result,
                 onSuccess = { data ->
-                    _uiState.value = _uiState.value.copy(otherGpsList = data.path)
+                    _uiState.value = _uiState.value.copy(otherGpsList = data!!.path)
                 },
                 onError = { msg ->
                     _uiState.value = _uiState.value.copy(tstMessage = msg)

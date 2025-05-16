@@ -13,6 +13,7 @@ plugins {
 val properties = Properties()
 properties.load(FileInputStream(rootProject.file("local.properties")))
 val naverClientId: String = properties.getProperty("NAVER_CLIENT_ID")
+val weatherApiKey: String = properties.getProperty("WEATHER_API_KEY")
 android {
     namespace = "com.ssafy.fitmily_android"
     compileSdk = 35
@@ -27,6 +28,9 @@ android {
 
         buildConfigField("String", "NAVER_CLIENT_ID", naverClientId)
         manifestPlaceholders["NAVER_CLIENT_ID"] =  naverClientId
+
+        buildConfigField("String", "WEATHER_API_KEY", weatherApiKey)
+        manifestPlaceholders["WEATHER_API_KEY"] = weatherApiKey
     }
 
     buildTypes {
@@ -39,14 +43,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
+        dataBinding = true
         buildConfig = true
     }
 }
@@ -75,6 +80,9 @@ dependencies {
     // navigation
     implementation("androidx.navigation:navigation-compose:2.8.9")
 
+    // 네이버 지도
+    implementation("com.naver.maps:map-sdk:3.21.0")
+
     // dagger hilt
     implementation("com.google.dagger:hilt-android:2.56.2")
 
@@ -98,6 +106,21 @@ dependencies {
     // lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
 
+    // krossbow websocket
+    implementation(libs.krossbow.stomp.core)
+    implementation(libs.krossbow.websocket.okhttp)
+    implementation(libs.krossbow.stomp.moshi)
+
+    // krossbow moshi
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+
+    // ted image picker
+    implementation("io.github.ParkSangGwon:tedimagepicker:1.6.1")
+
+    // coil3
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+
     // kizitonwose
     implementation("com.kizitonwose.calendar:compose:2.6.2")
 
@@ -106,7 +129,6 @@ dependencies {
 
     // WheelPicker
     implementation("com.github.commandiron:WheelPickerCompose:1.1.11")
-
 
     // 네이버 지도
     implementation("com.naver.maps:map-sdk:3.21.0")
@@ -119,10 +141,17 @@ dependencies {
     // stomp
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
 
-    //RxJava
+    // RxJava
     implementation ("io.reactivex.rxjava2:rxjava:2.2.5")
     implementation ("io.reactivex.rxjava2:rxandroid:2.1.0")
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+
+    // paging
+    implementation(libs.paging.compose)
+    implementation(libs.paging.common.ktx)
+
+    // coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }

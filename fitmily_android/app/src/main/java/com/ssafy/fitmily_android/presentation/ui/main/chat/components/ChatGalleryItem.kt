@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.chat.components
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,11 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.ssafy.fitmily_android.R
 
 @Composable
 fun ChatGalleryItem(
-    image: Int
+    image: Uri
     , onDeleteImage: () -> Unit
 ) {
     Box (
@@ -28,8 +30,8 @@ fun ChatGalleryItem(
             .fillMaxWidth()
             .aspectRatio(1f)
     ) {
-        Image(
-            painter = painterResource(image)
+        AsyncImage(
+            model = image
             , contentDescription = "갤러리 이미지"
             , contentScale = ContentScale.Crop
             , modifier = Modifier

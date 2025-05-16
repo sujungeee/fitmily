@@ -29,11 +29,11 @@ fun ChatDateItem(
                 .clip(RoundedCornerShape(16.dp))
                 .background(mainWhite)
                 .align(Alignment.Center)
-                .padding(horizontal = 10.dp, vertical = 6.dp)
+                .padding(horizontal = 10.dp, vertical = 4.dp)
         ) {
             Text(
                 text = chatDate
-                , style = Typography.bodyMedium
+                , style = Typography.bodySmall
                 , color = mainBlack
             )
         }

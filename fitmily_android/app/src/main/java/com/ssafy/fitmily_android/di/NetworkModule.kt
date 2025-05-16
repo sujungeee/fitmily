@@ -1,9 +1,11 @@
 package com.ssafy.fitmily_android.di
 
 import com.ssafy.fitmily_android.model.service.AuthService
+import com.ssafy.fitmily_android.model.service.ChatService
 import com.ssafy.fitmily_android.model.service.HomeService
-import com.ssafy.fitmily_android.model.service.WalkService
 import com.ssafy.fitmily_android.model.service.MyHealthService
+import com.ssafy.fitmily_android.model.service.WalkService
+import com.ssafy.fitmily_android.model.service.WeatherService
 import com.ssafy.fitmily_android.network.AccessTokenInterceptor
 import com.ssafy.fitmily_android.network.ReissueInterceptor
 import dagger.Module
@@ -31,6 +33,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
+    @MainRetrofit
     fun provideOkHttpClient(
         accessTokenInterceptor: AccessTokenInterceptor
         , reissueInterceptor: ReissueInterceptor
@@ -46,7 +49,8 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient) : Retrofit {
+    @MainRetrofit
+    fun provideRetrofit(@MainRetrofit okHttpClient: OkHttpClient) : Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://k12d208.p.ssafy.io/api/")
             .client(okHttpClient)
@@ -56,26 +60,60 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideAuthService(retrofit: Retrofit): AuthService {
+    @WeatherRetrofit
+    fun provideWeatherOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .readTimeout(5000, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .connectTimeout(5000, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            // 필요하다면 추가 Interceptor 가능
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @WeatherRetrofit
+    fun provideWeatherRetrofit(@WeatherRetrofit weatherOkHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.openweathermap.org/")
+            .client(weatherOkHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthService(@MainRetrofit retrofit: Retrofit): AuthService {
         return retrofit.create(AuthService::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideWalkService(retrofit: Retrofit): WalkService {
+    fun provideWalkService(@MainRetrofit retrofit: Retrofit): WalkService {
         return retrofit.create(WalkService::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideHomeService(retrofit: Retrofit): HomeService {
+    fun provideHomeService(@MainRetrofit retrofit: Retrofit): HomeService {
         return retrofit.create(HomeService::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideMyHealthService(retrofit: Retrofit): MyHealthService {
+    fun provideMyHealthService(@MainRetrofit retrofit: Retrofit): MyHealthService {
         return retrofit.create(MyHealthService::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideWeatherService(@WeatherRetrofit weatherRetrofit: Retrofit): WeatherService {
+        return weatherRetrofit.create(WeatherService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideChatService(@MainRetrofit retrofit: Retrofit): ChatService {
+        return retrofit.create(ChatService::class.java)
+    }
 }

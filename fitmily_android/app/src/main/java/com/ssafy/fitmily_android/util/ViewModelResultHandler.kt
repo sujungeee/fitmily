@@ -5,7 +5,7 @@ import com.ssafy.fitmily_android.model.common.Result
 object ViewModelResultHandler {
     inline fun <T> handle(
         result: Result<T>,
-        onSuccess: (T) -> Unit,
+        onSuccess: (T?) -> Unit,
         onError: (String) -> Unit
     ) {
         when (result) {

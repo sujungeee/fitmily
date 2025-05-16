@@ -17,10 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ssafy.fitmily_android.model.dto.response.home.WeatherResponse
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 
 @Composable
-fun FamilyHome(navController: NavHostController) {
+fun FamilyHome(
+    navController: NavHostController,
+    weather: WeatherResponse?
+) {
     LazyColumn {
         item {
             Column(
@@ -98,7 +102,10 @@ fun FamilyHome(navController: NavHostController) {
                         text = "오늘의 날씨",
                         style = typography.titleLarge,
                     )
-                    WeatherCard()
+                    WeatherCard(
+                        weather = weather,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
                 }
             }
         }
