@@ -40,10 +40,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         log.info("WebSocket 연결 완료: /api/ws-connect");
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        // STOMP 메시지 처리 전 인터셉터 등록
-        registration.interceptors(delegatingStompHandler);
-        System.out.println("인터셉터 등록 완료");
-    }
+    
+
 }
