@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.chat.components
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -9,32 +10,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.ui.theme.mainWhite
+import kotlin.math.log
 
+private const val TAG = "ChatGalleryBar_fitmily"
 @Composable
 fun ChatGalleryBar(
     modifier: Modifier
     , onGalleryClose: () -> Unit
+    , images: MutableList<Uri>
 ) {
     BackHandler {
         onGalleryClose()
     }
-
-    var imageCount by remember { mutableIntStateOf(-1) }
-    // TODO: delete
-    var images by remember { mutableStateOf(listOf(
-        R.drawable.tmp_image, R.drawable.tmp_image2, R.drawable.tmp_image,
-        R.drawable.tmp_image, R.drawable.tmp_image2, R.drawable.tmp_image,
-        R.drawable.tmp_image, R.drawable.tmp_image, R.drawable.tmp_image)) }
 
     Box(
        modifier = modifier
@@ -49,7 +40,8 @@ fun ChatGalleryBar(
                     .padding(start = 10.dp, end = 16.dp)
                     .padding(vertical = 8.dp)
                 , { onGalleryClose() }
-                , imageCount
+                , images
+                , images.size
             )
 
             ChatGalleryContent(
@@ -57,9 +49,9 @@ fun ChatGalleryBar(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 8.dp)
                     .aspectRatio(1f)
-                , images
-                , { image ->
-                    images = images.toMutableList().apply { remove(image) }
+                , images = images
+                , onDeleteImage = { image, idx ->
+                    images.removeAt(idx)
                 }
             )
         }
