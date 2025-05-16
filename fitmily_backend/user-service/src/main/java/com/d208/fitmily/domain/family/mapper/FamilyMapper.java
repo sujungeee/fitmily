@@ -1,6 +1,7 @@
 package com.d208.fitmily.domain.family.mapper;
 
 import com.d208.fitmily.domain.family.entity.Family;
+import com.d208.fitmily.domain.user.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -40,7 +41,13 @@ public interface FamilyMapper {
     @Select("SELECT * FROM family WHERE family_id = #{familyId}")
     Family findById(@Param("familyId") int familyId);
 
+    /**
+     * 패밀리 구성원 목록 조회
+     */
+    @Select("SELECT * FROM user WHERE family_id = #{familyId}")
+    List<User> findFamilyMembers(@Param("familyId") int familyId);
 
+    //
     /**
      * 가족 구성원 확인
      */
