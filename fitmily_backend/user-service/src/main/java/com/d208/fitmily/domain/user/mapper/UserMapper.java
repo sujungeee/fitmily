@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserMapper {
 
+
     // 아이디 중복 조회
     boolean existsByLoginId(@Param("loginId") String loginId);
 
