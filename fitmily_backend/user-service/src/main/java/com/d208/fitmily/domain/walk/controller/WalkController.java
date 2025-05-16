@@ -26,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -48,12 +49,13 @@ public class WalkController {
 
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
             Integer userId = userDetails.getId();
-            System.out.println("✅ userId = " + userId);
+            System.out.println("✅ [Controller] userId = " + userId);
             walkService.processGps(userId, gpsDto);
         } else {
-            System.out.println("❌ 인증 실패 또는 사용자 정보 없음");
+            System.out.println("❌ [Controller] 인증 실패 또는 사용자 정보 없음 → auth: " + auth);
         }
     }
+
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")
     public ResponseEntity<Map<String, Object>> getGpsList(@PathVariable Integer userId) {
