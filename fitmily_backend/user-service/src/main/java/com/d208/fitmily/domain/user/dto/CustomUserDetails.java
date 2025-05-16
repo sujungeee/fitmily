@@ -48,7 +48,9 @@ public class CustomUserDetails implements UserDetails {
         return userEntity.getGender();
     }
 
-    public String getZodiacName() { return userEntity.getZodiacName();}
+    public String getZodiacName(){
+        return userEntity.getZodiacName();
+    }
 
     public Integer getfamilyId() { return userEntity.getFamilyId();}
 
