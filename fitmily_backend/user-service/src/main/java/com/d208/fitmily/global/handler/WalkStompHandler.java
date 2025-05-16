@@ -54,6 +54,7 @@ public class WalkStompHandler {
                 User user = new User();
                 user.setUserId(userId);
                 user.setRole(role);
+                user.setLoginId(String.valueOf(userId));
                 CustomUserDetails userDetails = new CustomUserDetails(user);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(
@@ -63,9 +64,7 @@ public class WalkStompHandler {
 
                 // ✅ 메시지에 인증 정보 삽입
                 accessor.setUser(auth);
-                System.out.println("🔐 setUser(auth) 설정 완료 → " + auth.getName());
-
-                // ✅ 세션에 인증 정보 저장
+                SecurityContextHolder.getContext().setAuthentication(auth); // 🔥 추가
                 accessor.getSessionAttributes().put("user", auth);
                 System.out.println("💾 sessionAttributes 저장 완료: sessionId = " + accessor.getSessionId());
 

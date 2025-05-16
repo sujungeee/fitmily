@@ -9,7 +9,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
-// DelegatingStompHandler.java
 @Component
 @RequiredArgsConstructor
 public class DelegatingStompHandler implements ChannelInterceptor {
