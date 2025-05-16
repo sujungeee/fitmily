@@ -79,7 +79,7 @@
         user_id AS userId,
         user_family_sequence AS userFamilySequence,
         user_zodiac_name AS userZodiacName,
-        user_nickname AS userNickname
+        user_nickname AS userNickname,
         family_id AS familyId
         FROM user
         WHERE user_id = #{userId}
