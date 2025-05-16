@@ -85,8 +85,8 @@ public interface ExerciseGoalMapper {
             exercise_goal_updated_at
         ) VALUES (
             #{userId},
-            #{goal.exercise_goal_name},
-            #{goal.exercise_goal_value},
+            #{goal.exerciseGoalName},
+            #{goal.exerciseGoalValue},
             0,
             #{now},
             #{now}
@@ -109,7 +109,7 @@ public interface ExerciseGoalMapper {
     int updateGoal(
             @Param("userId") Integer userId,
             @Param("goalId") Integer goalId,
-            @Param("exerciseValue") String exerciseValue,
+            @Param("exerciseValue") float exerciseValue,
             @Param("now") Date now
     );
 

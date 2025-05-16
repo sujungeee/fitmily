@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class ExerciseGoalResponse {
-    private int exercise_goal_progress;
+    private int exerciseGoalProgress;
     private List<ExerciseGoalDto> goal;
 }
