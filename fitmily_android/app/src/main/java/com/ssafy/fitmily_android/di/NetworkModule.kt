@@ -1,9 +1,10 @@
 package com.ssafy.fitmily_android.di
 
 import com.ssafy.fitmily_android.model.service.AuthService
+import com.ssafy.fitmily_android.model.service.ChatService
 import com.ssafy.fitmily_android.model.service.HomeService
-import com.ssafy.fitmily_android.model.service.WalkService
 import com.ssafy.fitmily_android.model.service.MyHealthService
+import com.ssafy.fitmily_android.model.service.WalkService
 import com.ssafy.fitmily_android.model.service.WeatherService
 import com.ssafy.fitmily_android.network.AccessTokenInterceptor
 import com.ssafy.fitmily_android.network.ReissueInterceptor
@@ -110,4 +111,9 @@ object NetworkModule {
         return weatherRetrofit.create(WeatherService::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideChatService(@MainRetrofit retrofit: Retrofit): ChatService {
+        return retrofit.create(ChatService::class.java)
+    }
 }

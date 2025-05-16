@@ -5,7 +5,6 @@ import com.ssafy.fitmily_android.model.dto.request.FcmRequest
 import com.ssafy.fitmily_android.model.dto.request.JoinRequest
 import com.ssafy.fitmily_android.model.dto.request.LoginRequest
 import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
-import com.ssafy.fitmily_android.model.dto.response.FcmResponse
 import com.ssafy.fitmily_android.model.dto.response.LoginResponse
 import com.ssafy.fitmily_android.model.dto.response.ReissueResponse
 import com.ssafy.fitmily_android.model.service.AuthService
@@ -34,7 +33,7 @@ class AuthRepositoryImpl @Inject constructor(
         return authService.join(JoinRequest(userId, userPwd, userNickname, userBirth, userGender))
     }
 
-    override suspend fun sendFcmToken(userId: String, fcmToken: String): FcmResponse {
+    override suspend fun sendFcmToken(userId: Int, fcmToken: String): Any {
         return authService.sendFcmToken(FcmRequest(userId, fcmToken))
     }
 }

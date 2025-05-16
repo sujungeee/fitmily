@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,8 @@ class AuthDataStore(private val context: Context){
     // key
     val accessToken = stringPreferencesKey("accessToken")
     val refreshToken = stringPreferencesKey("refreshToken")
-    val userId = stringPreferencesKey("userId")
+    val familyId = intPreferencesKey("familyId")
+    val userId = intPreferencesKey("userId")
     val userNickname = stringPreferencesKey("userNickname")
     val userProfileImg = stringPreferencesKey("userProfileImg")
     val userColor = stringPreferencesKey("userColor")
@@ -42,10 +44,15 @@ class AuthDataStore(private val context: Context){
         context.datastore.edit {
             it[refreshToken] = value
         }
-
     }
 
-    suspend fun setUserId(value: String) {
+    suspend fun setFamilyId(value: Int) {
+        context.datastore.edit {
+            it[familyId] = value
+        }
+    }
+
+    suspend fun setUserId(value: Int) {
         context.datastore.edit {
             it[userId] = value
         }
@@ -78,8 +85,12 @@ class AuthDataStore(private val context: Context){
         return context.datastore.data.first()[refreshToken] ?: ""
     }
 
-    suspend fun getUserId(): String {
-        return context.datastore.data.first()[userId] ?: ""
+    suspend fun getFamilyId(): Int {
+        return context.datastore.data.first()[familyId] ?: -1
+    }
+
+    suspend fun getUserId(): Int {
+        return context.datastore.data.first()[userId] ?: -1
     }
 
     suspend fun getUserNickname(): String {

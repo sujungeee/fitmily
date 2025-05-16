@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.chat.components
 
+import android.provider.ContactsContract.Profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,7 @@ import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainWhite
-import com.ssafy.fitmily_android.util.Profile
+import com.ssafy.fitmily_android.util.ProfileUtil
 
 @Composable
 fun OthersChatMessageItem(
@@ -45,11 +46,11 @@ fun OthersChatMessageItem(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50.dp))
-                    .background(Color(Profile().strToColorInt(othersMessage.profileColor)))
+                    .background(othersMessage.profileColor)
                     .size(width = 44.dp, height = 44.dp)
             ) {
                 Image(
-                    painter = painterResource(Profile().typeToProfile(othersMessage.profileIcon)!!)
+                    painter = painterResource(ProfileUtil().typeToProfile(othersMessage.profileIcon)!!)
                     , contentDescription = "typeImage"
                     , modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))

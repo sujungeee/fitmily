@@ -6,7 +6,6 @@ import com.ssafy.fitmily_android.model.dto.request.LoginRequest
 import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
 import com.ssafy.fitmily_android.model.dto.response.LoginResponse
 import com.ssafy.fitmily_android.model.dto.response.ReissueResponse
-import com.ssafy.fitmily_android.model.dto.response.FcmResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -39,5 +38,5 @@ interface AuthService {
     @POST("fcm/token")
     suspend fun sendFcmToken(
         @Body fcmRequest: FcmRequest
-    ): FcmResponse
+    ): Any
 }

@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.chat.components
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.util.DebugLogger
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.presentation.ui.main.chat.ChatViewModel
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
@@ -25,7 +29,9 @@ import com.ssafy.fitmily_android.ui.theme.mainWhite
 @Composable
 fun ChatGallerySendButton (
     onGalleryClose: () -> Unit
+    , images: MutableList<Uri>
     , imageCount: Int
+    , chatViewModel: ChatViewModel = hiltViewModel()
 ) {
     Box(
         modifier = Modifier
@@ -33,7 +39,10 @@ fun ChatGallerySendButton (
             .background(mainBlue)
             .padding(horizontal = 10.dp, vertical = 6.dp)
             .clickable {
-                // TODO: 이미지 전송
+                chatViewModel.sendMessage(
+                    type = "image"
+                    , images = images.toList()
+                )
                 onGalleryClose()
             }
     ) {

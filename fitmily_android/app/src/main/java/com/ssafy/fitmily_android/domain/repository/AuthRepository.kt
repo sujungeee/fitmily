@@ -1,6 +1,5 @@
 package com.ssafy.fitmily_android.domain.repository
 
-import com.ssafy.fitmily_android.model.dto.response.FcmResponse
 import com.ssafy.fitmily_android.model.dto.response.LoginResponse
 import com.ssafy.fitmily_android.model.dto.response.ReissueResponse
 
@@ -15,5 +14,5 @@ interface AuthRepository {
 
     suspend fun join(userId: String, userPwd: String, userNickname: String, userBirth: String, userGender: Int): Boolean
 
-    suspend fun sendFcmToken(userId: String, fcmToken: String): FcmResponse
+    suspend fun sendFcmToken(userId: Int, fcmToken: String): Any
 }

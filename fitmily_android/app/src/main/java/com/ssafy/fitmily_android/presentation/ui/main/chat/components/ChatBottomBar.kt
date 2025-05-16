@@ -20,13 +20,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.presentation.ui.main.chat.ChatViewModel
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun ChatBottomBar (
     modifier : Modifier
     , onGalleryOpen: () -> Unit
+    , chatViewModel: ChatViewModel = hiltViewModel()
 ) {
     var message by remember { mutableStateOf("") }
 
@@ -51,14 +54,17 @@ fun ChatBottomBar (
                 )
             }
 
-
             ChatInputTextField(
                 modifier = Modifier.weight(1f), message, { message = it }
             )
 
             IconButton(
                 onClick = {
-                    // TODO: 전송
+                    chatViewModel.sendMessage(
+                        "text"
+                        , message
+                        , listOf()
+                    )
                     message = ""
                 }
             ) {

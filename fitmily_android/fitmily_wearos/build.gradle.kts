@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.dagger.hilt.android)
 }
 
@@ -29,11 +29,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -64,15 +64,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-wearable:18.1.0")
     // hilt
     implementation("com.google.dagger:hilt-android:$hilt_version")
-    kapt("com.google.dagger:hilt-compiler:$hilt_version")
+    ksp("com.google.dagger:hilt-compiler:2.56.2")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     // permissions
     implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
 
-}
-
-kapt {
-    useBuildCache = false
-    correctErrorTypes= true
 }
