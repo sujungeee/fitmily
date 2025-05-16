@@ -15,6 +15,14 @@ public enum ErrorCode {
     CHAT_MESSAGE_SEND_FAILED(4102, "메시지 전송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     CHAT_MESSAGE_READ_FAILED(4103, "메시지 읽음 처리에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    // 운동 목표 관련 오류 코드
+    // ErrorCode.java에 추가
+    EXERCISE_GOAL_ALREADY_EXISTS(4201, "이미 등록된 운동 목표가 있습니다.", HttpStatus.CONFLICT),
+    EXERCISE_GOAL_NOT_FOUND(4202, "존재하지 않는 운동 목표입니다.", HttpStatus.NOT_FOUND),
+    EXERCISE_GOAL_CREATE_FAILED(4203, "운동 목표 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    EXERCISE_GOAL_UPDATE_FAILED(4204, "운동 목표 수정에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    EXERCISE_GOAL_DELETE_FAILED(4205, "운동 목표 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
 
     // FCM 관련 오류 코드
     FCM_TOKEN_REGISTRATION_FAILED(4201, "FCM 토큰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
