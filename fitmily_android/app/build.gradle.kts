@@ -13,6 +13,7 @@ plugins {
 val properties = Properties()
 properties.load(FileInputStream(rootProject.file("local.properties")))
 val naverClientId: String = properties.getProperty("NAVER_CLIENT_ID")
+val weatherApiKey: String = properties.getProperty("WEATHER_API_KEY")
 android {
     namespace = "com.ssafy.fitmily_android"
     compileSdk = 35
@@ -27,6 +28,9 @@ android {
 
         buildConfigField("String", "NAVER_CLIENT_ID", naverClientId)
         manifestPlaceholders["NAVER_CLIENT_ID"] =  naverClientId
+
+        buildConfigField("String", "WEATHER_API_KEY", weatherApiKey)
+        manifestPlaceholders["WEATHER_API_KEY"] = weatherApiKey
     }
 
     buildTypes {
@@ -125,4 +129,11 @@ dependencies {
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    // 위치 정보
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
 }
