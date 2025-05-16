@@ -31,7 +31,8 @@ public enum ErrorCode {
 
     // 패밀리 관련
     INVALID_INVITE_CODE(4301, "유효하지 않은 초대 코드입니다", HttpStatus.BAD_REQUEST),
-    FAMILY_MEMBER_LIMIT_EXCEEDED(4302, "패밀리 최대 인원(6명)을 초과했습니다", HttpStatus.BAD_REQUEST);
+    FAMILY_MEMBER_LIMIT_EXCEEDED(4302, "패밀리 최대 인원(6명)을 초과했습니다", HttpStatus.BAD_REQUEST),
+    FAMILY_NOT_FOUND(4303, "해당 ID의 패밀리를 찾을 수 없습니다.", HttpStatus.NOT_FOUND)
 
     ;
     private final int        code;

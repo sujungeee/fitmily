@@ -41,9 +41,9 @@ public class HealthController {
 
     @Operation(summary = "건강 상태 수정", description = "- 건강상태를 수정합니다")
     @PatchMapping("health")
-    public ResponseEntity<UpdateHealthRequestDto> updateHealth(
+    public ResponseEntity<Void> updateHealth(
             @RequestBody UpdateHealthRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) throws JsonProcessingException {
 
         healthService.updateHealth(principal.getId(), dto);
         return ResponseEntity.ok(null);

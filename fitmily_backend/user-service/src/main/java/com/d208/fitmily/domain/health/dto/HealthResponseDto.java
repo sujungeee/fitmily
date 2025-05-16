@@ -1,10 +1,7 @@
 package com.d208.fitmily.domain.health.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +10,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class HealthResponseDto {
     private Integer healthId;
     private Float bmi;
@@ -30,4 +28,24 @@ public class HealthResponseDto {
     private List<String> fiveMajorDiseasesList;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public String getHealthFiveMajorDiseases() {
+        return fiveMajorDiseases;
+    }
+
+    public String getHealthOtherDiseases() {
+        return otherDiseases;
+    }
+
+    public float getHealthHeight() {
+        return height;
+    }
+
+    public float getHealthWeight() {
+        return weight;
+    }
+
+    public float getHealthBmi() {
+        return bmi;
+    }
 }
