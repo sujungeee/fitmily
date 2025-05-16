@@ -9,13 +9,13 @@
 
 
     <insert id="insertStopWalk"
-            parameterType="Walk"
+            parameterType="com.d208.fitmily.domain.walk.dto.StopWalkDto"
             useGeneratedKeys="true"
             keyProperty="walkId">
         INSERT INTO walk (
-        user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance )
+        user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_calories )
         VALUES(
-        #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance})
+        #{userId}, #{routeImg}, #{startTime}, #{endTime},#{distance}, #{calories})
     </insert>
 
 
