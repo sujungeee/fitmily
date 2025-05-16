@@ -21,7 +21,9 @@ public interface UserMapper {
             user_birth           AS birth,
             user_gender          AS gender,
             user_refresh_token   AS refreshToken,
-            user_role            AS role
+            user_role            AS role,
+            user_zodiac_name     AS zodiacName,
+            family_id       AS familyId
         FROM user
         WHERE user_login_id = #{loginId}
         """)

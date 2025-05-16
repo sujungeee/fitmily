@@ -29,6 +29,7 @@ public class HealthResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+
     public String getHealthFiveMajorDiseases() {
         return fiveMajorDiseases;
     }
