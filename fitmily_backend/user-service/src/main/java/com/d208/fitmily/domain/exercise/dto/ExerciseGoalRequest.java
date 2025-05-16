@@ -11,6 +11,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ExerciseGoalRequest {
-    private String exercise_goal_name;  // 운동 이름
-    private String exercise_goal_value; // 목표값
+    private String exerciseGoalName;  // 운동 이름
+    private float exerciseGoalValue; // 목표값
 }
