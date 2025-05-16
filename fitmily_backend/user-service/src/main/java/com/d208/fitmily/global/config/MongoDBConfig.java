@@ -4,6 +4,7 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,71 +17,53 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+
 @Configuration
 @EnableMongoRepositories(basePackages = "com.d208.fitmily.domain.chat.repository")
 public class MongoDBConfig {
 
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoDBConfig.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
 
-    @Value("${spring.data.mongodb.host:mongodb}")
+    @Value("${spring.data.mongodb.host:localhost}")
     private String mongoHost;
 
     @Value("${spring.data.mongodb.port:27017}")
     private String mongoPort;
 
     @Value("${spring.data.mongodb.database:fitmily}")
-    private String databaseName;
+    private String mongoDatabase;
 
-    /**
-     * MongoDB 클라이언트 빈 생성
-     */
     @Bean
     public MongoClient mongoClient() {
-        // host와 port를 명시적으로 사용하는 방식으로 구성
-        String mongoUri = String.format("mongodb://%s:%s/%s", mongoHost, mongoPort, databaseName);
+        String mongoUri = String.format("mongodb://%s:%s/%s", mongoHost, mongoPort, mongoDatabase);
+        log.info("MongoDB 연결 설정 완료: {}", mongoUri);
+
         ConnectionString connectionString = new ConnectionString(mongoUri);
-        MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
+        MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .build();
 
-        log.info("MongoDB 연결 설정 완료: {}", mongoUri);
-        return MongoClients.create(mongoClientSettings);
+        return MongoClients.create(settings);
     }
 
-    /**
-     * MongoDB 데이터베이스 팩토리 빈 생성
-     */
     @Bean
     public MongoDatabaseFactory mongoDatabaseFactory() {
-        return new SimpleMongoClientDatabaseFactory(mongoClient(), databaseName);
+        return new SimpleMongoClientDatabaseFactory(mongoClient(), mongoDatabase);
     }
 
-    /**
-     * MongoDB 매핑 컨텍스트 빈 생성
-     */
     @Bean
     public MongoMappingContext mongoMappingContext() {
-        MongoMappingContext context = new MongoMappingContext();
-        return context;
+        return new MongoMappingContext();
     }
 
-    /**
-     * MongoDB 템플릿 빈 생성
-     */
     @Bean
     public MongoTemplate mongoTemplate() {
-        // 커스텀 컨버터 설정
         MappingMongoConverter converter = new MappingMongoConverter(
-                new DefaultDbRefResolver(mongoDatabaseFactory()),
-                mongoMappingContext()
-        );
-
-        // _class 필드 제거 (선택사항)
+                new DefaultDbRefResolver(mongoDatabaseFactory()), mongoMappingContext());
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
 
-        MongoTemplate mongoTemplate = new MongoTemplate(mongoDatabaseFactory(), converter);
-        log.info("MongoTemplate 생성 완료: 데이터베이스 이름 = {}", databaseName);
+        log.info("MongoTemplate 생성 완료: 데이터베이스 이름 = {}", mongoDatabase);
 
-        return mongoTemplate;
+        return new MongoTemplate(mongoDatabaseFactory(), converter);
     }
 }
