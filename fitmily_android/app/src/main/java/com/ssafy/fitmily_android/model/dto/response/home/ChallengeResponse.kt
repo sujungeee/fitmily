@@ -6,4 +6,12 @@ data class ChallengeResponse(
     val progressPercentage: Int,
     val startDate: String,
     val targetDistance: Int
-)
+){
+    constructor() : this(
+        challengeId = 0,
+        participants = emptyList(),
+        progressPercentage = 0,
+        startDate = "",
+        targetDistance = 0
+    )
+}
