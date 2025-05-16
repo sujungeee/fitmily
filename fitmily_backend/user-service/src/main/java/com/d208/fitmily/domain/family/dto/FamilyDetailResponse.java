@@ -19,5 +19,6 @@ public class FamilyDetailResponse {
     public static class FamilyData {
         private String familyName;
         private String familyInviteCode;
+        private int familyPeople;  // 추가된 필드: 패밀리 인원 수
     }
 }
