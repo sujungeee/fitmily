@@ -15,9 +15,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -38,15 +42,18 @@ public class WalkController {
     private final GpsRedisService gpsRedisService;
     private final SseService sseService;
 
-    //산책 시작
-    @MessageMapping("/walk/gps")  // /app/walk/gps 로 전송된 메시지를 처리함
-    public void handleGps(@Payload GpsDto gpsDto, @AuthenticationPrincipal CustomUserDetails principal) {
+    @MessageMapping("/walk/gps")
+    public void handleGps(@Payload GpsDto gpsDto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        Integer userId = principal.getId();
-        walkService.processGps(userId, gpsDto);
-
+        if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
+            Integer userId = userDetails.getId();
+            System.out.println("✅ userId = " + userId);
+            walkService.processGps(userId, gpsDto);
+        } else {
+            System.out.println("❌ 인증 실패 또는 사용자 정보 없음");
+        }
     }
-
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")
     public ResponseEntity<Map<String, Object>> getGpsList(@PathVariable Integer userId) {

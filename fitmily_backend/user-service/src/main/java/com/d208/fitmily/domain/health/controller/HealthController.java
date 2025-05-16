@@ -29,8 +29,6 @@ public class HealthController {
         return ResponseEntity.ok(null);
     }
 
-
-
     @Operation(summary = "건강 상태 조회", description = "- JWT에서 추출한 userId로 건강 상태를 조회합니다.")
     @GetMapping("health")
     public ResponseEntity<HealthResponseDto> gethealth(@AuthenticationPrincipal CustomUserDetails principal){
