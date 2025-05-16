@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import retrofit2.http.Tag
 import javax.inject.Inject
 
@@ -35,6 +36,8 @@ class MyHealthViewModel @Inject constructor(
                     isLoading = true
                 )
             }
+
+            Log.d("test1234", "url : ")
 
             when(val result = myHealthGetInfoUseCase()) {
 
