@@ -23,7 +23,6 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        // 하드코딩 대신 설정 값 사용
         return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
