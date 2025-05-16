@@ -73,12 +73,13 @@
         WHERE user_id = #{userId}
     </select>
 
+    <!--    산책할때 유저정보 필요한거 가져오기 위해서 만듬-->
     <select id="getUserDtoById" resultType="com.d208.fitmily.domain.walk.dto.UserDto">
         SELECT
         user_id AS userId,
         user_family_sequence AS userFamilySequence,
         user_zodiac_name AS userZodiacName,
-        user_nickname AS userNickname,
+        user_nickname AS userNickname
         family_id AS familyId
         FROM user
         WHERE user_id = #{userId}
