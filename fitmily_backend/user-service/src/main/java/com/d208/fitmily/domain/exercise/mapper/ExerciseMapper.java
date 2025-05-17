@@ -79,7 +79,8 @@ public interface ExerciseMapper {
             NULL AS walkId,
             NULL AS imgUrl,
             e.exercise_calories AS exerciseCalories,
-            e.exercise_count AS exerciseRecord
+            e.exercise_count AS exerciseRecord,
+            e.exercise_name AS exerciseName
         FROM exercise e
         WHERE e.user_id = #{userId}
           AND DATE(e.exercise_created_at) = CURDATE()
