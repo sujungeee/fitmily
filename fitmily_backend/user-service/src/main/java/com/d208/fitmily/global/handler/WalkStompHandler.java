@@ -38,9 +38,6 @@ public class WalkStompHandler {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
 
-                if (!jwtUtil.validateToken(token)) {
-                    throw new BusinessException(ErrorCode.INVALID_TOKEN);
-                }
 
                 Integer userId = jwtUtil.getUserId(token);
                 String role = jwtUtil.getRole(token);
@@ -65,9 +62,9 @@ public class WalkStompHandler {
 
                 System.out.println("🔐 setUser(auth) 설정 완료 → " + auth.getName());
                 System.out.println("💾 sessionAttributes 저장 완료: sessionId = " + accessor.getSessionId());
-            } else {
-                throw new BusinessException(ErrorCode.INVALID_TOKEN);
             }
+
+
         }
 
         // SEND / SUBSCRIBE 시

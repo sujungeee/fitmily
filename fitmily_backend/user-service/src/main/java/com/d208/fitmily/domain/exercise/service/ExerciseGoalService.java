@@ -103,7 +103,6 @@ public class ExerciseGoalService {
         if (count > 0) {
             throw new BusinessException(ErrorCode.EXERCISE_GOAL_ALREADY_EXISTS);
         }
-
         try {
             int inserted = exerciseGoalMapper.insertGoal(userId, data, new Date());
             if (inserted == 0) {
