@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.fitmily_android.domain.usecase.auth.AuthLogoutUseCase
+import com.ssafy.fitmily_android.domain.usecase.notification.GetUnReadNotificationInfoUseCase
 import com.ssafy.fitmily_android.util.ViewModelResultHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -16,8 +17,8 @@ private const val TAG = "MyViewModel_fitmily"
 @HiltViewModel
 class MyViewModel @Inject constructor(
     private val authLogoutUseCase: AuthLogoutUseCase
+    , private val getUnReadNotificationInfoUseCase: GetUnReadNotificationInfoUseCase
 ): ViewModel(){
-
     private val _myUiState = MutableStateFlow(MyUiState())
     val myUiState: StateFlow<MyUiState> = _myUiState
 
@@ -40,6 +41,25 @@ class MyViewModel @Inject constructor(
                             logoutResult = false
                         )
                     }
+                    Log.e(TAG, msg)
+                }
+            )
+        }
+    }
+
+    fun getUnReadNotificationInfo() {
+        viewModelScope.launch {
+            val result = getUnReadNotificationInfoUseCase()
+            ViewModelResultHandler.handle(
+                result = result,
+                onSuccess = { data ->
+                    _myUiState.update {
+                        it.copy(
+                            hasUnreadNotification = data!!.hasUnreadNotification
+                        )
+                    }
+                },
+                onError = { msg ->
                     Log.e(TAG, msg)
                 }
             )
