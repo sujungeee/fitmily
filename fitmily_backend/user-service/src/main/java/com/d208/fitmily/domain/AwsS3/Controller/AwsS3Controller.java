@@ -1,5 +1,6 @@
 package com.d208.fitmily.domain.AwsS3.Controller;
 
+import com.d208.fitmily.domain.AwsS3.Service.AwsS3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/s3")
 public class AwsS3Controller {
 
-    private final S3Service s3Service;
+    private final AwsS3Service awsS3Service;
 
     @Operation(summary = "업로드용 Presigned URL 발급")
     @GetMapping("/upload-url")
@@ -27,7 +28,7 @@ public class AwsS3Controller {
             @RequestParam String filename,
             @RequestParam String contenttype
     ) {
-        String presignedUrl = s3Service.generatePresignedUploadUrl(filename, contenttype);
+        String presignedUrl = awsS3Service.generatePresignedUploadUrl(filename, contenttype);
         Map<String, Object> response = new HashMap<>();
         response.put("data", presignedUrl);
 
@@ -39,7 +40,7 @@ public class AwsS3Controller {
     public ResponseEntity<Map<String, Object>> getPresignedDownloadUrl(
             @RequestParam String filename
     ) {
-        String presignedUrl = s3Service.generatePresignedDownloadUrl(filename);
+        String presignedUrl = awsS3Service.generatePresignedDownloadUrl(filename);
         Map<String, Object> response = new HashMap<>();
         response.put("data", presignedUrl);
 
