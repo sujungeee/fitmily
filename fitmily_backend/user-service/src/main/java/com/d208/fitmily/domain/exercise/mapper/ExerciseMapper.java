@@ -51,11 +51,10 @@ public interface ExerciseMapper {
            COALESCE(SUM(r.exercise_count), 0) AS todayTotal
     FROM exercise_goal g
     LEFT JOIN exercise r
-        ON g.user_id = r.user_id
-       AND g.exercise_goal_name = r.exercise_name
-       AND DATE(r.exercise_created_at) = CURDATE()
-    WHERE g.user_id = #{userId}
-      AND g.exercise_goal_name = #{exerciseName}
+         ON g.user_id = r.user_id
+         AND g.exercise_goal_name = r.exercise_name
+         AND DATE(r.exercise_created_at) = CURDATE()
+    WHERE g.user_id = #{userId} AND g.exercise_goal_name = #{exerciseName}
     GROUP BY g.exercise_goal_value
     """)
 
@@ -66,8 +65,7 @@ public interface ExerciseMapper {
     @Update("""
     UPDATE exercise_goal
     SET exercise_goal_progress = #{progressRate}
-    WHERE user_id = #{userId}
-      AND exercise_goal_name = #{exerciseName}
+    WHERE user_id = #{userId} AND exercise_goal_name = #{exerciseName}
     """)
     void updateProgress(@Param("userId") Integer userId,
                         @Param("exerciseName") String exerciseName,
@@ -82,8 +80,7 @@ public interface ExerciseMapper {
             e.exercise_count AS exerciseRecord,
             e.exercise_name AS exerciseName
         FROM exercise e
-        WHERE e.user_id = #{userId}
-          AND DATE(e.exercise_created_at) = CURDATE()
+        WHERE e.user_id = #{userId} AND DATE(e.exercise_created_at) = CURDATE()
     """)
     List<ExerciseRecordResponseDto> findTodayExerciseRecords(Integer userId);
 
