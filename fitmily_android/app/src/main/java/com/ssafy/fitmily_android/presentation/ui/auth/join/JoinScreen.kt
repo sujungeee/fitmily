@@ -1,6 +1,7 @@
 package com.ssafy.fitmily_android.presentation.ui.auth.join
 
-import android.util.Log
+import android.app.Activity
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,12 +44,15 @@ import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
+private const val TAG = "JoinScreen_fitmily"
 @Composable
 fun JoinScreen(
     navController: NavHostController
     , joinViewModel: JoinViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val activity = context as? Activity
+    activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
     var id by remember { mutableStateOf("") }
     var pwd by remember { mutableStateOf("") }
@@ -63,7 +67,6 @@ fun JoinScreen(
     LaunchedEffect(uiState.isJoinAvailable) {
         if (uiState.isJoinAvailable == "Available") {
             joinState = "Available"
-            Toast.makeText(context, "사용 가능한 아이디입니다.", Toast.LENGTH_SHORT).show()
         } else if (uiState.isJoinAvailable == "Not Available") {
             joinState = "Not Available"
         }
@@ -123,6 +126,7 @@ fun JoinScreen(
                     , "id"
                     , id
                     , { id =  it }
+                    , enabled = joinState == "Not Initialized" || joinState == "Not Available"
                 )
 
                 Spacer(
@@ -131,7 +135,11 @@ fun JoinScreen(
 
                 Button(
                     onClick = {
-                        joinViewModel.checkDuplId(id)
+                        if (JoinUtil().isValidId(id)) {
+                            joinViewModel.checkDuplId(id)
+                        } else {
+                            Toast.makeText(context, "아이디 형식이 맞지 않습니다.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     , modifier = Modifier.wrapContentWidth()
                 ) {
@@ -147,9 +155,18 @@ fun JoinScreen(
                 modifier = Modifier.height(4.dp)
             )
 
+
             if (joinState == "Not Available") {
                 Text(
                     text = "아이디가 중복되었어요.",
+                    color = mainBlack,
+                    style = Typography.bodyMedium
+                )
+            }
+
+            if (joinState == "Available") {
+                Text(
+                    text = "사용 가능한 아이디입니다.",
                     color = mainBlack,
                     style = Typography.bodyMedium
                 )
@@ -241,15 +258,17 @@ fun JoinScreen(
                     , onClick = {
                         // 회원가입
                         val isInputValid = JoinUtil().isInputValid(id, pwd, pwd2, nickname, birth)
-                        val isFormatValid = JoinUtil().isFormatValid(id, pwd, pwd2, nickname, birth)
+                        val isFormatValid = JoinUtil().isFormatValid(id, pwd, nickname, birth)
+                        val isEqualsPwd = JoinUtil().isEqualsPwd(pwd, pwd2)
                         val joinStateValid = joinState == "Available"
 
-                        if (isInputValid && isFormatValid && joinStateValid) {
+                        if (isInputValid && isFormatValid && isEqualsPwd &&joinStateValid) {
                             joinViewModel.join(id, pwd, nickname, birth, if (gender.equals("남")) 0 else 1)
                         } else {
                             val message = when {
                                 !isInputValid -> "빈 칸을 입력해주세요."
                                 !isFormatValid -> "입력 형식이 맞지 않습니다."
+                                !isEqualsPwd -> "비밀번호가 일치하지 않습니다."
                                 !joinStateValid -> "아이디 중복을 확인해주세요."
                                 else -> ""
                             }

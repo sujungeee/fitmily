@@ -38,6 +38,7 @@ fun InputTextField(
     , value: String
     , onValueChange: (String) -> Unit
     , fontSize : Int = 16
+    , enabled: Boolean = true
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val visualTransformation = when(inputType) {
@@ -69,6 +70,7 @@ fun InputTextField(
                         , unfocusedIndicatorColor = mainDarkGray
                     )
                 )
+            , enabled = enabled
             , keyboardOptions = when (inputType) {
                 "number" -> KeyboardOptions(keyboardType = KeyboardType.Number)
                 "pwd" -> KeyboardOptions(keyboardType = KeyboardType.Password)
