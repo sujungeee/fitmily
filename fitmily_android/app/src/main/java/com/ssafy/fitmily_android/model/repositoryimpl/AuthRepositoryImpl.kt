@@ -3,10 +3,10 @@ package com.ssafy.fitmily_android.model.repositoryimpl
 import com.ssafy.fitmily_android.domain.repository.AuthRepository
 import com.ssafy.fitmily_android.model.common.ApiResultHandler
 import com.ssafy.fitmily_android.model.common.Result
-import com.ssafy.fitmily_android.model.dto.request.FcmRequest
-import com.ssafy.fitmily_android.model.dto.request.JoinRequest
-import com.ssafy.fitmily_android.model.dto.request.LoginRequest
-import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.FcmRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.JoinRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.LoginRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.ReissueRequest
 import com.ssafy.fitmily_android.model.dto.response.auth.LoginResponse
 import com.ssafy.fitmily_android.model.dto.response.auth.ReissueResponse
 import com.ssafy.fitmily_android.model.service.AuthService

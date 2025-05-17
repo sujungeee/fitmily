@@ -1,7 +1,7 @@
 package com.ssafy.fitmily_android.network
 
 import com.ssafy.fitmily_android.MainApplication
-import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.ReissueRequest
 import com.ssafy.fitmily_android.model.service.AuthService
 import jakarta.inject.Inject
 import jakarta.inject.Provider
