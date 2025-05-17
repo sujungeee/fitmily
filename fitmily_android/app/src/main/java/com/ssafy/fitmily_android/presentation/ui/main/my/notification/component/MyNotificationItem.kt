@@ -125,7 +125,7 @@ fun MyNotificationItem (
 }
 
 enum class NotificationType (val typeName: String, val typeImage: Int) {
-    STING("콕 찌르기", R.drawable.sting_icon)
+    POKE("콕 찌르기", R.drawable.sting_icon)
     , CHALLENGE("챌린지", R.drawable.challenge_icon)
     , WALK("산책", R.drawable.walk_icon);
 
