@@ -8,13 +8,15 @@ import androidx.navigation.compose.NavHost
 fun FitmilyNavHost (
     navController: NavHostController
     , startDestination : RootNavGraph
+    , fcmType: String?
+    , fcmId: String?
 ){
     NavHost(
         navController = navController
         , startDestination = startDestination.route
     ) {
         authNavGraph(navController)
-        mainNavGraph(navController)
+        mainNavGraph(navController, fcmType, fcmId)
     }
 }
 

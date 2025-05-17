@@ -3,7 +3,7 @@ package com.ssafy.fitmily_android.model.repositoryimpl
 import com.ssafy.fitmily_android.domain.repository.AuthRepository
 import com.ssafy.fitmily_android.model.common.ApiResultHandler
 import com.ssafy.fitmily_android.model.common.Result
-import com.ssafy.fitmily_android.model.dto.request.auth.FcmRequest
+import com.ssafy.fitmily_android.model.dto.request.notification.FcmRequest
 import com.ssafy.fitmily_android.model.dto.request.auth.JoinRequest
 import com.ssafy.fitmily_android.model.dto.request.auth.LoginRequest
 import com.ssafy.fitmily_android.model.dto.request.auth.ReissueRequest
@@ -42,12 +42,6 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun join(userId: String, userPwd: String, userNickname: String, userBirth: String, userGender: Int): Result<Unit> {
         return ApiResultHandler.handleApi {
             authService.join(JoinRequest(userId, userPwd, userNickname, userBirth, userGender))
-        }
-    }
-
-    override suspend fun sendFcmToken(userId: Int, fcmToken: String): Result<Unit> {
-        return ApiResultHandler.handleApi {
-            authService.sendFcmToken(FcmRequest(userId, fcmToken))
         }
     }
 }

@@ -3,6 +3,7 @@ package com.ssafy.fitmily_android.presentation.ui.main
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,11 +20,28 @@ import com.ssafy.fitmily_android.presentation.navigation.bottom.homeNavGraph
 import com.ssafy.fitmily_android.presentation.navigation.bottom.myNavGraph
 import com.ssafy.fitmily_android.presentation.navigation.bottom.walkNavGraph
 
+private const val TAG = "MainScreen_fitmily"
 @Composable
-fun MainScreen(parentNavController: NavHostController) {
+fun MainScreen(parentNavController: NavHostController, fcmType: String?, fcmId: String?) {
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
+
+    LaunchedEffect(Unit) {
+        val destination = when(fcmType) {
+            "POKE" -> "home/main"
+            "CHALLENGE" -> "home/main"
+            "CHAT" -> "chat/main"
+            "WALK" -> "walk/main"
+            else -> "home/main"
+        }
+        navController.navigate(destination) {
+            popUpTo(navController.graph.id) {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
+    }
 
     val isBottomVisible = remember { mutableStateOf(true) }
     currentRoute?.let { route ->
@@ -32,6 +50,7 @@ fun MainScreen(parentNavController: NavHostController) {
             else -> false
         }
     }
+
     Scaffold(
         bottomBar = {
             if (isBottomVisible.value) {
@@ -54,7 +73,6 @@ fun MainScreen(parentNavController: NavHostController) {
             }
         }
     ) { innerPadding ->
-
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.route,
@@ -66,6 +84,5 @@ fun MainScreen(parentNavController: NavHostController) {
             chatNavGraph(navController)
             myNavGraph(parentNavController, navController)
         }
-
     }
 }

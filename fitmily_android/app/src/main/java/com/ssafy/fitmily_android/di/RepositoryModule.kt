@@ -4,6 +4,7 @@ import com.ssafy.fitmily_android.domain.repository.AuthRepository
 import com.ssafy.fitmily_android.domain.repository.ChatRepository
 import com.ssafy.fitmily_android.domain.repository.MyHealthRepository
 import com.ssafy.fitmily_android.domain.repository.HomeRepository
+import com.ssafy.fitmily_android.domain.repository.NotificationRepository
 import com.ssafy.fitmily_android.domain.repository.WalkRepository
 import com.ssafy.fitmily_android.domain.repository.WeatherRepository
 import com.ssafy.fitmily_android.model.repositoryimpl.AuthRepositoryImpl
@@ -11,6 +12,7 @@ import com.ssafy.fitmily_android.model.repositoryimpl.ChatRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.HomeRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.WalkRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.MyHealthRepositoryImpl
+import com.ssafy.fitmily_android.model.repositoryimpl.NotificationRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.WeatherRepositoryImpl
 import com.ssafy.fitmily_android.model.service.AuthService
 import dagger.Binds
@@ -60,4 +62,9 @@ abstract class RepositoryModule {
         chatRepositoryImpl: ChatRepositoryImpl
     ): ChatRepository
 
+    @Singleton
+    @Binds
+    abstract fun providesNotificationRepository(
+        notificationRepositoryImpl: NotificationRepositoryImpl
+    ): NotificationRepository
 }

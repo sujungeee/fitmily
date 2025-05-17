@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -25,6 +26,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val authDataStore = MainApplication.getInstance().getDataStore()
+        val fcmType = intent.getStringExtra("type")
+        val fcmId = intent.getStringExtra("id")
+        Log.d(TAG, "onCreate: fcmType: ${fcmType}, fcmId: ${fcmId}")
 
         setContent {
             val navController = rememberNavController()
@@ -52,11 +56,16 @@ class MainActivity : ComponentActivity() {
 
             FitmilyTheme {
                 startGraph?.let {
-                    FitmilyNavHost(navController, it)
+                    FitmilyNavHost(navController, it, fcmType, fcmId)
                 }
             }
         }
         Log.d(TAG, "onCreate: ${BuildConfig.NAVER_CLIENT_ID}")
         NaverMapSdk.getInstance(this).client = NaverMapSdk.NcpKeyClient(BuildConfig.NAVER_CLIENT_ID)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
     }
 }

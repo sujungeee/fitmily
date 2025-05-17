@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.domain.usecase.auth.AuthLoginUseCase
-import com.ssafy.fitmily_android.domain.usecase.auth.FcmUseCase
+import com.ssafy.fitmily_android.domain.usecase.notification.SendFcmUseCase
 import com.ssafy.fitmily_android.util.ViewModelResultHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -18,7 +18,7 @@ private const val TAG = "LoginViewModel_fitmily"
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authLoginUseCase: AuthLoginUseCase
-    , private val fcmUseCase: FcmUseCase
+    , private val sendFcmUseCase: SendFcmUseCase
 ) : ViewModel() {
     val authDataStore = MainApplication.getInstance().getDataStore()
 
@@ -27,7 +27,7 @@ class LoginViewModel @Inject constructor(
 
     fun sendFcmToken(token: String) {
         viewModelScope.launch {
-            val result = fcmUseCase(authDataStore.getUserId(), token)
+            val result = sendFcmUseCase(authDataStore.getUserId(), token)
             ViewModelResultHandler.handle(
                 result = result,
                 onSuccess = { data ->
