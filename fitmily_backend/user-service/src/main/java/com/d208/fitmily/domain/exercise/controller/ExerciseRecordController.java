@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "운동기록 API", description = "운동 기록 추가, 조회")
 @RestController
 @RequestMapping("/api")
@@ -27,12 +29,14 @@ public class ExerciseRecordController {
     public ResponseEntity<Void> ExerciseRecord(@RequestBody ExerciseRecordRequestDto dto,
                                                @AuthenticationPrincipal CustomUserDetails principal){
         Integer userId = principal.getId();
-
         exerciseService.recordExercise(userId, dto);
         return ResponseEntity.ok(null);
     }
 
-//    @GetMapping("/exercise/{exerciseId}")
-//    public ResponseEntity<ExerciseRecordResponseDto>
-
+    @GetMapping("/records/{userId}")
+    public ResponseEntity<List<ExerciseRecordResponseDto>> getExerciseRecords(@AuthenticationPrincipal CustomUserDetails principal) {
+        Integer userId = principal.getId();
+        List<ExerciseRecordResponseDto> records = exerciseService.getDailyExerciseRecords(userId);
+        return ResponseEntity.ok(records);
+    }
 }
