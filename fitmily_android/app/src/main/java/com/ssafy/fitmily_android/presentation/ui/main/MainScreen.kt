@@ -64,7 +64,7 @@ fun MainScreen(parentNavController: NavHostController) {
             familyNavGraph(navController)
             walkNavGraph(navController)
             chatNavGraph(navController)
-            myNavGraph(navController)
+            myNavGraph(parentNavController, navController)
         }
 
     }
