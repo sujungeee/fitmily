@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ebe2f556-8f87-4bc3-b081-d6c1ac0eee32" name="변경" comment="">
-      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/controller/ExerciseRecordController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/dto/ExerciseRecordInsertDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/dto/ExerciseRecordRequestDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/service/ExerciseRecordService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/mapper/ExerciseMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/mapper/ExerciseMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/service/ExerciseRecordService.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/service/ExerciseRecordService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
