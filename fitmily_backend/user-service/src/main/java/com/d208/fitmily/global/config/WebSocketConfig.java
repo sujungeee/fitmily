@@ -1,7 +1,7 @@
 package com.d208.fitmily.global.config;
 
 import com.d208.fitmily.global.handler.DelegatingStompHandler;
-import com.d208.fitmily.global.handler.StompHandler;
+//import com.d208.fitmily.global.handler.StompHandler;
 import com.d208.fitmily.global.handler.StompPrincipal;
 import com.d208.fitmily.global.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WebSocketConfig.class);
 
-    private final StompHandler stompHandler;
+//    private final StompHandler stompHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {

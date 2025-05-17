@@ -1,11 +1,12 @@
 package com.d208.fitmily.domain.exercise.mapper;
 
+import com.d208.fitmily.domain.exercise.dto.ExerciseRecordInsertDto;
+import com.d208.fitmily.domain.exercise.dto.ExerciseRecordResponseDto;
 import com.d208.fitmily.domain.exercise.entity.Exercise;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ExerciseMapper {
@@ -20,4 +21,69 @@ public interface ExerciseMapper {
      */
     @Select("SELECT COALESCE(SUM(exercise_calories), 0) FROM exercise WHERE user_id = #{userId} AND DATE(exercise_created_at) = #{date}")
     int calculateUserTotalCalories(@Param("userId") int userId, @Param("date") String date);
+
+
+    //    운동 기록 추가
+    @Insert("""
+        INSERT INTO exercise(
+            user_id,
+            exercise_name,
+            exercise_count,
+            exercise_time,
+            exercise_calories,
+            exercise_created_at,
+            exercise_updated_at
+        ) VALUES (
+            #{userId},
+            #{exerciseName},
+            #{exerciseCount},
+            #{exerciseTime},
+            #{exerciseCalories},
+              NOW(),
+              NOW()
+        )
+    """)
+    void insertExerciseRecord(ExerciseRecordInsertDto dto);
+
+    // 당일한 운동 총합, 목표 조회
+    @Select("""
+    SELECT g.exercise_goal_value AS goalValue,
+           COALESCE(SUM(r.exercise_count), 0) AS todayTotal
+    FROM exercise_goal g
+    LEFT JOIN exercise r
+         ON g.user_id = r.user_id
+         AND g.exercise_goal_name = r.exercise_name
+         AND DATE(r.exercise_created_at) = CURDATE()
+    WHERE g.user_id = #{userId} AND g.exercise_goal_name = #{exerciseName}
+    GROUP BY g.exercise_goal_value
+    """)
+
+    Map<String, Object> findGoalAndTodayTotal(@Param("userId") Integer userId, @Param("exerciseName") String exerciseName);
+
+
+    // 달성률 업데이트
+    @Update("""
+    UPDATE exercise_goal
+    SET exercise_goal_progress = #{progressRate}
+    WHERE user_id = #{userId} AND exercise_goal_name = #{exerciseName}
+    """)
+    void updateProgress(@Param("userId") Integer userId,
+                        @Param("exerciseName") String exerciseName,
+                        @Param("progressRate") Integer progressRate);
+
+    // 운동 기록 조회
+    @Select("""
+        SELECT
+            NULL AS walkId,
+            NULL AS imgUrl,
+            e.exercise_calories AS exerciseCalories,
+            e.exercise_count AS exerciseRecord,
+            e.exercise_name AS exerciseName
+        FROM exercise e
+        WHERE e.user_id = #{userId} AND DATE(e.exercise_created_at) = CURDATE()
+    """)
+    List<ExerciseRecordResponseDto> findTodayExerciseRecords(Integer userId);
+
+
+
 }
