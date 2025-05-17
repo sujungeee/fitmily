@@ -34,10 +34,12 @@ public class ExerciseRecordController {
     }
 
     @Operation(summary = "개인 운동 기록 조회 (일반운동 + 산책)")
-    @GetMapping("/records/{userId}")
+    @GetMapping("/exercise")
     public ResponseEntity<List<ExerciseRecordResponseDto>> getExerciseRecords(@AuthenticationPrincipal CustomUserDetails principal) {
         Integer userId = principal.getId();
         List<ExerciseRecordResponseDto> records = exerciseService.getDailyExerciseRecords(userId);
         return ResponseEntity.ok(records);
     }
+
+
 }

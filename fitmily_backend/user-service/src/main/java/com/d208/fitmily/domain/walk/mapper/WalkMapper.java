@@ -64,7 +64,8 @@ public interface WalkMapper {
         w.walk_id AS walkId,
         w.walk_route_img AS imgUrl,
         w.walk_calories AS exerciseCalories,
-        w.walk_distance AS exerciseRecord
+        w.walk_distance AS exerciseRecord,
+        '산책' AS exerciseName
     FROM walk w
     WHERE w.user_id = #{userId}
       AND DATE(w.walk_created_at) = CURDATE()
