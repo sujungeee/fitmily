@@ -51,15 +51,12 @@ class MainActivity : ComponentActivity() {
             }
 
             FitmilyTheme {
-//                startGraph?.let {
-//                    FitmilyNavHost(navController, it)
-//                }
-                FitmilyNavHost(navController, RootNavGraph.MainNavGraph) // TODO: 통신 성공 시 delete
+                startGraph?.let {
+                    FitmilyNavHost(navController, it)
+                }
             }
         }
         Log.d(TAG, "onCreate: ${BuildConfig.NAVER_CLIENT_ID}")
         NaverMapSdk.getInstance(this).client = NaverMapSdk.NcpKeyClient(BuildConfig.NAVER_CLIENT_ID)
-
-
     }
 }
