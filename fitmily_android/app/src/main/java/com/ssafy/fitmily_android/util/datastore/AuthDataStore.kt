@@ -21,9 +21,7 @@ class AuthDataStore(private val context: Context){
     val familyId = intPreferencesKey("familyId")
     val userId = intPreferencesKey("userId")
     val userNickname = stringPreferencesKey("userNickname")
-    val userProfileImg = stringPreferencesKey("userProfileImg")
-    val userColor = stringPreferencesKey("userColor")
-
+    val userZodiacName = stringPreferencesKey("userZodiacName")
     val authExpired = booleanPreferencesKey("authExpired")
 
     // clear
@@ -44,6 +42,7 @@ class AuthDataStore(private val context: Context){
         context.datastore.edit {
             it[refreshToken] = value
         }
+
     }
 
     suspend fun setFamilyId(value: Int) {
@@ -64,15 +63,9 @@ class AuthDataStore(private val context: Context){
         }
     }
 
-    suspend fun setUserProfileImg(value: String) {
+    suspend fun setUserZodiacName(value: String) {
         context.datastore.edit {
-            it[userProfileImg] = value
-        }
-    }
-
-    suspend fun setUserColor(value: String) {
-        context.datastore.edit {
-            it[userColor] = value
+            it[userZodiacName] = value
         }
     }
 
@@ -97,14 +90,9 @@ class AuthDataStore(private val context: Context){
         return context.datastore.data.first()[userNickname] ?: ""
     }
 
-    suspend fun getUserProfileImg(): String {
-        return context.datastore.data.first()[userProfileImg] ?: ""
+    suspend fun getUserZodiacName(): String {
+        return context.datastore.data.first()[userZodiacName] ?: ""
     }
-
-    suspend fun getUserColor(): String {
-        return context.datastore.data.first()[userColor] ?: ""
-    }
-
 
     // reissue
     suspend fun setAuthExpired(value: Boolean) {
