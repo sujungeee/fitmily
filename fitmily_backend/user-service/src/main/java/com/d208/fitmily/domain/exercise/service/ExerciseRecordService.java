@@ -6,6 +6,7 @@ import com.d208.fitmily.domain.exercise.dto.ExerciseRecordRequestDto;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class ExerciseRecordService {
             "사이드레터럴레이즈", 0.3f
     );
 
+    @Transactional
     public void recordExercise(Integer userId, ExerciseRecordRequestDto dto){
 
         //칼로리 계산 해서 기록 추가
@@ -44,22 +46,20 @@ public class ExerciseRecordService {
 
         exerciseMapper.insertExerciseRecord(record);
 
-        //목표 + 오늘 총합 운동량 조회
-        Map<String, Object> progress = exerciseMapper.findGoalAndTodayTotal(
-                userId, dto.getExerciseName()
-        );
+        try {
+            Map<String, Object> progress = exerciseMapper.findGoalAndTodayTotal(userId, dto.getExerciseName());
 
-        // sql 연산한 값을 JDBC 드라이버가 알아서 BigDecimal로 변환해버림 (Number)로 받음
-        int goalValue = ((Number) progress.get("goalValue")).intValue();  // 목표
-        int todayTotal = ((Number) progress.get("todayTotal")).intValue(); // 운동 총합
+            if (progress != null && progress.get("goalValue") != null) {
+                int goalValue = ((Number) progress.get("goalValue")).intValue();
+                int todayTotal = ((Number) progress.get("todayTotal")).intValue();
+                int progressRate = Math.min(100, (int) Math.round((todayTotal / (double) goalValue) * 100));
 
-        //달성률 계산
-        int progressRate = (int) Math.round((todayTotal / (double) goalValue) * 100);
-
-        //목표 테이블 업데이트
-        exerciseMapper.updateProgress(userId, exerciseName, progressRate);
-
-
+                exerciseMapper.updateProgress(userId, dto.getExerciseName(), progressRate);
+            }
+        } catch (Exception e) {
+            // 목표가 없는 경우 무시하고 기록은 성공
+            System.out.println("목표가 없어 progress 갱신 실패");
+        }
     }
 
 }
