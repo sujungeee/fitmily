@@ -33,6 +33,7 @@ public class ExerciseRecordController {
         return ResponseEntity.ok(null);
     }
 
+    @Operation(summary = "개인 운동 기록 조회 (일반운동 + 산책)")
     @GetMapping("/records/{userId}")
     public ResponseEntity<List<ExerciseRecordResponseDto>> getExerciseRecords(@AuthenticationPrincipal CustomUserDetails principal) {
         Integer userId = principal.getId();
