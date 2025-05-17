@@ -32,10 +32,11 @@ public class ExerciseRecordService {
             "사이드레터럴레이즈", 0.3f
     );
 
+    // 운동 기록 + 달성률 업데이트
     @Transactional
     public void recordExercise(Integer userId, ExerciseRecordRequestDto dto){
 
-        // 1번 칼로리 계산 해서 기록 추가
+        // 칼로리 계산
         String exerciseName = dto.getExerciseName();
         int count = dto.getExerciseCount();
 
@@ -51,7 +52,7 @@ public class ExerciseRecordService {
 
         exerciseMapper.insertExerciseRecord(record);
 
-        // 2번 달성률 업데이트
+        // 달성률 업데이트
         try {
             Map<String, Object> progress = exerciseMapper.findGoalAndTodayTotal(userId, dto.getExerciseName());
 
@@ -63,7 +64,6 @@ public class ExerciseRecordService {
                 exerciseMapper.updateProgress(userId, dto.getExerciseName(), progressRate);
             }
         } catch (Exception e) {
-            // 목표가 없는 경우 무시하고 기록은 성공
             System.out.println("목표가 없어 progress 갱신 실패");
         }
     }
@@ -73,7 +73,6 @@ public class ExerciseRecordService {
 
         // 오늘 운동 기록
         List<ExerciseRecordResponseDto> exerciseRecords = exerciseMapper.findTodayExerciseRecords(userId);
-
         // 오늘 산책 기록
         List<ExerciseRecordResponseDto> walkRecords = walkMapper.findTodayWalkRecords(userId);
 
