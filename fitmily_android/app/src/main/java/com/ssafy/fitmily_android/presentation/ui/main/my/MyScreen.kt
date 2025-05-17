@@ -1,23 +1,25 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my
 
-import android.util.Log
-import androidx.compose.animation.core.animateValueAsState
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.presentation.navigation.RootNavGraph
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyAchievement
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseGoal
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseStatusGraph
@@ -29,8 +31,32 @@ import com.ssafy.fitmily_android.ui.theme.backGroundGray
 
 @Composable
 fun MyScreen(
-    navController : NavHostController
+    parentNavController: NavHostController
+    , navController : NavHostController
+    , myViewMdodel: MyViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val uiState by myViewMdodel.myUiState.collectAsStateWithLifecycle()
+    val authDataStore = MainApplication.getInstance().getDataStore()
+
+    LaunchedEffect(uiState.mySideEffect) {
+        for(sideEffect in uiState.mySideEffect ?: return@LaunchedEffect) {
+            when (sideEffect) {
+                is MySideEffect.ClearAuthData -> {
+                    authDataStore.clear()
+                }
+
+                is MySideEffect.NavigateToLogin -> {
+                    parentNavController.navigate("login") {
+                        popUpTo(RootNavGraph.MainNavGraph.route) {
+                            inclusive = true
+                        }
+                    }
+                    Toast.makeText(context, "로그아웃이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     val goals = listOf(
         GoalItem("스쿼트", 69f, 100f, "회"),
@@ -131,8 +157,7 @@ fun MyScreen(
         /* 로그아웃 섹션 */
         item {
             MyLogout {
-                /* TODO 로그아웃 로직 */
-                Log.d("test1234", "로그아웃 버튼 눌림")
+                myViewMdodel.logout()
             }
         }
     }
