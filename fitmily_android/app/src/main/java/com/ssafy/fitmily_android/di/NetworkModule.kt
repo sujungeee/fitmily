@@ -63,8 +63,8 @@ object NetworkModule {
     @WeatherRetrofit
     fun provideWeatherOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .readTimeout(5000, java.util.concurrent.TimeUnit.MILLISECONDS)
-            .connectTimeout(5000, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .readTimeout(5000, TimeUnit.MILLISECONDS)
+            .connectTimeout(5000, TimeUnit.MILLISECONDS)
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             // 필요하다면 추가 Interceptor 가능
             .build()
