@@ -68,7 +68,9 @@ public class ExerciseRecordService {
         }
     }
 
+    // 운동 + 산책 기록 조회
     public List<ExerciseRecordResponseDto> getDailyExerciseRecords(Integer userId) {
+
         // 오늘 운동 기록
         List<ExerciseRecordResponseDto> exerciseRecords = exerciseMapper.findTodayExerciseRecords(userId);
 
@@ -82,6 +84,4 @@ public class ExerciseRecordService {
 
         return result;
     }
-}
-
 }

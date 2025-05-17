@@ -76,13 +76,13 @@ public interface ExerciseMapper {
     // 운동 기록 조회
     @Select("""
         SELECT
-            NULL AS walkId, -- 운동이므로 walkId는 null
-            NULL AS imgUrl,AS imgUrl,
+            NULL AS walkId,
+            NULL AS imgUrl,
             e.exercise_calories AS exerciseCalories,
             e.exercise_count AS exerciseRecord
         FROM exercise e
         WHERE e.user_id = #{userId}
-          AND DATE(e.created_at) = CURDATE()
+          AND DATE(e.exercise_created_at) = CURDATE()
     """)
     List<ExerciseRecordResponseDto> findTodayExerciseRecords(Integer userId);
 

@@ -67,7 +67,7 @@ public interface WalkMapper {
         w.walk_distance AS exerciseRecord
     FROM walk w
     WHERE w.user_id = #{userId}
-      AND DATE(w.walk_start_time) = CURDATE()
+      AND DATE(w.walk_created_at) = CURDATE()
 """)
     List<ExerciseRecordResponseDto> findTodayWalkRecords(Integer userId);
 }
