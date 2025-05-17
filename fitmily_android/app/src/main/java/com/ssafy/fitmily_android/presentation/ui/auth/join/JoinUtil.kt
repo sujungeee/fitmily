@@ -9,10 +9,9 @@ class JoinUtil{
                 && birth.isNotEmpty())
     }
 
-    fun isFormatValid(id: String, pwd: String, pwd2: String, nickname: String, birth: String): Boolean {
+    fun isFormatValid(id: String, pwd: String, nickname: String, birth: String): Boolean {
         return (isValidId(id)
                 && isValidPwd(pwd)
-                && !isEqualsPwd(pwd, pwd2)
                 && isValidNickname(nickname)
                 && isValidBirth(birth))
     }

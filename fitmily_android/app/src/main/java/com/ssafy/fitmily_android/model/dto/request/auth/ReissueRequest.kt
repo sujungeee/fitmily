@@ -1,4 +1,4 @@
-package com.ssafy.fitmily_android.model.dto.request
+package com.ssafy.fitmily_android.model.dto.request.auth
 
 import com.google.gson.annotations.SerializedName
 

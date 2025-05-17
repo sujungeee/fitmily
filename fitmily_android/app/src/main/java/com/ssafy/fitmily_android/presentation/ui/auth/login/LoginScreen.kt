@@ -1,6 +1,9 @@
 package com.ssafy.fitmily_android.presentation.ui.auth.login
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.view.WindowManager
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +48,10 @@ fun LoginScreen(
     navController: NavHostController
     , loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
     val uiState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.loginSideEffect) {
@@ -65,6 +73,7 @@ fun LoginScreen(
                             inclusive = true
                         }
                     }
+                    Toast.makeText(context, "로그인이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -130,7 +139,11 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 28.dp)
                 , onClick = {
-                    loginViewModel.login(id, pwd)
+                    if (id.isNotEmpty() && pwd.isNotEmpty()) {
+                        loginViewModel.login(id, pwd)
+                    } else {
+                        Toast.makeText(context, "빈 칸을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 , text = "로그인"
             )

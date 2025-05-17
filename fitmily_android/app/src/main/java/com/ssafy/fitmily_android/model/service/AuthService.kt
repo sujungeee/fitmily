@@ -1,11 +1,12 @@
 package com.ssafy.fitmily_android.model.service
 
-import com.ssafy.fitmily_android.model.dto.request.FcmRequest
-import com.ssafy.fitmily_android.model.dto.request.JoinRequest
-import com.ssafy.fitmily_android.model.dto.request.LoginRequest
-import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
-import com.ssafy.fitmily_android.model.dto.response.LoginResponse
-import com.ssafy.fitmily_android.model.dto.response.ReissueResponse
+import com.ssafy.fitmily_android.model.dto.request.auth.FcmRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.JoinRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.LoginRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.ReissueRequest
+import com.ssafy.fitmily_android.model.dto.response.auth.LoginResponse
+import com.ssafy.fitmily_android.model.dto.response.auth.ReissueResponse
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -15,28 +16,28 @@ interface AuthService {
     @POST("auth/login")
     suspend fun login(
         @Body loginRequest: LoginRequest
-    ): LoginResponse
+    ): Response<LoginResponse>
 
     @POST("auth/logout")
-    suspend fun logout(): Boolean
+    suspend fun logout(): Response<Unit>
 
     @POST("auth/reissue")
     suspend fun reissue(
         @Body reissueRequest: ReissueRequest
-    ): ReissueResponse
+    ): Response<ReissueResponse>
 
     @GET("users/check-id")
     suspend fun checkDuplId(
         @Query("username") userId: String
-    ): Boolean
+    ): Response<Boolean>
 
     @POST("users")
     suspend fun join(
         @Body joinRequest: JoinRequest
-    ): Boolean
+    ): Response<Unit>
 
     @POST("fcm/token")
     suspend fun sendFcmToken(
         @Body fcmRequest: FcmRequest
-    ): Any
+    ): Response<Unit>
 }

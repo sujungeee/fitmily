@@ -1,7 +1,7 @@
 package com.ssafy.fitmily_android.network
 
 import com.ssafy.fitmily_android.MainApplication
-import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
+import com.ssafy.fitmily_android.model.dto.request.auth.ReissueRequest
 import com.ssafy.fitmily_android.model.service.AuthService
 import jakarta.inject.Inject
 import jakarta.inject.Provider
@@ -29,24 +29,25 @@ class ReissueInterceptor @Inject constructor(
         return runBlocking {
             val refreshToken = authDataStore.getRefreshToken()
 
-            val newRequest = runCatching {
+            val result = runCatching {
                 authService.reissue(ReissueRequest(refreshToken))
-            }.fold(
-                onSuccess = {
-                    authDataStore.setAccessToken(it.accessToken)
-                    authDataStore.setRefreshToken(it.refreshToken)
+            }
+            result.fold(
+                onSuccess = { tokenResponse ->
+                    authDataStore.setAccessToken(tokenResponse.body()!!.accessToken)
+                    authDataStore.setRefreshToken(tokenResponse.body()!!.refreshToken)
 
+                    // 기존 요청에 새 토큰 추가
                     response.request.newBuilder()
-                        .addHeader("Authorization", "Bearer ${it.accessToken}")
+                        .removeHeader("Authorization")
+                        .addHeader("Authorization", "Bearer ${tokenResponse.body()!!.accessToken}")
                         .build()
-                }
-                , onFailure = {
-                    runBlocking { authDataStore.setAuthExpired(true) }
+                },
+                onFailure = {
+                    authDataStore.setAuthExpired(true)
                     null
                 }
             )
-
-            return@runBlocking newRequest
         }
     }
 }

@@ -80,9 +80,6 @@ dependencies {
     // navigation
     implementation("androidx.navigation:navigation-compose:2.8.9")
 
-    // 네이버 지도
-    implementation("com.naver.maps:map-sdk:3.21.0")
-
     // dagger hilt
     implementation("com.google.dagger:hilt-android:2.56.2")
 
@@ -130,6 +127,7 @@ dependencies {
     // WheelPicker
     implementation("com.github.commandiron:WheelPickerCompose:1.1.11")
 
+
     // 네이버 지도
     implementation("com.naver.maps:map-sdk:3.21.0")
     implementation("io.github.fornewid:naver-map-compose:1.5.7")
@@ -141,7 +139,7 @@ dependencies {
     // stomp
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
 
-    // RxJava
+    //RxJava
     implementation ("io.reactivex.rxjava2:rxjava:2.2.5")
     implementation ("io.reactivex.rxjava2:rxandroid:2.1.0")
 

@@ -1,13 +1,7 @@
 package com.ssafy.fitmily_android.model.service
 
-import com.ssafy.fitmily_android.model.dto.request.FcmRequest
-import com.ssafy.fitmily_android.model.dto.request.JoinRequest
-import com.ssafy.fitmily_android.model.dto.request.LoginRequest
-import com.ssafy.fitmily_android.model.dto.request.ReissueRequest
 import com.ssafy.fitmily_android.model.dto.request.home.FamilyCreateRequest
 import com.ssafy.fitmily_android.model.dto.request.home.FamilyJoinRequest
-import com.ssafy.fitmily_android.model.dto.response.LoginResponse
-import com.ssafy.fitmily_android.model.dto.response.ReissueResponse
 import com.ssafy.fitmily_android.model.dto.response.home.ChallengeResponse
 import com.ssafy.fitmily_android.model.dto.response.home.FamilyHealthResponse
 import com.ssafy.fitmily_android.model.dto.response.home.FamilyJoinResponse

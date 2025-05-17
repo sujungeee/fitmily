@@ -11,12 +11,15 @@ import com.ssafy.fitmily_android.presentation.ui.main.my.goal.MyGoalScreen
 import com.ssafy.fitmily_android.presentation.ui.main.my.health.MyHealthRegisterScreen
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.MyNotificationScreen
 
-fun NavGraphBuilder.myNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.myNavGraph(
+    parentNavController: NavHostController
+    , navController: NavHostController
+) {
     navigation(
         startDestination = "my/main", route = BottomNavItem.My.route
     ) {
         composable("my/main") {
-            MyScreen(navController)
+            MyScreen(parentNavController, navController)
         }
 
         composable("my/notification") {
