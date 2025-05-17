@@ -20,4 +20,13 @@ public interface ExerciseMapper {
      */
     @Select("SELECT COALESCE(SUM(exercise_calories), 0) FROM exercise WHERE user_id = #{userId} AND DATE(exercise_created_at) = #{date}")
     int calculateUserTotalCalories(@Param("userId") int userId, @Param("date") String date);
+
+
+
+
+    
+
+
+
+
 }
