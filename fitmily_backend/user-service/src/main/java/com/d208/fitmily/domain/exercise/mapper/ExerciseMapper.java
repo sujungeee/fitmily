@@ -24,43 +24,51 @@ public interface ExerciseMapper {
 
     //    운동 기록 추가
     @Insert("""
-        INSERT INTO exercise_record (
+        INSERT INTO exercise(
             user_id,
             exercise_name,
-            exercise_record,
+            exercise_count,
             exercise_time,
-            exercise_calories
+            exercise_calories,
+            exercise_created_at,
+            exercise_updated_at
         ) VALUES (
             #{userId},
             #{exerciseName},
-            #{exerciseRecord},
+            #{exerciseCount},
             #{exerciseTime},
-            #{exerciseCalories}
+            #{exerciseCalories},
+              NOW(),
+              NOW()
         )
     """)
     void insertExerciseRecord(ExerciseRecordInsertDto dto);
 
     @Select("""
-    SELECT g.goal_value AS goalValue,
-           COALESCE(SUM(r.exercise_record), 0) AS todayTotal
-    FROM exercise_goal g LEFT JOIN exercise_record r ON g.user_id = r.user_id
-                               AND g.exercise_goal_name = r.exercise_name
-                               AND DATE(r.created_at) = CURDATE()
+    SELECT g.exercise_goal_value AS goalValue,
+           COALESCE(SUM(r.exercise_count), 0) AS todayTotal
+    FROM exercise_goal g
+    LEFT JOIN exercise r
+        ON g.user_id = r.user_id
+       AND g.exercise_goal_name = r.exercise_name
+       AND DATE(r.exercise_created_at) = CURDATE()
     WHERE g.user_id = #{userId}
       AND g.exercise_goal_name = #{exerciseName}
-    GROUP BY g.goal_value
+    GROUP BY g.exercise_goal_value
     """)
-    Map<String, Integer> findGoalAndTodayTotal(@Param("userId") Integer userId, @Param("exerciseName") String exerciseName);
+
+    Map<String, Object> findGoalAndTodayTotal(@Param("userId") Integer userId, @Param("exerciseName") String exerciseName);
 
 
     @Update("""
     UPDATE exercise_goal
-    SET progress_value = #{progressValue},
-        progress_rate = #{progressRate}
+    SET exercise_goal_progress = #{progressRate}
     WHERE user_id = #{userId}
       AND exercise_goal_name = #{exerciseName}
     """)
-    void updateProgress(@Param("userId") Integer userId, @Param("exerciseName") String exerciseName, @Param("progressValue") Integer progressValue, @Param("progressRate") Integer progressRate);
+    void updateProgress(@Param("userId") Integer userId,
+                        @Param("exerciseName") String exerciseName,
+                        @Param("progressRate") Integer progressRate);
 
 
 

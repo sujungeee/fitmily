@@ -4,11 +4,11 @@ import org.springframework.http.HttpStatus;
 
 
 public enum ErrorCode {
-    INTERNAL_SERVER_ERROR(5000, "서버에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    USERNAME_DUPLICATED(4001, "이미 사용 중인 아이디입니다.", HttpStatus.BAD_REQUEST),
-    INVALID_TOKEN(4011, "토큰이 없습니다.", HttpStatus.UNAUTHORIZED),
-    REFRESH_TOKEN_MISMATCH(4012, "토큰이 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
-    USER_NOT_FOUND(4002, "유저 아이디가 없습니다.", HttpStatus.UNAUTHORIZED),
+//    INTERNAL_SERVER_ERROR(5000, "서버에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+//    USERNAME_DUPLICATED(4001, "이미 사용 중인 아이디입니다.", HttpStatus.BAD_REQUEST),
+//    INVALID_TOKEN(4011, "토큰이 없습니다.", HttpStatus.UNAUTHORIZED),
+//    REFRESH_TOKEN_MISMATCH(4012, "토큰이 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
+//    USER_NOT_FOUND(4002, "유저 아이디가 없습니다.", HttpStatus.UNAUTHORIZED),
 
     // 채팅 관련 오류 코드
     CHAT_ACCESS_DENIED(4101, "채팅방 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),

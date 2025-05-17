@@ -7,6 +7,7 @@ import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Service
@@ -28,10 +29,10 @@ public class ExerciseRecordService {
     public void recordExercise(Integer userId, ExerciseRecordRequestDto dto){
 
         //칼로리 계산 해서 기록 추가
-        String name = dto.getExerciseName();
+        String exerciseName = dto.getExerciseName();
         int count = dto.getExerciseCount();
 
-        float oneCalories = CALORIES.get(name);
+        float oneCalories = CALORIES.get(exerciseName);
         int totalCalories = Math.round(oneCalories * count);
 
         ExerciseRecordInsertDto record = new ExerciseRecordInsertDto();
@@ -44,17 +45,19 @@ public class ExerciseRecordService {
         exerciseMapper.insertExerciseRecord(record);
 
         //목표 + 오늘 총합 운동량 조회
-        Map<String, Integer> progress = exerciseMapper.findGoalAndTodayTotal(
+        Map<String, Object> progress = exerciseMapper.findGoalAndTodayTotal(
                 userId, dto.getExerciseName()
         );
-        Integer goalValue = progress.get("goalValue");
-        Integer todayTotal = progress.get("todayTotal");
+
+        // sql 연산한 값을 JDBC 드라이버가 알아서 BigDecimal로 변환해버림 (Number)로 받음
+        int goalValue = ((Number) progress.get("goalValue")).intValue();  // 목표
+        int todayTotal = ((Number) progress.get("todayTotal")).intValue(); // 운동 총합
 
         //달성률 계산
         int progressRate = (int) Math.round((todayTotal / (double) goalValue) * 100);
 
         //목표 테이블 업데이트
-        exerciseMapper.updateProgress(userId, dto.getExerciseName(), todayTotal, progressRate);
+        exerciseMapper.updateProgress(userId, exerciseName, progressRate);
 
 
     }
