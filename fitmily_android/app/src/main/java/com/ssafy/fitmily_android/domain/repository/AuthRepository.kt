@@ -14,6 +14,4 @@ interface AuthRepository {
     suspend fun checkDuplId(userId: String): Result<Boolean>
 
     suspend fun join(userId: String, userPwd: String, userNickname: String, userBirth: String, userGender: Int): Result<Unit>
-
-    suspend fun sendFcmToken(userId: Int, fcmToken: String): Result<Unit>
 }

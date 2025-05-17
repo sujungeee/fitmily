@@ -1,6 +1,5 @@
 package com.ssafy.fitmily_android.model.service
 
-import com.ssafy.fitmily_android.model.dto.request.auth.FcmRequest
 import com.ssafy.fitmily_android.model.dto.request.auth.JoinRequest
 import com.ssafy.fitmily_android.model.dto.request.auth.LoginRequest
 import com.ssafy.fitmily_android.model.dto.request.auth.ReissueRequest
@@ -34,10 +33,5 @@ interface AuthService {
     @POST("users")
     suspend fun join(
         @Body joinRequest: JoinRequest
-    ): Response<Unit>
-
-    @POST("fcm/token")
-    suspend fun sendFcmToken(
-        @Body fcmRequest: FcmRequest
     ): Response<Unit>
 }
