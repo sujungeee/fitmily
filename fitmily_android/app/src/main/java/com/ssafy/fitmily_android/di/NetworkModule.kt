@@ -4,6 +4,7 @@ import com.ssafy.fitmily_android.model.service.AuthService
 import com.ssafy.fitmily_android.model.service.ChatService
 import com.ssafy.fitmily_android.model.service.HomeService
 import com.ssafy.fitmily_android.model.service.MyHealthService
+import com.ssafy.fitmily_android.model.service.NotificationService
 import com.ssafy.fitmily_android.model.service.WalkService
 import com.ssafy.fitmily_android.model.service.WeatherService
 import com.ssafy.fitmily_android.network.AccessTokenInterceptor
@@ -115,5 +116,11 @@ object NetworkModule {
     @Provides
     fun provideChatService(@MainRetrofit retrofit: Retrofit): ChatService {
         return retrofit.create(ChatService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideNotificationService(@MainRetrofit retrofit: Retrofit): NotificationService {
+        return retrofit.create(NotificationService::class.java)
     }
 }
