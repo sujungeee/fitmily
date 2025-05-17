@@ -3,18 +3,23 @@ package com.d208.fitmily.domain.exercise.service;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseRecordInsertDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseRecordRequestDto;
+import com.d208.fitmily.domain.exercise.dto.ExerciseRecordResponseDto;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
+import com.d208.fitmily.domain.walk.mapper.WalkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ExerciseRecordService {
     private final ExerciseMapper exerciseMapper;
+    private final WalkMapper walkMapper;
 
     private static final Map<String, Float> CALORIES = Map.of(
             "벤치프레스", 0.5f,
@@ -30,7 +35,7 @@ public class ExerciseRecordService {
     @Transactional
     public void recordExercise(Integer userId, ExerciseRecordRequestDto dto){
 
-        //칼로리 계산 해서 기록 추가
+        // 1번 칼로리 계산 해서 기록 추가
         String exerciseName = dto.getExerciseName();
         int count = dto.getExerciseCount();
 
@@ -46,6 +51,7 @@ public class ExerciseRecordService {
 
         exerciseMapper.insertExerciseRecord(record);
 
+        // 2번 달성률 업데이트
         try {
             Map<String, Object> progress = exerciseMapper.findGoalAndTodayTotal(userId, dto.getExerciseName());
 
@@ -61,5 +67,21 @@ public class ExerciseRecordService {
             System.out.println("목표가 없어 progress 갱신 실패");
         }
     }
+
+    public List<ExerciseRecordResponseDto> getDailyExerciseRecords(Integer userId) {
+        // 오늘 운동 기록
+        List<ExerciseRecordResponseDto> exerciseRecords = exerciseMapper.findTodayExerciseRecords(userId);
+
+        // 오늘 산책 기록
+        List<ExerciseRecordResponseDto> walkRecords = walkMapper.findTodayWalkRecords(userId);
+
+        // 둘 다 합쳐서 반환
+        List<ExerciseRecordResponseDto> result = new ArrayList<>();
+        result.addAll(walkRecords);
+        result.addAll(exerciseRecords);
+
+        return result;
+    }
+}
 
 }

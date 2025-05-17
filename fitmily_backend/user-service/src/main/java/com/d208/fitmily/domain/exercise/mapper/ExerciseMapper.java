@@ -1,6 +1,7 @@
 package com.d208.fitmily.domain.exercise.mapper;
 
 import com.d208.fitmily.domain.exercise.dto.ExerciseRecordInsertDto;
+import com.d208.fitmily.domain.exercise.dto.ExerciseRecordResponseDto;
 import com.d208.fitmily.domain.exercise.entity.Exercise;
 import org.apache.ibatis.annotations.*;
 
@@ -44,6 +45,7 @@ public interface ExerciseMapper {
     """)
     void insertExerciseRecord(ExerciseRecordInsertDto dto);
 
+    // 당일한 운동 총합, 목표 조회
     @Select("""
     SELECT g.exercise_goal_value AS goalValue,
            COALESCE(SUM(r.exercise_count), 0) AS todayTotal
@@ -60,6 +62,7 @@ public interface ExerciseMapper {
     Map<String, Object> findGoalAndTodayTotal(@Param("userId") Integer userId, @Param("exerciseName") String exerciseName);
 
 
+    // 달성률 업데이트
     @Update("""
     UPDATE exercise_goal
     SET exercise_goal_progress = #{progressRate}
@@ -70,8 +73,18 @@ public interface ExerciseMapper {
                         @Param("exerciseName") String exerciseName,
                         @Param("progressRate") Integer progressRate);
 
-
-
+    // 운동 기록 조회
+    @Select("""
+        SELECT
+            NULL AS walkId, -- 운동이므로 walkId는 null
+            NULL AS imgUrl,AS imgUrl,
+            e.exercise_calories AS exerciseCalories,
+            e.exercise_count AS exerciseRecord
+        FROM exercise e
+        WHERE e.user_id = #{userId}
+          AND DATE(e.created_at) = CURDATE()
+    """)
+    List<ExerciseRecordResponseDto> findTodayExerciseRecords(Integer userId);
 
 
 
