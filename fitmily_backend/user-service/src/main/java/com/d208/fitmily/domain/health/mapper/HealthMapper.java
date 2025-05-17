@@ -16,7 +16,9 @@ public interface HealthMapper {
             health_height,
             health_weight,
             health_other_diseases,
-            health_five_major_diseases
+            health_five_major_diseases,
+            health_created_at,
+            health_updated_at
         )
         VALUES (
             #{userId},
@@ -24,7 +26,9 @@ public interface HealthMapper {
             #{height},
             #{weight},
             #{healthOtherDiseasesJson},
-            #{healthFiveMajorDiseasesJson}
+            #{healthFiveMajorDiseasesJson},
+            NOW(),
+            NOW()
         )
         """)
     @Options(useGeneratedKeys = true, keyProperty = "healthId")
@@ -56,7 +60,8 @@ public interface HealthMapper {
             health_height = #{height},
             health_weight = #{weight},
             health_other_diseases = #{otherDiseases},
-            health_five_major_diseases = #{fiveMajorDiseases}
+            health_five_major_diseases = #{fiveMajorDiseases},
+            health_updated_at = NOW()
         WHERE user_id = #{userId}
         """)
     int updateHealth(UpdateHealthResponseDto dto);

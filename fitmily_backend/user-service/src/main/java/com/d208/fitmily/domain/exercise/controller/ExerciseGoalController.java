@@ -102,4 +102,7 @@ public class ExerciseGoalController {
         exerciseGoalService.deleteGoal(userId, goalId);
         return ResponseEntity.ok().build();
     }
+
+
+
 }
