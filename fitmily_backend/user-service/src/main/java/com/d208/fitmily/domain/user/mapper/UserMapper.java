@@ -4,6 +4,8 @@ import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.domain.walk.dto.UserDto;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
 
@@ -74,4 +76,9 @@ public interface UserMapper {
         WHERE user_id = #{userId}
         """)
     UserDto getUserDtoById(@Param("userId") Integer userId);
+
+    // 9) 
+    @Select("SELECT user_id FROM user WHERE family_id = #{familyId}")
+    List<Integer> getUserIdsByFamilyId(@Param("familyId") Integer familyId);
+
 }
