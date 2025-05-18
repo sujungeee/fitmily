@@ -170,27 +170,24 @@ public class FamilyService {
         List<FamilyHealthStatusResponse.MemberHealthInfo> memberHealthInfoList = new ArrayList<>();
 
         for (User member : familyMembers) {
-            // 사용자의 최신 건강 정보 조회 (기존 HealthMapper 사용)
+            // 사용자의 최신 건강 정보 조회
             HealthResponseDto healthInfo = healthMapper.selectLatestByUserId(member.getUserId());
 
-            // 건강 정보가 없는 사용자는 건너뜀
-            if (healthInfo == null) {
-                continue;
-            }
+            if (healthInfo == null) continue;
 
-            // JSON 문자열을 리스트로 변환
-            List<String> fiveMajorDiseases = parseJsonList(healthInfo.getHealthFiveMajorDiseases());
-            List<String> otherDiseases = parseJsonList(healthInfo.getHealthOtherDiseases());
+            // JSON 문자열을 리스트로 변환 - 표준 getter 사용
+            List<String> fiveMajorDiseases = parseJsonList(healthInfo.getFiveMajorDiseases());
+            List<String> otherDiseases = parseJsonList(healthInfo.getOtherDiseases());
 
-            // 사용자 건강 정보 생성
             FamilyHealthStatusResponse.MemberHealthInfo memberHealthInfo = FamilyHealthStatusResponse.MemberHealthInfo.builder()
                     .userId(member.getUserId())
                     .userNickname(member.getUserNickname())
                     .userBirth(member.getUserBirth())
                     .userGender(member.getUserGender())
-                    .healthHeight(healthInfo.getHealthHeight())
-                    .healthWeight(healthInfo.getHealthWeight())
-                    .healthBmi(healthInfo.getHealthBmi())
+                    // 표준 getter 사용
+                    .healthHeight(healthInfo.getHeight())
+                    .healthWeight(healthInfo.getWeight())
+                    .healthBmi(healthInfo.getBmi())
                     .healthFiveMajorDiseases(fiveMajorDiseases)
                     .healthOtherDiseases(otherDiseases)
                     .build();
