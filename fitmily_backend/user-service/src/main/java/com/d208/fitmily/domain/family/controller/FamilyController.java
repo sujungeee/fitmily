@@ -3,11 +3,13 @@ package com.d208.fitmily.domain.family.controller;
 import com.d208.fitmily.domain.family.dto.*;
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.service.FamilyService;
-import com.d208.fitmily.global.config.SecurityConfig;
+import com.d208.fitmily.domain.user.dto.CustomUserDetails;
+import com.d208.fitmily.global.jwt.JWTUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,6 +22,8 @@ import java.time.format.DateTimeFormatter;
 public class FamilyController {
 
     private final FamilyService familyService;
+    private final JWTUtil jwtUtil;
+
 
     @PostMapping
     public ResponseEntity<CreateFamilyResponse> createFamily(@RequestBody CreateFamilyRequest request) {
@@ -28,17 +32,25 @@ public class FamilyController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<JoinFamilyResponse> joinFamily(@RequestBody JoinFamilyRequest request) {
-        // 현재 로그인한 사용자 ID 가져오기
-        int userId = SecurityConfig.getCurrentUserId();
+    public ResponseEntity<JoinFamilyResponse> joinFamily(
+            @RequestBody JoinFamilyRequest request,
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        // 패밀리 가입 처리
+        // 디버깅 로그 추가
+        System.out.println("인증 정보: " + (principal != null ? "있음" : "없음"));
+
+        // CustomUserDetails에서 사용자 ID 직접 가져옴
+        int userId = principal.getId();
+        System.out.println("사용자 ID: " + userId);
+
         int familyId = familyService.joinFamily(request.getFamilyInviteCode(), userId);
 
-        // 응답 생성
-        JoinFamilyResponse response = new JoinFamilyResponse(new JoinFamilyResponse.FamilyData(familyId));
+        JoinFamilyResponse response = new JoinFamilyResponse(
+                new JoinFamilyResponse.FamilyData(familyId)
+        );
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/{familyId}")
     public ResponseEntity<FamilyDetailResponse> getFamily(@PathVariable int familyId) {
