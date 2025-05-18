@@ -130,18 +130,29 @@ public class WalkService {
 
         // familyId로 가족 구성원의 userId 다 리스트로 가져옴
         List<Integer> userIds = userService.getUserIdsByFamilyId(familyId);
-        List<UserDto> result = new ArrayList<>();
+        System.out.println(userIds);
 
+        List<Integer> walkingUserIds = new ArrayList<>();
         for (Integer userId : userIds) {
             if (redisTemplate.hasKey("walk:gps:" + userId)) {
-                result.add(UserDto.builder()
-                        .userId(user.getUserId())
-//                        .name(user.getName())
-//                        .profileImg(user.getProfileImg())
-                        .build());
+                walkingUserIds.add(userId);
             }
         }
+        //산책중인 userId로 이름,가족가입순서, 띠 정보 가져옴
+        List<User> walkingUsers = userService.getUsersByIds(walkingUserIds);
+
+
+        List<UserDto> result = new ArrayList<>();
+        for (User user : walkingUsers) {
+            result.add(UserDto.builder()
+                    .userId(user.getUserId())
+                    .userNickname(user.getUserNickname())
+                    .userFamilySequence(user.getUserFamilySequence())
+                    .userZodiacName(user.getUserZodiacName())
+                    .build());
+        }
         return result;
+
             }
         }
 
