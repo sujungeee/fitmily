@@ -90,8 +90,9 @@ public class MessageRepository {
 
     /**
      * 특정 메시지 ID 이전의 모든 메시지 읽음 처리
+     * @return 업데이트된 메시지 수
      */
-    public void updateReadStatusBeforeId(String familyId, String messageId, String userId) {
+    public int updateReadStatusBeforeId(String familyId, String messageId, String userId) {
         try {
             // 메시지 ID에서 타임스탬프 추출 (메시지 ID 형식: 타임스탬프_familyId)
             String[] parts = messageId.split("_");
@@ -112,6 +113,8 @@ public class MessageRepository {
             log.debug("메시지 ID 이전 일괄 읽음 처리: familyId={}, messageId={}, userId={}, 업데이트 건수={}",
                     familyId, messageId, userId, updateResult.getModifiedCount());
 
+            return (int) updateResult.getModifiedCount();
+
         } catch (Exception e) {
             log.error("메시지 ID에서 타임스탬프 추출 실패, 메시지 ID 자체로 쿼리: {}", e.getMessage());
 
@@ -127,6 +130,8 @@ public class MessageRepository {
             var updateResult = mongoTemplate.updateMulti(query, update, ChatMessage.class, "messages");
             log.debug("메시지 ID 기준 일괄 읽음 처리(대체 방식): familyId={}, messageId={}, userId={}, 업데이트 건수={}",
                     familyId, messageId, userId, updateResult.getModifiedCount());
+
+            return (int) updateResult.getModifiedCount();
         }
     }
 

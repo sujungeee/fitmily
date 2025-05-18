@@ -16,8 +16,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.d208.fitmily.domain.chat.dto.MessageRequestDTO;
+import com.d208.fitmily.domain.chat.service.ChatMessageService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FamilyService {
@@ -33,6 +37,7 @@ public class FamilyService {
     private final ExerciseMapper exerciseMapper;
     private final HealthMapper healthMapper;
     private final ObjectMapper objectMapper;
+    private final ChatMessageService chatMessageService;
 
     private static final int MAX_FAMILY_MEMBERS = 6;
 
@@ -53,6 +58,9 @@ public class FamilyService {
 
         // DB에 저장
         familyMapper.createFamily(family);
+
+        // 채팅방 초기화 - 시스템 메시지 전송
+        initializeChat(String.valueOf(family.getFamilyId()), "system");
 
         return family.getFamilyId();
     }
@@ -216,6 +224,27 @@ public class FamilyService {
             return objectMapper.readValue(json, new TypeReference<List<String>>() {});
         } catch (JsonProcessingException e) {
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 채팅방 초기화 - 시스템 메시지 전송
+     */
+    private void initializeChat(String familyId, String senderId) {
+        try {
+            // 환영 메시지 생성
+            MessageRequestDTO welcomeMessage = new MessageRequestDTO();
+            welcomeMessage.setMessageType("system");
+            welcomeMessage.setContent("패밀리 채팅방이 생성되었습니다. 가족들과 함께 대화를 나눠보세요!");
+
+            // 메시지 전송
+            chatMessageService.sendMessage(familyId, welcomeMessage, senderId);
+
+            // 로그 기록
+            log.info("패밀리 채팅방 초기화 완료 - 패밀리 ID: {}", familyId);
+        } catch (Exception e) {
+            // 실패해도 패밀리 생성은 계속 진행
+            log.error("패밀리 채팅방 초기화 실패 (무시됨)", e);
         }
     }
 

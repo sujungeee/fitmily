@@ -2,6 +2,7 @@ package com.d208.fitmily.domain.chat.controller;
 
 import com.d208.fitmily.domain.chat.dto.ChatMessagesResponseDTO;
 import com.d208.fitmily.domain.chat.service.ChatService;
+import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -55,15 +56,32 @@ public class ChatController {
             Object principal = authentication.getPrincipal();
             log.debug("Principal 타입: {}", principal.getClass().getName());
 
+            // CustomUserDetails 타입인 경우
+            if (principal instanceof CustomUserDetails) {
+                return String.valueOf(((CustomUserDetails) principal).getId());
+            }
+
             // 문자열 타입인 경우
             if (principal instanceof String) {
                 return (String) principal;
             }
 
-            // 다른 타입인 경우 toString() 사용
-            return principal.toString();
+            // 다른 타입인 경우 toString() 결과에서 ID만 추출 시도
+            String principalStr = principal.toString();
+            if (principalStr.contains("CustomUserDetails")) {
+                try {
+                    // CustomUserDetails에서 ID 추출 시도
+                    if (principal instanceof CustomUserDetails) {
+                        return String.valueOf(((CustomUserDetails) principal).getId());
+                    }
+                } catch (Exception e) {
+                    log.warn("CustomUserDetails에서 ID 추출 실패", e);
+                }
+            }
+
+            return principalStr;
         }
-        // 테스트용 기본값 (실제론 예외 처리 필요)
-        return "1";
+
+        return null;
     }
 }
