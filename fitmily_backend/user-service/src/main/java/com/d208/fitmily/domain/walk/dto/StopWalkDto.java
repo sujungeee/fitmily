@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 @Data
 @Builder
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class StopWalkDto {
@@ -16,5 +17,5 @@ public class StopWalkDto {
     private Timestamp startTime;
     private Timestamp endTime;
     private Float distance;
-    private Float calories;
+    private Integer calories;
 }

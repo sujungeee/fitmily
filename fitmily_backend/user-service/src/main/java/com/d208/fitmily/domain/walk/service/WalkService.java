@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.time.Duration.between;
 
@@ -44,7 +45,7 @@ public class WalkService {
         User user = userService.getUserById(userId);
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
-        float weight = health.getWeight();
+        float weight = Optional.ofNullable(health.getWeight()).orElse(66.0f);
         Instant startTime = dto.getStartTime().toInstant();
         Instant endTime = dto.getEndTime().toInstant();
 
@@ -52,9 +53,11 @@ public class WalkService {
 
         // 칼로리계산식 = MET × 체중(kg) × 운동시간(hr)
         // MET = 운동강도 (3.5가 평균)
-        final double MET = 3.5;
-        double walkHours = walkingTime / 60.0;
-        double walkCalories = MET * weight * walkHours;
+        final float  MET = 3.5f;
+        float walkHours = walkingTime / 60.0f;
+        float floatWalkCalories = MET * weight * walkHours;
+
+        int walkCalories = Math.round(floatWalkCalories);
 
         StopWalkDto stopWalkDto = StopWalkDto.builder()
                 .userId(userId)
@@ -62,7 +65,7 @@ public class WalkService {
                 .startTime(dto.getStartTime())
                 .endTime(dto.getEndTime())
                 .distance(dto.getDistance())
-                .calories((float) walkCalories)
+                .calories(walkCalories)
                 .build();
 
         walkMapper.insertStopWalk(stopWalkDto);
@@ -70,6 +73,9 @@ public class WalkService {
         // 산책 챌린지 거리 업데이트
         walkChallengeService.updateChallengeDistance(stopWalkDto);
     }
+
+
+
 
     // 산책 기록 조회
     public List<WalkResponseDto> findWalks(Integer userId, LocalDateTime start, LocalDateTime end) {
@@ -81,10 +87,15 @@ public class WalkService {
         return walkMapper.selectWalks(params);
     }
 
+
+
     // 산책 목표 여부 조회
     public Boolean walkGoalExists(Integer userId){
         return walkMapper.walkGoalExists(userId);
     }
+
+
+
 
     // 산책 시작했을때
     public void processGps(Integer userId, GpsDto gpsDto){
@@ -111,6 +122,7 @@ public class WalkService {
         String topic = "/topic/walk/gps/" + userId;
         messagingTemplate.convertAndSend(topic, gpsDto);
     }
+
 
     // 산책중인 가족 구성원 조회
 //    public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
