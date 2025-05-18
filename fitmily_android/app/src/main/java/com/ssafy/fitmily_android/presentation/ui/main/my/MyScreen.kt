@@ -39,6 +39,10 @@ fun MyScreen(
     val uiState by myViewMdodel.myUiState.collectAsStateWithLifecycle()
     val authDataStore = MainApplication.getInstance().getDataStore()
 
+    LaunchedEffect(Unit) {
+        myViewMdodel.getMyGoalInfo()
+    }
+
     LaunchedEffect(uiState.mySideEffect) {
         for(sideEffect in uiState.mySideEffect ?: return@LaunchedEffect) {
             when (sideEffect) {
@@ -57,12 +61,6 @@ fun MyScreen(
             }
         }
     }
-
-    val goals = listOf(
-        GoalItem("스쿼트", 69f, 100f, "회"),
-        GoalItem("루마니안 데드리프트", 28f, 100f, "회"),
-        GoalItem("산책", 0.65f, 1f, "km"),
-    )
 
     val weekData = listOf(
         AchievementDay("5/10", 0.7f),
@@ -104,7 +102,7 @@ fun MyScreen(
         item {
             Spacer(Modifier.height(32.dp))
             MyExerciseStatusGraph(
-                progress = 80f,
+                progress = uiState.myGoalInfo?.exerciseGoalProgress ?: 0,
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
         }
@@ -113,7 +111,7 @@ fun MyScreen(
         item {
             Spacer(Modifier.height(12.dp))
             MyExerciseGoal(
-                goals = goals,
+                goals = uiState.myGoalInfo?.goal ?: emptyList(),
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
         }
