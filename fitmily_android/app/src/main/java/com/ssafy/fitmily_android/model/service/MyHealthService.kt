@@ -16,10 +16,10 @@ interface MyHealthService {
     @POST("health")
     suspend fun insertMyHealthInfo(
         @Body myHealthRequest: MyHealthRequest
-    ): Response<Any>
+    ): Response<Unit>
 
     @PATCH("health")
     suspend fun updateMyHealthInfo(
         @Body myHealthRequest: MyHealthRequest
-    ): Response<Any>
+    ): Response<Unit>
 }
