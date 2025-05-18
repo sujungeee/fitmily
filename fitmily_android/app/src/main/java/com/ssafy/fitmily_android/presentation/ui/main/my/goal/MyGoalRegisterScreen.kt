@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseSelectBottomSheet
@@ -35,14 +37,27 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyGoalRegisterScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    myGoalRegisterViewModel: MyGoalRegisterViewModel = hiltViewModel()
 ) {
 
-    /* TODO 추후 UI STATE로 추출 */
+    val myGoalRegisterUiState by myGoalRegisterViewModel.myGoalRegisterUiState.collectAsState()
+
     var selectedExercise by remember { mutableStateOf<String?>("런지") }
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
+    val inputValue = if(myGoalRegisterUiState.exerciseGoalValue == 1f) ""
+                     else myGoalRegisterUiState.exerciseGoalValue.toString()
+
+    LaunchedEffect(myGoalRegisterUiState.myGoalSideEffect) {
+        when (myGoalRegisterUiState.myGoalSideEffect) {
+            is MyGoalSideEffect.NavigateToMy -> {
+                navController.popBackStack()
+                myGoalRegisterViewModel.consumeSideEffect()
+            }
+            null -> Unit
+        }
+    }
 
 
     Column(
@@ -67,7 +82,7 @@ fun MyGoalRegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(80.dp))
                 MyExerciseImage(
-                    exerciseName = "산책",
+                    exerciseName = myGoalRegisterUiState.exerciseGoalName,
                     modifier = Modifier
                         .padding(horizontal = 28.dp)
                 )
@@ -77,9 +92,9 @@ fun MyGoalRegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(80.dp))
                 MyExerciseInputText(
+                    selectedExercise = myGoalRegisterUiState.exerciseGoalName,
                     onClick = {
                         showBottomSheet = true
-                        Log.d("test1234", "운동 선택 클릭됌")
                     },
                     modifier = Modifier.padding(horizontal = 28.dp)
                 )
@@ -89,7 +104,11 @@ fun MyGoalRegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(32.dp))
                 MyExerciseValueInputText(
-                    modifier = Modifier.padding(horizontal = 28.dp)
+                    modifier = Modifier.padding(horizontal = 28.dp),
+                    onValueChange = { newValue ->
+                        myGoalRegisterViewModel.updateExerciseGoalValue(newValue)
+                    },
+                    value = inputValue
                 )
                 Spacer(modifier = Modifier.height(80.dp))
             }
@@ -98,8 +117,7 @@ fun MyGoalRegisterScreen(
         MyButton(
             text = "추가하기",
             onClick = {
-                /* TODO 목표 리스트에 추가하기 */
-                navController.popBackStack()
+                myGoalRegisterViewModel.insertMyGoalInfo()
             },
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -118,8 +136,9 @@ fun MyGoalRegisterScreen(
 
         MyExerciseSelectBottomSheet(
             selectedExercise = selectedExercise,
-            onItemSelected = { selectedExercise ->
-                /*  TODO 선택된 운동 처리 */
+            onItemSelected = { exercise ->
+                selectedExercise = exercise
+                myGoalRegisterViewModel.updateExerciseGoalName(exercise)
                 showBottomSheet = false
             },
             onDismiss = { showBottomSheet = false },

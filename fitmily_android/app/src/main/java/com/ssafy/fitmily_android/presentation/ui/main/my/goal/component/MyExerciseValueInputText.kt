@@ -20,11 +20,10 @@ import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 
 @Composable
 fun MyExerciseValueInputText(
-    modifier: Modifier
+    modifier: Modifier,
+    onValueChange: (String) -> Unit,
+    value: String
 ) {
-
-    /* TODO 추후 UI STATE로 추출 */
-    var inputValue by remember { mutableStateOf("") }
 
     Box(
         modifier = modifier
@@ -43,12 +42,12 @@ fun MyExerciseValueInputText(
             }
     ) {
         BasicTextField(
-            value = inputValue,
-            onValueChange = { inputValue = it },
+            value = value,
+            onValueChange = onValueChange,
             singleLine = true,
             textStyle = Typography.bodyLarge.copy(color = mainBlack),
             decorationBox = { innerTextField ->
-                if (inputValue.isEmpty()) {
+                if (value.isEmpty()) {
                     Text(
                         text = "횟수 / 거리",
                         color = mainDarkGray,
