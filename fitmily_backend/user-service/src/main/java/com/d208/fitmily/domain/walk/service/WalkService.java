@@ -132,6 +132,10 @@ public class WalkService {
         List<Integer> userIds = userService.getUserIdsByFamilyId(familyId);
         System.out.println(userIds);
 
+        if (userIds == null || userIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<Integer> walkingUserIds = new ArrayList<>();
         for (Integer userId : userIds) {
             if (redisTemplate.hasKey("walk:gps:" + userId)) {
