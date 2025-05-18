@@ -106,7 +106,7 @@ public class FamilyService {
     }
 
     /**
-     * 패밀리 홈 대시보드 조회 - Exercise 테이블 사용
+     * 패밀리 홈 대시보드 조회 - 목표 달성률 표시 형식으로 변경
      */
     @Transactional(readOnly = true)
     public FamilyDashboardResponse getFamilyDashboard(int familyId, String date) {
@@ -126,23 +126,39 @@ public class FamilyService {
             // 사용자의 해당 일자 운동 목록 조회
             List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), date);
 
-            // 운동 정보 변환
-            List<FamilyDashboardResponse.ExerciseInfo> exerciseInfoList = exercises.stream()
-                    .map(exercise -> FamilyDashboardResponse.ExerciseInfo.builder()
-                            .exerciseId(exercise.getExerciseId())
-                            .exerciseName(exercise.getExerciseName())
-                            .exerciseTime(exercise.getExerciseTime())
-                            .exerciseCount(exercise.getExerciseCount())
-                            .exerciseCalories(exercise.getExerciseCalories())
-                            .build())
-                    .collect(Collectors.toList());
+            // 각 운동을 목표 정보로 변환
+            List<FamilyDashboardResponse.GoalInfo> goalInfoList = new ArrayList<>();
+            int completedGoals = 0; // 달성한 목표 수
 
-            // 총 운동 칼로리 조회 (진행률 대체)
-            int totalCalories = exerciseMapper.calculateUserTotalCalories(member.getUserId(), date);
+            for (Exercise exercise : exercises) {
+                // 운동에 대한 목표값 설정 (실제로는 DB에서 가져와야 함)
+                int goalValue = exercise.getExerciseCount() > 0 ?
+                        exercise.getExerciseCount() :
+                        (exercise.getExerciseTime() != null ? exercise.getExerciseTime() : 100);
 
-            // 진행률 계산 (예: 목표 칼로리를 500으로 가정하고 비율 계산)
-            int targetCalories = 500; // 고정값 또는 DB에서 가져올 수 있음
-            int progressRate = Math.min(totalCalories * 100 / Math.max(1, targetCalories), 100);
+                // 현재 달성 정도
+                int progress = exercise.getExerciseCount() > 0 ?
+                        exercise.getExerciseCount() :
+                        (exercise.getExerciseTime() != null ? exercise.getExerciseTime() : 0);
+
+                // 목표 달성 여부 확인
+                if (progress >= goalValue) {
+                    completedGoals++;
+                }
+
+                // 운동 목표 정보 생성
+                goalInfoList.add(FamilyDashboardResponse.GoalInfo.builder()
+                        .exerciseGoalId(exercise.getExerciseId())
+                        .exerciseGoalName(exercise.getExerciseName())
+                        .exerciseGoalValue(goalValue)
+                        .exerciseGoalProgress(progress)
+                        .build());
+            }
+
+            // 총 진행률 계산 (달성한 목표 수 / 전체 목표 수) * 100
+            int totalGoals = exercises.size();
+            int progressRate = totalGoals > 0 ?
+                    (int)Math.round((double)completedGoals / totalGoals * 100) : 0;
 
             // 구성원 정보 생성
             FamilyDashboardResponse.FamilyMember memberInfo = FamilyDashboardResponse.FamilyMember.builder()
@@ -150,7 +166,7 @@ public class FamilyService {
                     .userNickname(member.getUserNickname())
                     .userZodiacName(member.getUserZodiacName())
                     .userFamilySequence(member.getUserFamilySequence())
-                    .exercises(exerciseInfoList)  // goals → exercises
+                    .goals(goalInfoList)  // exercises에서 goals로 변경
                     .totalProgressRate(progressRate)
                     .build();
 
