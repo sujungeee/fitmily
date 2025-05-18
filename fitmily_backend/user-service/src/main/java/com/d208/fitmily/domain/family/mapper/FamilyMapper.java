@@ -2,10 +2,7 @@ package com.d208.fitmily.domain.family.mapper;
 
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.user.entity.User;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -15,13 +12,26 @@ public interface FamilyMapper {
     /**
      * 가족 생성
      */
+    // createFamily 메서드를 어노테이션으로 구현
+    @Insert("INSERT INTO family (family_name, family_invite_code, family_people, family_created_at, family_updated_at) " +
+            "VALUES (#{familyName}, #{familyInviteCode}, #{familyPeople}, #{familyCreatedAt}, #{familyUpdatedAt})")
+    @Options(useGeneratedKeys = true, keyProperty = "familyId")
     void createFamily(Family family);
 
     /**
      * 초대 코드로 패밀리 조회
      */
     @Select("SELECT * FROM family WHERE family_invite_code = #{inviteCode}")
+    @Results(id = "familyMap", value = {
+            @Result(property = "familyId", column = "family_id"),
+            @Result(property = "familyName", column = "family_name"),
+            @Result(property = "familyInviteCode", column = "family_invite_code"),
+            @Result(property = "familyPeople", column = "family_people"),
+            @Result(property = "familyCreatedAt", column = "family_created_at"),
+            @Result(property = "familyUpdatedAt", column = "family_updated_at")
+    })
     Family findByInviteCode(@Param("inviteCode") String inviteCode);
+
 
     /**
      * 패밀리 인원 수 증가
