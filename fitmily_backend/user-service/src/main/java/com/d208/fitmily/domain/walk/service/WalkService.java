@@ -14,10 +14,14 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.time.Duration.between;
 
 
 @Service
@@ -41,10 +45,16 @@ public class WalkService {
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
         float weight = health.getWeight();
-//        long walkTime = between(dto.getStartTime(), dto.getEndTime()).toMinutes();
+        Instant startTime = dto.getStartTime().toInstant();
+        Instant endTime = dto.getEndTime().toInstant();
 
-        final double MET_WALKING = 3.5;
-        double caloriesBurned = MET_WALKING * weight * (MET_WALKING / 60.0); // kcal
+        long walkingTime = Duration.between(startTime, endTime).toMinutes();
+
+        // 칼로리계산식 = MET × 체중(kg) × 운동시간(hr)
+        // MET = 운동강도 (3.5가 평균)
+        final double MET = 3.5;
+        double walkHours = walkingTime / 60.0;
+        double walkCalories = MET * weight * walkHours;
 
         StopWalkDto stopWalkDto = StopWalkDto.builder()
                 .userId(userId)
@@ -52,7 +62,7 @@ public class WalkService {
                 .startTime(dto.getStartTime())
                 .endTime(dto.getEndTime())
                 .distance(dto.getDistance())
-                .calories((float) caloriesBurned)
+                .calories((float) walkCalories)
                 .build();
 
         walkMapper.insertStopWalk(stopWalkDto);
