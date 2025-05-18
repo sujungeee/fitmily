@@ -53,7 +53,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // SockJS 지원 엔드포인트
         registry.addEndpoint("/api/ws-connect")
                 .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .withSockJS()
+                .setSessionCookieNeeded(false);
 
         log.info("WebSocket 연결 완료: /api/ws-connect");
     }

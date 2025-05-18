@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h1>WebSocket Test</h1>
+<div id="status">연결 대기 중...</div>
+<div id="log"></div>
+
+<script>
+    function log(message) {
+        document.getElementById('log').innerHTML += '<p>' + message + '</p>';
+        console.log(message);
+    }
+
+    // 1. SockJS 연결 테스트 (HTTP 기반)
+    try {
+        log("SockJS 연결 시도 중...");
+        var socket = new SockJS('http://k12d208.p.ssafy.io:8080/api/ws-connect');
+        var stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function(frame) {
+            document.getElementById('status').innerHTML = '<span style="color:green">SockJS 연결 성공!</span>';
+            log('Connected: ' + frame);
+        }, function(error) {
+            document.getElementById('status').innerHTML = '<span style="color:red">SockJS 연결 실패</span>';
+            log('Error: ' + error);
+        });
+    } catch (e) {
+        log('SockJS 연결 예외 발생: ' + e.message);
+    }
+
+    // 2. 순수 WebSocket 연결 테스트 (WS 기반)
+    setTimeout(function() {
+        try {
+            log("WebSocket 직접 연결 시도 중...");
+            var ws = new WebSocket('ws://k12d208.p.ssafy.io:8080/api/ws-connect');
+
+            ws.onopen = function() {
+                log('<span style="color:green">WebSocket 직접 연결 성공!</span>');
+            };
+
+            ws.onclose = function() {
+                log('<span style="color:red">WebSocket 연결 종료</span>');
+            };
+
+            ws.onerror = function(error) {
+                log('<span style="color:red">WebSocket 오류: ' + error + '</span>');
+            };
+        } catch (e) {
+            log('WebSocket 연결 예외 발생: ' + e.message);
+        }
+    }, 3000); // SockJS 테스트 후 3초 뒤에 WebSocket 테스트
+</script>
+</body>
+</html>
