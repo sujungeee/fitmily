@@ -24,6 +24,11 @@ public class ExerciseGoalService {
      * @param userId 사용자 ID
      * @return 운동 목표 응답 객체
      */
+    /**
+     * 운동 목표 목록 조회 및 진행률 업데이트
+     * @param userId 사용자 ID
+     * @return 운동 목표 응답 객체
+     */
     public ExerciseGoalResponse getGoals(Integer userId) {
         // 전체 진행률 계산
         int progress = exerciseGoalMapper.calculateProgress(userId);
@@ -35,20 +40,18 @@ public class ExerciseGoalService {
         List<ExerciseGoalDto> goals = new ArrayList<>();
         for (Map<String, Object> map : goalMaps) {
             ExerciseGoalDto dto = new ExerciseGoalDto();
+
+            dto.setGoalId(((Number) map.get("exercise_goal_id")).intValue());
             dto.setExerciseGoalName((String) map.get("exercise_goal_name"));
 
-            // String -> float 변환 필요
-            String goalValue = (String) map.get("exercise_goal_value");
-            dto.setExerciseGoalValue(Float.parseFloat(goalValue));
-
-            String recordValue = (String) map.get("exercise_record_value");
-            dto.setExerciseRecordValue(Float.parseFloat(recordValue));
+            // Number 타입으로 직접 받아서 float으로 변환
+            dto.setExerciseGoalValue(((Number) map.get("exercise_goal_value")).floatValue());
+            dto.setExerciseRecordValue(((Number) map.get("exercise_record_value")).floatValue());
 
             goals.add(dto);
 
-            // 개별 목표 진행률 업데이트 (DB에 저장)
+            // 개별 목표 진행률 업데이트
             try {
-                // float 값을 직접 전달하여 진행률 계산
                 int goalProgress = calculateIndividualProgress(
                         dto.getExerciseRecordValue(),
                         dto.getExerciseGoalValue()
@@ -60,7 +63,6 @@ public class ExerciseGoalService {
                         goalProgress
                 );
             } catch (Exception e) {
-                // 예외 발생 시 로깅만 하고 계속 진행
             }
         }
 
