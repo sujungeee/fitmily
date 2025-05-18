@@ -1,10 +1,6 @@
 package com.d208.fitmily.domain.family.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -27,7 +23,7 @@ public class FamilyDashboardResponse {
         private String userNickname;
         private String userZodiacName;
         private int userFamilySequence;
-        private List<ExerciseInfo> exercises;  // goals → exercises
+        private List<GoalInfo> goals;  // exercises에서 goals로 변경
         private int totalProgressRate;
     }
 
@@ -36,11 +32,10 @@ public class FamilyDashboardResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class ExerciseInfo {
-        private int exerciseId;
-        private String exerciseName;
-        private Integer exerciseTime;  // 운동 시간
-        private int exerciseCount;     // 운동 횟수
-        private int exerciseCalories;  // 소모 칼로리
+    public static class GoalInfo {  // ExerciseInfo에서 GoalInfo로 변경
+        private int exerciseGoalId;  // exerciseId에서 변경
+        private String exerciseGoalName;  // exerciseName에서 변경
+        private int exerciseGoalValue;  // 새로운 필드
+        private int exerciseGoalProgress;  // 새로운 필드
     }
 }

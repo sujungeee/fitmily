@@ -70,16 +70,16 @@ public class JWTUtil {
         return createJwt(userId, null, "refresh", 1000L * 60 * 60 * 24 * 14); // 2주
     }
 
-    public Claims validateAndGetClaims(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (JwtException e) {
-            throw new RuntimeException("유효하지 않은 JWT 토큰입니다", e);
-        }
-    }
+//    public Claims validateAndGetClaims(String token) {
+//        try {
+//            return Jwts.parser()
+//                    .verifyWith(secretKey)
+//                    .build()
+//                    .parseSignedClaims(token)
+//                    .getPayload();
+//        } catch (JwtException e) {
+//            throw new RuntimeException("유효하지 않은 JWT 토큰입니다", e);
+//        }
+//    }
 
 }

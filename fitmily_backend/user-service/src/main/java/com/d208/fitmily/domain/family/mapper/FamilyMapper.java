@@ -76,6 +76,7 @@ public interface FamilyMapper {
     @Select("SELECT user_id FROM user WHERE family_id = #{familyId}")
     List<String> selectFamilyMemberIds(@Param("familyId") String familyId);
 
+
     /**
      * 사용자가 특정 패밀리에 속해있는지 확인
      */
