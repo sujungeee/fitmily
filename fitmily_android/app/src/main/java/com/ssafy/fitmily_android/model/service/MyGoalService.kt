@@ -18,15 +18,15 @@ interface MyGoalService {
     @POST("goals")
     suspend fun insertMyGoalInfo(
         @Body myGoalRequest: MyGoalRequest
-    ): Response<Any>
+    ): Response<Unit>
 
     @PATCH("goals/{goalId}")
     suspend fun patchMyGoalInfo(
         @Path("goalId") goalId: Int, @Body myGoalRequest: MyGoalRequest
-    ): Response<Any>
+    ): Response<Unit>
 
     @DELETE("goals/{goalId}")
     suspend fun deleteMyGoalInfo(
         @Path("goalId") goalId: Int
-    ): Response<Any>
+    ): Response<Unit>
 }

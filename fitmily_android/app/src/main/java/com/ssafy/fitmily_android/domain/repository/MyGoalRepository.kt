@@ -1,6 +1,7 @@
 package com.ssafy.fitmily_android.domain.repository
 
 import com.ssafy.fitmily_android.model.dto.response.my.MyGoalResponse
+import com.ssafy.fitmily_android.model.common.Result
 
 interface MyGoalRepository {
 
@@ -9,15 +10,14 @@ interface MyGoalRepository {
     suspend fun insertMyGoalInfo(
         exerciseGoalName: String,
         exerciseGoalValue: Float
-    ): Result<Any>
+    ): Result<Unit>
 
     suspend fun patchMyGoalInfo(
         goalId: Int,
-        exerciseGoalName: String?,
-        exerciseGoalValue: Float?
-    ): Result<Any>
+        exerciseGoalValue: Float
+    ): Result<Unit>
 
     suspend fun deleteMyGoalInfo(
         goalId: Int
-    ): Result<Any>
+    ): Result<Unit>
 }
