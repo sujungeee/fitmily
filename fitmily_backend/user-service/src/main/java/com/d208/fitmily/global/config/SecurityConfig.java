@@ -35,17 +35,30 @@ public class SecurityConfig {
 
     public static int getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
             throw new RuntimeException("인증 정보가 없습니다.");
         }
 
         Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails) {
-            return Integer.parseInt(((UserDetails) principal).getUsername());
+        try {
+            if (principal instanceof UserDetails) {
+                String username = ((UserDetails) principal).getUsername();
+                if (username != null && !username.isEmpty()) {
+                    return Integer.parseInt(username);
+                }
+            } else if (principal != null) {
+                String principalStr = principal.toString();
+                if (principalStr != null && !principalStr.isEmpty()) {
+                    return Integer.parseInt(principalStr);
+                }
+            }
+            throw new RuntimeException("사용자 ID를 찾을 수 없습니다.");
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("사용자 ID 형식이 올바르지 않습니다: " + principal);
         }
-
-        return Integer.parseInt(principal.toString());
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
