@@ -78,7 +78,7 @@ public class SecurityConfig {
         configuration.addAllowedOriginPattern("*"); // 모든 origin 허용 (운영환경에선 도메인 제한 필요) http://k12d208.p.ssafy.io
         configuration.addAllowedMethod("*");        // GET, POST, PUT, DELETE 등 모두 허용
         configuration.addAllowedHeader("*");        // 모든 헤더 허용
-        configuration.setAllowCredentials(false);    // 쿠키, 인증정보 포함 여부 (필요에 따라 true/false)
+        configuration.setAllowCredentials(true);    // 쿠키, 인증정보 포함 여부 (필요에 따라 true/false)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -116,7 +116,7 @@ public class SecurityConfig {
                         .requestMatchers( "/api-docs/**").permitAll()
                         .requestMatchers( "/swagger-ui.html").permitAll()
 //
-                         //chat-test.html 허용 코드 3가지
+                        //chat-test.html 허용 코드 3가지
                         .requestMatchers("/api/ws-connect/**").permitAll()
                         .requestMatchers("/chat-test.html").permitAll()
                         .requestMatchers("/.well-known/**").permitAll()

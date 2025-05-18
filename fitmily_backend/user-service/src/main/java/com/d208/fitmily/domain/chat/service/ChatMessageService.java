@@ -5,10 +5,8 @@ import com.d208.fitmily.domain.chat.dto.ReadReceiptResponseDTO;
 import com.d208.fitmily.domain.chat.entity.ChatMessage;
 import com.d208.fitmily.domain.chat.repository.MessageRepository;
 import com.d208.fitmily.domain.family.mapper.FamilyMapper;
-
-import com.d208.fitmily.global.common.exception.BusinessException;
-import com.d208.fitmily.global.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -16,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
@@ -25,101 +24,177 @@ public class ChatMessageService {
     private final SimpMessagingTemplate messagingTemplate;
     private final FamilyMapper familyMapper;
 
-    public void sendMessage(String familyId, MessageRequestDTO messageRequest, String userId) {
-        // 메시지 유효성 검증
-        if (!StringUtils.hasText(messageRequest.getContent()) &&
-                ("text".equals(messageRequest.getMessageType()))) {
-            throw new BusinessException(ErrorCode.CHAT_MESSAGE_SEND_FAILED);
-        }
-
-        // 채팅방 접근 권한 확인
-        if (!familyMapper.checkFamilyMembership(familyId, userId)) {
-            throw new BusinessException(ErrorCode.CHAT_ACCESS_DENIED);
-        }
-
-        // 메시지 ID 생성 - 타임스탬프 기반으로 수정
-        String messageId = System.currentTimeMillis() + "_" + familyId;
-
-        // 가족 구성원 수 조회
-        int familyMembersCount = familyMapper.countFamilyMembers(familyId);
-
-        // 메시지 객체 생성
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setMessageId(messageId);
-        chatMessage.setFamilyId(familyId);
-        chatMessage.setSenderId(userId);
-
-        // 발신자 정보 설정 - 실제로는 사용자 서비스에서 조회
-        ChatMessage.SenderInfo senderInfo = new ChatMessage.SenderInfo();
-        senderInfo.setNickname("사용자_" + userId);
-        senderInfo.setFamilySequence("2");
-        chatMessage.setSenderInfo(senderInfo);
-
-        // 메시지 컨텐츠 설정
-        ChatMessage.MessageContent content = new ChatMessage.MessageContent();
-        content.setMessageType(messageRequest.getMessageType());
-        content.setText(messageRequest.getContent());
-        content.setImageUrl(messageRequest.getImageUrl());
-        chatMessage.setContent(content);
-
-        // 메시지 시간 및 읽음 상태 설정
-        chatMessage.setSentAt(new Date());
-        chatMessage.setReadByUserIds(Collections.singletonList(userId));
-        chatMessage.setUnreadCount(familyMembersCount - 1);
-
-        // MongoDB에 메시지 저장
-        messageRepository.save(chatMessage);
-
-        // Redis에 발신자의 마지막 읽은 메시지 ID 업데이트
+    /**
+     * 사용자가 특정 패밀리에 접근할 권한이 있는지 확인
+     */
+    public boolean validateUserFamilyAccess(String userId, String familyId) {
         try {
-            // 발신자의 마지막 읽은 메시지 ID 업데이트
-            redisTemplate.opsForValue().set("read:" + familyId + ":" + userId, messageId);
+            log.debug("사용자-패밀리 권한 확인: userId={}, familyId={}", userId, familyId);
 
-            // 가족 구성원의 안 읽은 메시지 수 증가
+            // CustomUserDetails 객체 처리
+            if (userId != null && userId.contains("CustomUserDetails")) {
+                log.warn("CustomUserDetails 형식의 userId 처리 - 접근 거부: {}", userId);
+                return false;
+            }
+
+            if (userId != null) {
+                try {
+
+                    Integer userIdInt = Integer.parseInt(userId);
+
+                    List<String> familyMembers = familyMapper.selectFamilyMemberIds(familyId);
+
+                    boolean isMember = familyMembers.contains(userId);
+                    log.debug("패밀리 구성원 확인 결과: {}", isMember);
+                    return isMember;
+                } catch (NumberFormatException e) {
+                    log.error("사용자 ID {} 숫자 변환 실패: {}", userId, e.getMessage());
+                    return false;
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            log.error("사용자-패밀리 관계 확인 중 오류", e);
+            return false;
+        }
+    }
+
+    public void sendMessage(String familyId, MessageRequestDTO messageRequest, String userId) {
+        log.info("메시지 전송 시작 - familyId: {}, userId: {}, type: {}",
+                familyId, userId, messageRequest.getMessageType());
+
+        try {
+            // 메시지 유효성 검증
+            if (!StringUtils.hasText(messageRequest.getContent()) &&
+                    "text".equals(messageRequest.getMessageType())) {
+                log.error("빈 텍스트 메시지");
+                throw new IllegalArgumentException("텍스트 메시지 내용이 없습니다");
+            }
+
+            // 메시지 ID 생성 (타임스탬프_familyId 형식)
+            String messageId = System.currentTimeMillis() + "_" + familyId;
+
+            // 읽음 상태 초기화 (발신자는 이미 읽음)
+            List<String> readByUserIds = new ArrayList<>();
+            readByUserIds.add(userId);
+
+            // 가족 구성원 수 조회
+            int familyMembersCount = 1; // 기본값으로 초기화 (최소 발신자 1명)
+            try {
+                familyMembersCount = familyMapper.countFamilyMembers(familyId);
+            } catch (Exception e) {
+                log.error("가족 구성원 수 조회 중 오류 발생", e);
+            }
+
+            // 현재 시간
+            Date sentAt = new Date();
+
+            // 메시지 엔티티 생성
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setMessageId(messageId);
+            chatMessage.setFamilyId(familyId);
+            chatMessage.setSenderId(userId);
+
+            // 발신자 정보 설정 (사용자 정보 조회)
+            ChatMessage.SenderInfo senderInfo = new ChatMessage.SenderInfo();
+            try {
+                // 사용자 정보 조회 로직 (닉네임, 가족 순서 등)
+                senderInfo.setNickname("사용자_" + userId);
+                senderInfo.setFamilySequence("1"); // 기본값 (실제로는 DB에서 조회)
+            } catch (Exception e) {
+                log.warn("사용자 정보 조회 실패, 기본값 사용: {}", e.getMessage());
+                senderInfo.setNickname("사용자_" + userId);
+                senderInfo.setFamilySequence("?");
+            }
+            chatMessage.setSenderInfo(senderInfo);
+
+            // 메시지 내용 설정
+            ChatMessage.MessageContent content = new ChatMessage.MessageContent();
+            content.setMessageType(messageRequest.getMessageType());
+            content.setText(messageRequest.getContent());
+            content.setImageUrl(messageRequest.getImageUrl());
+            chatMessage.setContent(content);
+
+            chatMessage.setSentAt(sentAt);
+            chatMessage.setReadByUserIds(readByUserIds);
+            chatMessage.setUnreadCount(Math.max(familyMembersCount - 1, 0));  // 발신자 제외
+
+            // MongoDB에 저장
+            chatMessage = messageRepository.save(chatMessage);
+            log.info("메시지 저장 완료: {}", messageId);
+
+            // Redis에 데이터 업데이트
+            updateRedisAfterMessageSend(familyId, messageId, userId);
+
+            // 웹소켓으로 메시지 브로드캐스트
+            Map<String, Object> response = new HashMap<>();
+            response.put("type", "CHAT_MESSAGE");
+            response.put("data", chatMessage);
+
+            messagingTemplate.convertAndSend("/topic/chat/family/" + familyId, response);
+            log.info("메시지 브로드캐스트 완료: /topic/chat/family/{}", familyId);
+
+        } catch (Exception e) {
+            log.error("메시지 전송 중 오류 발생", e);
+            throw new RuntimeException("메시지 전송 실패: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Redis 데이터 업데이트 - 메시지 전송 후
+     * 1. 발신자의 마지막 읽은 메시지 ID 업데이트
+     * 2. 가족 구성원의 안 읽은 메시지 수 증가
+     */
+    private void updateRedisAfterMessageSend(String familyId, String messageId, String senderId) {
+        try {
+            // 1. 발신자의 마지막 읽은 메시지 ID 업데이트
+            redisTemplate.opsForValue().set("read:" + familyId + ":" + senderId, messageId);
+
+            // 2. 가족 구성원의 안 읽은 메시지 수 증가 (발신자 제외)
             List<String> familyMembers = familyMapper.selectFamilyMemberIds(familyId);
+
             for (String memberId : familyMembers) {
-                if (!memberId.equals(userId)) {
+                if (!memberId.equals(senderId)) {
                     // 기존 안 읽은 메시지 수 조회
                     String unreadCountStr = (String) redisTemplate.opsForValue().get("unread:" + familyId + ":" + memberId);
                     int unreadCount = 0;
+
                     if (unreadCountStr != null) {
-                        unreadCount = Integer.parseInt(unreadCountStr);
+                        try {
+                            unreadCount = Integer.parseInt(unreadCountStr);
+                        } catch (NumberFormatException e) {
+                            log.warn("안 읽은 메시지 수 파싱 실패: {}", unreadCountStr);
+                        }
                     }
+
                     // 안 읽은 메시지 수 증가
                     redisTemplate.opsForValue().set("unread:" + familyId + ":" + memberId, String.valueOf(unreadCount + 1));
+                    log.debug("안 읽은 메시지 수 증가: familyId={}, userId={}, count={}", familyId, memberId, unreadCount + 1);
                 }
             }
+
+            // 3. 채팅방에 현재 구독 중인 사용자 목록 관리 (온라인 상태)
+            redisTemplate.opsForSet().add("family:" + familyId + ":subscribers", senderId);
+
         } catch (Exception e) {
-            // Redis 오류 무시하고 계속 진행
-            System.out.println("Redis 작업 실패 (무시됨): " + e.getMessage());
+            log.warn("Redis 업데이트 실패 (계속 진행): {}", e.getMessage());
         }
-
-        // WebSocket 브로드캐스트 - 응답 형식 수정
-        Map<String, Object> response = new HashMap<>();
-        response.put("type", "CHAT_MESSAGE");
-        response.put("data", chatMessage);
-        messagingTemplate.convertAndSend("/topic/chat/family/" + familyId, response);
-
-        // 오프라인 사용자 푸시 알림
-        sendNotificationsToOfflineUsers(chatMessage, familyId, userId);
     }
 
-    // 메시지 읽음 상태 업데이트 메서드
     public void markAsRead(String familyId, String messageId, String userId) {
-        // 채팅방 접근 권한 확인
-        if (!familyMapper.checkFamilyMembership(familyId, userId)) {
-            throw new BusinessException(ErrorCode.CHAT_ACCESS_DENIED);
-        }
+        log.info("메시지 읽음 처리 - familyId: {}, messageId: {}, userId: {}",
+                familyId, messageId, userId);
 
         try {
             // Redis에 마지막 읽은 메시지 ID 업데이트
             redisTemplate.opsForValue().set("read:" + familyId + ":" + userId, messageId);
-
-            // 안 읽은 메시지 수를 0으로 리셋
             redisTemplate.opsForValue().set("unread:" + familyId + ":" + userId, "0");
+            log.debug("Redis 읽음 상태 업데이트 - 안 읽은 메시지 수: 0");
 
-            // MongoDB 읽음 상태 업데이트 (해당 메시지보다 이전 메시지 모두 읽음 처리)
-            messageRepository.updateReadStatusBeforeId(familyId, messageId, userId);
+            // MongoDB 읽음 상태 업데이트
+            int updatedCount = messageRepository.updateReadStatusBeforeId(familyId, messageId, userId);
+            log.debug("MongoDB 읽음 상태 업데이트 - 업데이트된 메시지 수: {}", updatedCount);
 
             // 읽음 상태 이벤트 브로드캐스트
             ReadReceiptResponseDTO readReceipt = ReadReceiptResponseDTO.builder()
@@ -132,35 +207,11 @@ public class ChatMessageService {
                     .build();
 
             messagingTemplate.convertAndSend("/topic/chat/family/" + familyId, readReceipt);
+            log.info("읽음 상태 브로드캐스트 완료: {}", messageId);
+
         } catch (Exception e) {
-            System.out.println("읽음 상태 업데이트 실패: " + e.getMessage());
-            throw new BusinessException(ErrorCode.CHAT_MESSAGE_READ_FAILED);
-        }
-    }
-
-    // 오프라인 사용자에게 알림 전송
-    private void sendNotificationsToOfflineUsers(ChatMessage message, String familyId, String userId) {
-        try {
-            // 가족 구성원 목록 조회
-            List<String> familyMembers = familyMapper.selectFamilyMemberIds(familyId);
-
-            // 오프라인 상태인 사용자 확인 및 알림 전송
-            for (String memberId : familyMembers) {
-                if (!memberId.equals(userId)) {
-                    // Redis에서 사용자의 온라인 상태 확인
-                    Boolean isOnline = redisTemplate.hasKey("user:online:" + memberId);
-
-                    // 오프라인 상태면 푸시 알림 전송
-                    if (Boolean.FALSE.equals(isOnline)) {
-                        // FCM 알림 전송 로직 구현
-                        System.out.println("FCM 알림 전송 (미구현): 사용자 " + memberId +
-                                "에게 메시지 알림: " + message.getContent().getText());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // 예외 무시하고 로그만 출력
-            System.out.println("알림 전송 실패 (무시됨): " + e.getMessage());
+            log.error("메시지 읽음 처리 중 오류 발생", e);
+            throw new RuntimeException("메시지 읽음 처리 실패: " + e.getMessage(), e);
         }
     }
 }
