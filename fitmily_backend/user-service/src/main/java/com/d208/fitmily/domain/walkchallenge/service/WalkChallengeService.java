@@ -185,10 +185,12 @@ public class WalkChallengeService {
                         Float distanceCompleted = (Float) data.get("distanceCompleted");
                         Integer rank = ((Number) data.get("user_rank")).intValue();
 
+                        UserDto userDto = userService.getUserDtoById(userId);
                         return ParticipantDto.builder()
                                 .userId(userId)
-                                .nickname(nickname != null ? nickname : "사용자" + userId)
-                                .profileColor(profileColor != null ? profileColor : "#FF5733")
+                                .nickname(userDto.getUserNickname())
+                                .familySequence(userDto.getUserFamilySequence())
+                                .zodiacName(userDto.getUserZodiacName())
                                 .distanceCompleted(distanceCompleted != null ? distanceCompleted : 0.0f)
                                 .rank(rank)
                                 .build();
@@ -231,10 +233,12 @@ public class WalkChallengeService {
                             Float distanceCompleted = (Float) data.get("distanceCompleted");
                             Integer rank = ((Number) data.get("user_rank")).intValue();
 
+                            UserDto userDto = userService.getUserDtoById(userId);
                             return ParticipantDto.builder()
                                     .userId(userId)
-                                    .nickname(nickname != null ? nickname : "사용자" + userId)
-                                    .profileColor(profileColor != null ? profileColor : "#FF5733")
+                                    .nickname(userDto.getUserNickname())
+                                    .familySequence(userDto.getUserFamilySequence())
+                                    .zodiacName(userDto.getUserZodiacName())
                                     .distanceCompleted(distanceCompleted != null ? distanceCompleted : 0.0f)
                                     .rank(rank)
                                     .build();
