@@ -60,7 +60,7 @@ public class AwsS3Service {
 
         // Presigned GET URL 생성 설정
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(15)) // 유효 시간 설정 (일회성, 시간제한된 접근 링크라 없으면 url 생성 안댐)
+                .signatureDuration(Duration.ofMinutes(15)) // 유효 시간 설정 (일회성, 시간제한된 접근 링크라 제한시간 없으면 url 생성 안댐)
                 .getObjectRequest(getObjectRequest)
                 .build();
 
