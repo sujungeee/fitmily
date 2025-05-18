@@ -1,6 +1,4 @@
-package com.ssafy.fitmily_android.presentation.ui.state
-
-import com.ssafy.fitmily_android.model.service.MyHealthService
+package com.ssafy.fitmily_android.presentation.ui.main.my.health
 
 data class MyHealthUiState(
     val mode: Mode = Mode.REGISTER,
