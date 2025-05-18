@@ -64,11 +64,12 @@ public interface FamilyMapper {
             @Result(property = "familyId", column = "family_id"),
             @Result(property = "role", column = "role"),
             @Result(property = "zodiacName", column = "zodiac_name"),
-            @Result(property = "userFamilySequence", column = "user_family_sequence"),
+            @Result(property = "familySequence", column = "user_family_sequence"), // userFamilySequence → familySequence
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at")
     })
     List<User> findFamilyMembers(@Param("familyId") int familyId);
+
 
 
     //
