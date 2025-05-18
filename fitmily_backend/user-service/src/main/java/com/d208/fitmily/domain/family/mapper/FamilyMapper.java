@@ -70,6 +70,7 @@ public interface FamilyMapper {
     })
     List<User> findFamilyMembers(@Param("familyId") int familyId);
 
+
     //
     /**
      * 가족 구성원 확인
@@ -88,13 +89,6 @@ public interface FamilyMapper {
      */
     @Select("SELECT user_id FROM user WHERE family_id = #{familyId}")
     List<String> selectFamilyMemberIds(@Param("familyId") String familyId);
-
-
-    /**
-     * 사용자가 특정 패밀리에 속해있는지 확인
-     */
-    @Select("SELECT COUNT(*) FROM user WHERE user_id = #{userId} AND family_id = #{familyId}")
-    int countUserInFamily(@Param("userId") int userId, @Param("familyId") String familyId);
 
 }
 
