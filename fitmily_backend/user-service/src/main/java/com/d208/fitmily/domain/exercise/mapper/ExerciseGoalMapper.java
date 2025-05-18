@@ -46,32 +46,31 @@ public interface ExerciseGoalMapper {
 
     // 2. 사용자의 운동 목표 목록 조회
     @Select("""
-        SELECT
-            eg.exercise_goal_name,
-            CAST(eg.exercise_goal_value AS CHAR) AS exercise_goal_value,
-            CAST(
-                CASE
-                    WHEN eg.exercise_goal_name = '산책' THEN
-                        COALESCE(
-                            (SELECT SUM(w.walk_distance)
-                             FROM walk w
-                             WHERE w.user_id = #{userId} AND DATE(w.walk_created_at) = CURDATE()),
-                            0
-                        )
-                    ELSE
-                        COALESCE(
-                            (SELECT SUM(e.exercise_count)
-                             FROM exercise e
-                             WHERE e.user_id = #{userId}
-                               AND e.exercise_name = eg.exercise_goal_name
-                               AND DATE(e.exercise_created_at) = CURDATE()),
-                            0
-                        )
-                END AS CHAR
-            ) AS exercise_record_value
-        FROM exercise_goal eg
-        WHERE eg.user_id = #{userId}
-        """)
+    SELECT
+        eg.exercise_goal_id,
+        eg.exercise_goal_name,
+        eg.exercise_goal_value,  -- CAST 제거
+        CASE
+            WHEN eg.exercise_goal_name = '산책' THEN
+                COALESCE(
+                    (SELECT SUM(w.walk_distance)
+                     FROM walk w
+                     WHERE w.user_id = #{userId} AND DATE(w.walk_created_at) = CURDATE()),
+                    0
+                )
+            ELSE
+                COALESCE(
+                    (SELECT SUM(e.exercise_count)
+                     FROM exercise e
+                     WHERE e.user_id = #{userId}
+                       AND e.exercise_name = eg.exercise_goal_name
+                       AND DATE(e.exercise_created_at) = CURDATE()),
+                    0
+                )
+        END AS exercise_record_value  -- CAST 제거
+    FROM exercise_goal eg
+    WHERE eg.user_id = #{userId}
+    """)
     List<Map<String, Object>> selectGoalsByUserId(@Param("userId") Integer userId);
 
     // 3. 운동 목표 등록
