@@ -4,11 +4,11 @@ import com.d208.fitmily.domain.family.dto.*;
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.service.FamilyService;
 import com.d208.fitmily.global.jwt.JWTUtil;
-import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -33,22 +33,23 @@ public class FamilyController {
     @PostMapping("/join")
     public ResponseEntity<JoinFamilyResponse> joinFamily(
             @RequestBody JoinFamilyRequest request,
-            @RequestHeader("Authorization") String authHeader) {
+            Authentication authentication) {
 
-        // JWT 토큰에서 직접 사용자 ID 추출
+        // Spring Security의 Authentication 객체 활용
         int userId;
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        if (authentication != null && authentication.isAuthenticated()) {
             try {
-                // JWTUtil을 주입받아 사용
-                Claims claims = jwtUtil.validateAndGetClaims(token);
-                userId = claims.get("userId", Integer.class);
-            } catch (Exception e) {
-                throw new RuntimeException("토큰이 유효하지 않습니다");
+                // SecurityContext에서 사용자 정보 가져오기
+                userId = Integer.parseInt(authentication.getName());
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("사용자 ID 형식이 올바르지 않습니다");
             }
         } else {
-            throw new RuntimeException("인증 토큰이 필요합니다");
+            throw new RuntimeException("인증 정보가 없습니다");
         }
+
+        // 패밀리 가입 처리 전 디버그 로깅 추가
+        System.out.println("초대 코드: " + request.getFamilyInviteCode() + ", 사용자 ID: " + userId);
 
         int familyId = familyService.joinFamily(request.getFamilyInviteCode(), userId);
 
@@ -57,6 +58,7 @@ public class FamilyController {
         );
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/{familyId}")
     public ResponseEntity<FamilyDetailResponse> getFamily(@PathVariable int familyId) {
