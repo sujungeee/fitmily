@@ -71,7 +71,7 @@ fun MyGoalScreen(
                         selectedGoal = goal
                         showEditDialog = true
                     },
-                    onDeleteClick = { myGoalViewModel.deleteMyGoalInfo(selectedGoal!!.goalId) }
+                    onDeleteClick = { myGoalViewModel.deleteMyGoalInfo(goal.goalId) }
                 )
             }
         }
