@@ -21,8 +21,17 @@ public interface FamilyMapper {
     /**
      * 초대 코드로 패밀리 조회
      */
-    @Select("SELECT * FROM family WHERE family_invite_code = '${inviteCode}'")
+    @Select("SELECT * FROM family WHERE family_invite_code = #{inviteCode}")
+    @Results(id = "familyMap", value = {
+            @Result(property = "familyId", column = "family_id"),
+            @Result(property = "familyName", column = "family_name"),
+            @Result(property = "familyInviteCode", column = "family_invite_code"),
+            @Result(property = "familyPeople", column = "family_people"),
+            @Result(property = "familyCreatedAt", column = "family_created_at"),
+            @Result(property = "familyUpdatedAt", column = "family_updated_at")
+    })
     Family findByInviteCode(@Param("inviteCode") String inviteCode);
+
 
     /**
      * 패밀리 인원 수 증가
