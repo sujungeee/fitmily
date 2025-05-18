@@ -88,10 +88,14 @@ fun MyGoalScreen(
                 initialValue = "${selectedGoal!!.exerciseGoalValue}",
                 onDismiss = { showEditDialog = false },
                 onConfirm = { newValue ->
+
+                    val value = newValue.toFloatOrNull() ?: 1f
+
                     myGoalViewModel.patchMyGoalInfo(
                         goalId = selectedGoal!!.goalId,
-                        exerciseGoalValue = 1f
+                        exerciseGoalValue = value
                     )
+
                     showEditDialog = false
                 }
             )
