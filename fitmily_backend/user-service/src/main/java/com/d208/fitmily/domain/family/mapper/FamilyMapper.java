@@ -21,7 +21,7 @@ public interface FamilyMapper {
     /**
      * 초대 코드로 패밀리 조회
      */
-    @Select("SELECT * FROM family WHERE family_invite_code = #{inviteCode}")
+    @Select("SELECT * FROM family WHERE family_invite_code = '${inviteCode}'")
     Family findByInviteCode(@Param("inviteCode") String inviteCode);
 
     /**
