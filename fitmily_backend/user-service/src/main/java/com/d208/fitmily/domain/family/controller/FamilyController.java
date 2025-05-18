@@ -3,11 +3,12 @@ package com.d208.fitmily.domain.family.controller;
 import com.d208.fitmily.domain.family.dto.*;
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.family.service.FamilyService;
-import com.d208.fitmily.global.config.SecurityConfig;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,17 +29,37 @@ public class FamilyController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<JoinFamilyResponse> joinFamily(@RequestBody JoinFamilyRequest request) {
-        // 현재 로그인한 사용자 ID 가져오기
-        int userId = SecurityConfig.getCurrentUserId();
+    public ResponseEntity<JoinFamilyResponse> joinFamily(@RequestBody JoinFamilyRequest request,
+                                                         Authentication authentication) {
+        // Authentication 객체에서 직접 사용자 ID 추출
+        int userId;
+        if (authentication != null && authentication.isAuthenticated()) {
+            try {
+                Object principal = authentication.getPrincipal();
+                if (principal instanceof UserDetails) {
+                    userId = Integer.parseInt(((UserDetails) principal).getUsername());
+                } else if (!"anonymousUser".equals(principal)) {
+                    userId = Integer.parseInt(authentication.getName());
+                } else {
+                    throw new RuntimeException("로그인이 필요합니다");
+                }
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("사용자 ID 형식이 올바르지 않습니다");
+            }
+        } else {
+            throw new RuntimeException("인증 정보가 없습니다");
+        }
 
         // 패밀리 가입 처리
         int familyId = familyService.joinFamily(request.getFamilyInviteCode(), userId);
 
         // 응답 생성
-        JoinFamilyResponse response = new JoinFamilyResponse(new JoinFamilyResponse.FamilyData(familyId));
+        JoinFamilyResponse response = new JoinFamilyResponse(
+                new JoinFamilyResponse.FamilyData(familyId)
+        );
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/{familyId}")
     public ResponseEntity<FamilyDetailResponse> getFamily(@PathVariable int familyId) {
