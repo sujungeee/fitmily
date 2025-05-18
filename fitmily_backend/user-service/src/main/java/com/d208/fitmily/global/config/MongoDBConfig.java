@@ -24,7 +24,7 @@ public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
 
-    @Value("${spring.data.mongodb.host:localhost}")
+    @Value("${spring.data.mongodb.host:mongodb}")
     private String mongoHost;
 
     @Value("${spring.data.mongodb.port:27017}")

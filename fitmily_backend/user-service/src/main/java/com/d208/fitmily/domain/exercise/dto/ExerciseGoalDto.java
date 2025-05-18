@@ -13,6 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ExerciseGoalDto {
+    private int goalId;
     private String exerciseGoalName;    // 운동 이름
     private float exerciseGoalValue;   // 목표 값
     private float exerciseRecordValue; // 현재 기록 값

@@ -70,25 +70,37 @@ public class FamilyService {
      */
     @Transactional
     public int joinFamily(String inviteCode, int userId) {
-        // 초대 코드로 패밀리 조회
-        Family family = familyMapper.findByInviteCode(inviteCode);
-        if (family == null) {
-            throw new com.d208.fitmily.global.common.exception.CustomException(ErrorCode.INVALID_INVITE_CODE);
+        try {
+            // 입력 파라미터 디버깅 로그
+            System.out.println("초대 코드: " + inviteCode);
+            System.out.println("사용자 ID: " + userId);
+
+            // 패밀리 조회
+            Family family = familyMapper.findByInviteCode(inviteCode);
+
+            // 조회 결과 디버깅 로그
+            System.out.println("조회된 패밀리: " + (family != null ? family.getFamilyId() : "null"));
+
+            // 패밀리 존재 여부 확인
+            if (family == null) {
+                throw new CustomException(ErrorCode.INVALID_INVITE_CODE);
+            }
+
+            // 사용자 패밀리 ID 업데이트
+            familyMapper.updateUserFamilyId(userId, family.getFamilyId());
+
+            // 패밀리 인원 수 증가
+            familyMapper.incrementFamilyPeople(family.getFamilyId());
+
+            return family.getFamilyId();
+        } catch (Exception e) {
+            // 예외 발생 시 스택 트레이스 출력
+            System.out.println("패밀리 가입 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            throw e;  // 예외 다시 던지기
         }
-
-        // 최대 인원 체크 (6명)
-        if (family.getFamilyPeople() >= MAX_FAMILY_MEMBERS) {
-            throw new com.d208.fitmily.global.common.exception.CustomException(ErrorCode.FAMILY_MEMBER_LIMIT_EXCEEDED);
-        }
-
-        // 사용자 패밀리 업데이트
-        familyMapper.updateUserFamilyId(userId, family.getFamilyId());
-
-        // 패밀리 인원 수 증가
-        familyMapper.incrementFamilyPeople(family.getFamilyId());
-
-        return family.getFamilyId();
     }
+
 
     /**
      * 패밀리 조회
@@ -178,27 +190,24 @@ public class FamilyService {
         List<FamilyHealthStatusResponse.MemberHealthInfo> memberHealthInfoList = new ArrayList<>();
 
         for (User member : familyMembers) {
-            // 사용자의 최신 건강 정보 조회 (기존 HealthMapper 사용)
+            // 사용자의 최신 건강 정보 조회
             HealthResponseDto healthInfo = healthMapper.selectLatestByUserId(member.getUserId());
 
-            // 건강 정보가 없는 사용자는 건너뜀
-            if (healthInfo == null) {
-                continue;
-            }
+            if (healthInfo == null) continue;
 
-            // JSON 문자열을 리스트로 변환
-            List<String> fiveMajorDiseases = parseJsonList(healthInfo.getHealthFiveMajorDiseases());
-            List<String> otherDiseases = parseJsonList(healthInfo.getHealthOtherDiseases());
+            // JSON 문자열을 리스트로 변환 - 표준 getter 사용
+            List<String> fiveMajorDiseases = parseJsonList(healthInfo.getFiveMajorDiseases());
+            List<String> otherDiseases = parseJsonList(healthInfo.getOtherDiseases());
 
-            // 사용자 건강 정보 생성
             FamilyHealthStatusResponse.MemberHealthInfo memberHealthInfo = FamilyHealthStatusResponse.MemberHealthInfo.builder()
                     .userId(member.getUserId())
                     .userNickname(member.getUserNickname())
                     .userBirth(member.getUserBirth())
                     .userGender(member.getUserGender())
-                    .healthHeight(healthInfo.getHealthHeight())
-                    .healthWeight(healthInfo.getHealthWeight())
-                    .healthBmi(healthInfo.getHealthBmi())
+                    // 표준 getter 사용
+                    .healthHeight(healthInfo.getHeight())
+                    .healthWeight(healthInfo.getWeight())
+                    .healthBmi(healthInfo.getBmi())
                     .healthFiveMajorDiseases(fiveMajorDiseases)
                     .healthOtherDiseases(otherDiseases)
                     .build();
