@@ -34,41 +34,22 @@ public class FamilyController {
     @PostMapping("/join")
     public ResponseEntity<JoinFamilyResponse> joinFamily(
             @RequestBody JoinFamilyRequest request,
-            @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        int userId;
+        // 디버깅 로그 추가
+        System.out.println("인증 정보: " + (principal != null ? "있음" : "없음"));
 
-        // 1. CustomUserDetails에서 사용자 ID 가져오기 시도
-        if (principal != null) {
-            userId = principal.getId();
-            System.out.println("사용자 ID (principal에서): " + userId);
-        }
-        // 2. Authorization 헤더가 있으면 JWT에서 추출 시도
-        else if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            try {
-                String token = authHeader.substring(7);
-                userId = jwtUtil.getUserId(token);
-                System.out.println("사용자 ID (JWT에서): " + userId);
-            } catch (Exception e) {
-                // 3. 테스트용 하드코딩 ID 사용
-                userId = 2;  // 테스트용 사용자 ID
-                System.out.println("사용자 ID (하드코딩): " + userId);
-            }
-        }
-        // 4. 둘 다 없으면 테스트용 ID 사용
-        else {
-            userId = 2;  // 테스트용 사용자 ID
-            System.out.println("사용자 ID (하드코딩): " + userId);
-        }
+        // CustomUserDetails에서 사용자 ID 직접 가져옴
+        int userId = principal.getId();
+        System.out.println("사용자 ID: " + userId);
 
         int familyId = familyService.joinFamily(request.getFamilyInviteCode(), userId);
 
-        return ResponseEntity.ok(new JoinFamilyResponse(
+        JoinFamilyResponse response = new JoinFamilyResponse(
                 new JoinFamilyResponse.FamilyData(familyId)
-        ));
+        );
+        return ResponseEntity.ok(response);
     }
-
 
 
     @GetMapping("/{familyId}")
