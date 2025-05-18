@@ -13,6 +13,8 @@ import com.d208.fitmily.domain.user.dto.JoinRequestDTO;
 import com.d208.fitmily.domain.user.entity.User;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -107,5 +109,10 @@ public class UserService {
     /* 아이디 중복 체크 */
     public boolean isUsernameDuplicate(String username) {
         return userMapper.existsByLoginId(username);
+    }
+
+    // familyId로 userId 전부 조회하기
+    public List<Integer> getUserIdsByFamilyId(Integer familyId) {
+        return userMapper.getUserIdsByFamilyId(familyId);
     }
 }

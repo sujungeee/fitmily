@@ -5,6 +5,7 @@ package com.d208.fitmily.domain.walk.controller;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import com.d208.fitmily.domain.walk.dto.EndWalkRequestDto;
 import com.d208.fitmily.domain.walk.dto.GpsDto;
+import com.d208.fitmily.domain.walk.dto.UserDto;
 import com.d208.fitmily.domain.walk.dto.WalkResponseDto;
 import com.d208.fitmily.domain.walk.service.GpsRedisService;
 import com.d208.fitmily.domain.walk.service.SseService;
@@ -94,11 +95,11 @@ public class WalkController {
         return sseService.connectFamilyEmitter(familyId);
     }
 
-//    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
-//    @GetMapping("/api/family/{familyId}/walking-members")
-//    public ApiResponse<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
-//        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
-//        return ApiResponse.ok(walkingUsers, "산책중인 가족인원 조회완료");
-//    }
+    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
+    @GetMapping("/api/family/{familyId}/walking-members")
+    public ResponseEntity<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
+        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
+        return ResponseEntity.ok(walkingUsers);
+    }
 }
 

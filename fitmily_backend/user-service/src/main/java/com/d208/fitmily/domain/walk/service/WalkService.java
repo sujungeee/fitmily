@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.time.Duration.between;
 
@@ -39,10 +36,11 @@ public class WalkService {
     private final WalkChallengeService walkChallengeService;
 
 
-    // 산책 중지 (칼로리 계산에서 막힘 일단 패스 )
+
+    // 산책 중지
     @Transactional
     public void endWalk(Integer userId, EndWalkRequestDto dto){
-        User user = userService.getUserById(userId);
+//        User user = userService.getUserById(userId);
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
         float weight = Optional.ofNullable(health.getWeight()).orElse(66.0f);
@@ -72,6 +70,9 @@ public class WalkService {
 
         // 산책 챌린지 거리 업데이트
         walkChallengeService.updateChallengeDistance(stopWalkDto);
+
+        //gps 데이터 삭제
+        gpsRedisService.removeWalkData(userId);
     }
 
 
@@ -125,25 +126,25 @@ public class WalkService {
 
 
     // 산책중인 가족 구성원 조회
-//    public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
-//
-//        // familyId로 가족 구성원의 userId 다 리스트로 가져옴
-//        List<Integer> userIds = familyService.getUserIdsByFamilyId(familyId);
-//        List<UserDto> result = new ArrayList<>();
-//
-//        for (Integer userId : userIds) {
-//            if (redisTemplate.hasKey("walk:gps:" + userId)) {
-//                result.add(UserDto.builder()
-//                        .userId(user.getUserId())
-////                        .name(user.getName())
-////                        .profileImg(user.getProfileImg())
-//                        .build());
-//            }
-//        }
-//        return result;
-//            }
-//        }
-}
+    public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
+
+        // familyId로 가족 구성원의 userId 다 리스트로 가져옴
+        List<Integer> userIds = userService.getUserIdsByFamilyId(familyId);
+        List<UserDto> result = new ArrayList<>();
+
+        for (Integer userId : userIds) {
+            if (redisTemplate.hasKey("walk:gps:" + userId)) {
+                result.add(UserDto.builder()
+                        .userId(user.getUserId())
+//                        .name(user.getName())
+//                        .profileImg(user.getProfileImg())
+                        .build());
+            }
+        }
+        return result;
+            }
+        }
+
 
 
 
