@@ -1,6 +1,5 @@
 package com.d208.fitmily.domain.family.dto;
 
-import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
