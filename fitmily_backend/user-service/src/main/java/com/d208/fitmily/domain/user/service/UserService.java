@@ -111,8 +111,15 @@ public class UserService {
         return userMapper.existsByLoginId(username);
     }
 
-    // familyId로 userId 전부 조회하기
+    /* familyId로 userId 전부 조회하기 */
     public List<Integer> getUserIdsByFamilyId(Integer familyId) {
         return userMapper.getUserIdsByFamilyId(familyId);
     }
+
+    /* userId들에 따른 정보 한번에 조회 */
+    public List<User> getUsersByIds(List<Integer> userIds) {
+        return userMapper.getUsersByIds(userIds);
+    }
+
+
 }
