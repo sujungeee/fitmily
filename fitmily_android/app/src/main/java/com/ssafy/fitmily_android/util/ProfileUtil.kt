@@ -8,6 +8,7 @@ import com.ssafy.fitmily_android.ui.theme.familyFourth
 import com.ssafy.fitmily_android.ui.theme.familySecond
 import com.ssafy.fitmily_android.ui.theme.familySixth
 import com.ssafy.fitmily_android.ui.theme.familyThird
+import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 class ProfileUtil {
     // 활용: painterResource(typeToProfile("horse"))
@@ -31,7 +32,7 @@ class ProfileUtil {
     }
 
     // 가족 순서에 따른 color
-    fun seqToColor(seq: Int): Color? {
+    fun seqToColor(seq: Int): Color {
         when (seq) {
             1 -> return familyFirst
             2 -> return familySecond
@@ -39,7 +40,7 @@ class ProfileUtil {
             4 -> return familyFourth
             5 -> return familyFifth
             6 -> return familySixth
-            else -> return null
+            else -> return mainWhite
         }
     }
 }
