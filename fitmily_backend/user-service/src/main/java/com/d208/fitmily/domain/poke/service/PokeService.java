@@ -29,7 +29,7 @@ public class PokeService {
         log.info("콕 찌르기 전송: senderId={}, targetId={}", senderId, targetUserId);
 
 // 사용자 확인
-        User sender = userMapper.findUserById(senderId);
+        User sender = userMapper.selectById(senderId);
         if (sender == null) {
             log.error("발신자를 찾을 수 없습니다: userId={}", senderId);
             throw new RuntimeException("발신자를 찾을 수 없습니다: " + senderId);
@@ -38,7 +38,7 @@ public class PokeService {
 // 디버깅 로그 추가
         log.info("발신자 정보: userId={}, nickname={}", sender.getUserId(), sender.getUserNickname());
 
-        User target = userMapper.findUserById(targetUserId);
+        User target = userMapper.selectById(targetUserId);
         if (target == null) {
             log.error("수신자를 찾을 수 없습니다: userId={}", targetUserId);
             throw new RuntimeException("수신자를 찾을 수 없습니다: " + targetUserId);

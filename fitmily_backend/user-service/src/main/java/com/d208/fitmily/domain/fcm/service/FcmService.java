@@ -49,7 +49,7 @@ public class FcmService {
         log.info("FCM 토큰 등록: userId={}, token={}", userId, fcmToken);
 
         // 유저 존재 확인
-        User user = userMapper.findUserById(userId);
+        User user = userMapper.selectById(userId);
         if (user == null) {
             log.error("사용자를 찾을 수 없습니다: userId={}", userId);
             throw new RuntimeException("사용자를 찾을 수 없습니다: " + userId);
