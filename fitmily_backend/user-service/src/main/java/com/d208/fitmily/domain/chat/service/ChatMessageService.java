@@ -101,7 +101,6 @@ public class ChatMessageService {
             try {
                 // 사용자 정보 조회 로직 (닉네임, 가족 순서 등)
                 senderInfo.setNickname("사용자_" + userId);
-                senderInfo.setFamilySequence("1"); // 기본값 (실제로는 DB에서 조회)
             } catch (Exception e) {
                 log.warn("사용자 정보 조회 실패, 기본값 사용: {}", e.getMessage());
                 senderInfo.setNickname("사용자_" + userId);
