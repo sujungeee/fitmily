@@ -21,26 +21,25 @@ public class AwsS3Controller {
     private final AwsS3Service awsS3Service;
 
     @Operation(summary = "업로드용 Presigned URL 발급")
-    @GetMapping("/upload-url")
+    @PostMapping("/upload-url")
     public ResponseEntity<Map<String, Object>> getPresignedUploadUrl(
             @RequestBody uploadUrlRequestDto dto
     ) {
         String presignedUrl = awsS3Service.generatePresignedUploadUrl(dto);
         Map<String, Object> response = new HashMap<>();
         response.put("data", presignedUrl);
-
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "다운로드/조회용 Presigned URL 발급")
-    @GetMapping("/download-url")
-    public ResponseEntity<Map<String, Object>> getPresignedDownloadUrl(
-            @RequestParam String filename
-    ) {
-        String presignedUrl = awsS3Service.generatePresignedDownloadUrl(filename);
-        Map<String, Object> response = new HashMap<>();
-        response.put("data", presignedUrl);
-
-        return ResponseEntity.ok(response);
-    }
+//    @Operation(summary = "다운로드/조회용 Presigned URL 발급")
+//    @GetMapping("/download-url")
+//    public ResponseEntity<Map<String, Object>> getPresignedDownloadUrl(
+//            @RequestParam String filename
+//    ) {
+//        String presignedUrl = awsS3Service.generatePresignedDownloadUrl(filename);
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("data", presignedUrl);
+//
+//        return ResponseEntity.ok(response);
+//    }
 }
