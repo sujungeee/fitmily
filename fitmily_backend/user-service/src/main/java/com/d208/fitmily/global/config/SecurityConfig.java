@@ -108,6 +108,8 @@ public class SecurityConfig {
                         .requestMatchers("/chat-test.html").permitAll()
                         .requestMatchers("/.well-known/**").permitAll()
 
+                        .requestMatchers("/api/ws-connect/**").permitAll()
+
                         .requestMatchers( "/*").permitAll()
 
 

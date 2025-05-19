@@ -5,8 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ebe2f556-8f87-4bc3-b081-d6c1ac0eee32" name="변경" comment="">
+      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/controller/WalkSocketController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/user/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/user/mapper/UserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/controller/ExerciseGoalController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/exercise/controller/ExerciseGoalController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/health/controller/HealthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/health/controller/HealthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/controller/WalkController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/controller/WalkController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/dto/GpsDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/dto/GpsDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/service/WalkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/domain/walk/service/WalkService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/AwsS3Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/AwsS3Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/MongoDBConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/MongoDBConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/MongoIndexInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/MongoIndexInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/config/WebSocketConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/handler/DelegatingStompHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/handler/DelegatingStompHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/handler/StompPrincipal.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/handler/StompPrincipal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/handler/WalkStompHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/d208/fitmily/global/handler/WalkStompHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
