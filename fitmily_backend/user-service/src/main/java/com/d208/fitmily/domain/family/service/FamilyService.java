@@ -47,7 +47,7 @@ public class FamilyService {
     private static final int MAX_FAMILY_MEMBERS = 6;
 
     @Transactional
-    public int createFamily(String familyName) {
+    public int createFamily(String familyName, int userId) {  // userId 매개변수 추가
         Family family = new Family();
         family.setFamilyName(familyName);
 
@@ -63,6 +63,9 @@ public class FamilyService {
 
         // DB에 저장
         familyMapper.createFamily(family);
+
+        // 패밀리 생성자를 해당 패밀리의 첫 멤버로 등록 (sequence = 1)
+        familyMapper.updateUserFamilyIdAndSequence(userId, family.getFamilyId(), 1);
 
         // 채팅방 초기화 - 시스템 메시지 전송
         initializeChat(String.valueOf(family.getFamilyId()), "system");
