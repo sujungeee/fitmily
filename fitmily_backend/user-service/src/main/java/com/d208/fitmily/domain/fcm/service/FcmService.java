@@ -1,5 +1,6 @@
 package com.d208.fitmily.domain.fcm.service;
 
+import com.d208.fitmily.domain.chat.entity.ChatMessage;
 import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import com.d208.fitmily.domain.fcm.dto.FcmTokenDTO;
 import com.d208.fitmily.domain.fcm.entity.Fcm;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -333,5 +335,95 @@ public class FcmService {
         return e.getMessagingErrorCode() == MessagingErrorCode.UNREGISTERED
                 || (e.getMessagingErrorCode() == MessagingErrorCode.INVALID_ARGUMENT
                 && e.getMessage().contains("Invalid registration"));
+    }
+
+    /**
+     * 채팅 메시지 알림 전송
+     */
+    public void sendChatMessageNotification(String senderName, String messageContent,
+                                            String familyId, String messageId,
+                                            String senderId, String messageType,
+                                            Date timestamp, List<String> receiverIds) {
+        log.info("채팅 메시지 알림 전송: familyId={}, messageId={}, receivers={}",
+                familyId, messageId, receiverIds.size());
+
+        if (receiverIds.isEmpty()) {
+            log.debug("수신자가 없어 FCM 알림 전송 생략");
+            return;
+        }
+
+        for (String receiverId : receiverIds) {
+            try {
+                int userIdInt = Integer.parseInt(receiverId);
+                // 대상 사용자의 FCM 토큰 조회
+                List<Fcm> targetTokens = fcmMapper.findByUserId(userIdInt);
+
+                if (targetTokens.isEmpty()) {
+                    log.warn("대상 사용자의 FCM 토큰이 없음: userId={}", receiverId);
+                    continue;
+                }
+
+                for (Fcm fcm : targetTokens) {
+                    try {
+                        // 알림 메시지 생성
+                        Message message = createChatMessageNotificationMessage(
+                                senderName, messageContent, familyId, messageId,
+                                senderId, messageType, timestamp, fcm.getFcmToken());
+
+                        // 메시지 전송
+                        String response = firebaseMessaging.send(message);
+                        log.info("채팅 메시지 알림 전송 성공: userId={}, response={}", receiverId, response);
+                    } catch (FirebaseMessagingException e) {
+                        log.error("채팅 메시지 알림 전송 실패: token={}, error={}", fcm.getFcmToken(), e.getMessage());
+                        // 유효하지 않은 토큰 처리
+                        if (isInvalidTokenError(e)) {
+                            fcmMapper.deleteFcmToken(fcm.getFcmId());
+                            log.info("유효하지 않은 FCM 토큰 삭제: {}", fcm.getFcmToken());
+                        }
+                    }
+                }
+            } catch (NumberFormatException e) {
+                log.error("사용자 ID 변환 실패: userId={}, error={}", receiverId, e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 채팅 메시지 알림 메시지 생성
+     */
+    private Message createChatMessageNotificationMessage(String senderName, String messageContent,
+                                                         String familyId, String messageId,
+                                                         String senderId, String messageType,
+                                                         Date timestamp, String token) {
+        // Data 페이로드
+        Map<String, String> data = new HashMap<>();
+        data.put("type", "CHAT");
+        data.put("id", messageId);
+        data.put("senderId", senderId);
+        data.put("senderName", senderName);
+        data.put("familyChatId", familyId);
+        data.put("message", messageContent);
+        data.put("messageType", messageType);
+        data.put("timestamp", timestamp.toString());
+
+        // 알림 정보
+        Notification notification = Notification.builder()
+                .setTitle(senderName)
+                .setBody(messageContent)
+                .build();
+
+        // Android 설정
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                        .setChannelId("chat_channel")
+                        .build())
+                .build();
+
+        return Message.builder()
+                .setToken(token)
+                .putAllData(data)
+                .setNotification(notification)
+                .setAndroidConfig(androidConfig)
+                .build();
     }
 }
