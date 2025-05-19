@@ -45,6 +45,16 @@ public interface WalkMapper {
         ORDER BY w.walk_start_time DESC
         </script>
         """)
+    @Results(id = "WalkResponseDtoMap", value = {
+            @Result(column = "walk_id", property = "walkId"),
+            @Result(column = "user_id", property = "userId"),
+            @Result(column = "walk_route_img", property = "routeImg"),
+            @Result(column = "walk_start_time", property = "startTime"),
+            @Result(column = "walk_end_time", property = "endTime"),
+            @Result(column = "walk_distance", property = "distance"),
+            @Result(column = "walk_calories", property = "calories"),
+            @Result(column = "user_nickname", property = "nickname")
+    })
     List<WalkResponseDto> selectWalks(Map<String, Object> params);
 
     // 3. 산책 목표 존재 여부 확인

@@ -25,15 +25,6 @@ public class AwsS3Config {
         System.out.println("✅ AWS region = " + region);
         System.out.println("✅ AWS accessKey = " + credentials.getAccessKey());
     }
-//    cloud:
-//    aws:
-//    s3:
-//    bucket: pop4u
-//    stack.auto: false
-//    region.static: us-east-1
-//    credentials:
-//    accessKey: AKIAXZ2CK3QV4WQ7TVW5
-//    secretKey: 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
     private Credentials credentials;
     private String region;
     private S3 s3;

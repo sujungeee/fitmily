@@ -20,8 +20,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.time.Duration.between;
-
-
 @Service
 @RequiredArgsConstructor
 public class WalkService {
@@ -130,26 +128,35 @@ public class WalkService {
     // 산책중인 가족 구성원 조회
     public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
 
-        // familyId로 가족 구성원의 userId 다 리스트로 가져옴
+        // familyId로 가족 구성원의 userId 다 리스트로 가져와서
         List<Integer> userIds = userService.getUserIdsByFamilyId(familyId);
         System.out.println(userIds);
 
+        // userId가 없다면 return
         if (userIds == null || userIds.isEmpty()) {
             return Collections.emptyList();
         }
 
+        // userId를 돌면서 walk:gps:userId가 있는지 = 산책중인지 확인
         List<Integer> walkingUserIds = new ArrayList<>();
         for (Integer userId : userIds) {
             if (redisTemplate.hasKey("walk:gps:" + userId)) {
                 walkingUserIds.add(userId);
             }
         }
+
+        // 운동중인 사용자 배열이 비었다면 return
+        if (walkingUserIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         //산책중인 userId로 이름,가족가입순서, 띠 정보 가져옴
         List<User> walkingUsers = userService.getUsersByIds(walkingUserIds);
 
 
         List<UserDto> result = new ArrayList<>();
         for (User user : walkingUsers) {
+            if (user == null) continue;
             result.add(UserDto.builder()
                     .userId(user.getUserId())
                     .userNickname(user.getUserNickname())
@@ -158,7 +165,6 @@ public class WalkService {
                     .build());
         }
         return result;
-
             }
         }
 
