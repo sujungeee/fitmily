@@ -1,5 +1,6 @@
 package com.d208.fitmily.domain.family.mapper;
 
+import com.d208.fitmily.domain.exercise.entity.Exercise;
 import com.d208.fitmily.domain.family.entity.Family;
 import com.d208.fitmily.domain.user.entity.User;
 import org.apache.ibatis.annotations.*;
@@ -69,6 +70,26 @@ public interface FamilyMapper {
             @Result(property = "updatedAt", column = "user_updated_at")
     })
     List<User> findFamilyMembers(@Param("familyId") int familyId);
+
+    @Mapper
+    public interface ExerciseMapper {
+        @Select("SELECT * FROM exercise WHERE user_id = #{userId} AND DATE(exercise_created_at) = #{date}")
+        @Results(id = "exerciseMap", value = {
+                @Result(property = "exerciseId", column = "exercise_id"),
+                @Result(property = "userId", column = "user_id"),
+                @Result(property = "exerciseName", column = "exercise_name"),
+                @Result(property = "exerciseTime", column = "exercise_time"),
+                @Result(property = "exerciseCount", column = "exercise_count"),
+                @Result(property = "exerciseCalories", column = "exercise_calories"),
+                @Result(property = "exerciseCreatedAt", column = "exercise_created_at"),
+                @Result(property = "exerciseUpdatedAt", column = "exercise_updated_at")
+        })
+        List<Exercise> findUserExercisesByDate(@Param("userId") int userId, @Param("date") String date);
+
+        @Select("SELECT COALESCE(SUM(exercise_calories), 0) FROM exercise WHERE user_id = #{userId} AND DATE(exercise_created_at) = #{date}")
+        int calculateUserTotalCalories(@Param("userId") int userId, @Param("date") String date);
+    }
+
 
 
 
