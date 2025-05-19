@@ -76,6 +76,8 @@ public class ChatService {
                 .map(this::convertToChatMessageDTO)
                 .collect(Collectors.toList());
 
+        log.info("보낼 메시지 DTO: {}", messageDTOs);
+
         return new ChatMessagesResponseDTO(messageDTOs, hasMore);
     }
 
@@ -88,6 +90,7 @@ public class ChatService {
             senderInfoDTO = ChatMessageDTO.SenderInfoDTO.builder()
                     .nickname(message.getSenderInfo().getNickname())
                     .familySequence(message.getSenderInfo().getFamilySequence())
+                    .userZodiacName(message.getSenderInfo().getUserZodiacName())
                     .build();
         }
 

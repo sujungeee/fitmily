@@ -45,7 +45,7 @@ public interface WalkChallengeMapper {
         """)
     int updateUserWalkChallengeDistance(UserWalkChallengeDto userWalkChallenge);
 
-    // 특정 가족의 현재 활성 챌린지 조회
+    // 기존의 특정 가족의 현재 활성 챌린지 조회
     @Select("""
         SELECT 
             challenge_id as challengeId,
@@ -80,7 +80,7 @@ public interface WalkChallengeMapper {
             @Param("currentStartDate") LocalDate currentStartDate
     );
 
-    // 특정 챌린지의 총 달성 거리 조회
+    // 기존의 특정 챌린지의 총 달성 거리 조회
     @Select("""
         SELECT SUM(user_walk_challenge_distance)
         FROM user_walk_challenge
@@ -110,6 +110,7 @@ public interface WalkChallengeMapper {
         """)
     List<Integer> getAllFamilyIds();
 
+    // 기존의 사용자 챌린지 거리 동기화
     @Update("""
     UPDATE user_walk_challenge uwc
     SET user_walk_challenge_distance = (
@@ -127,4 +128,28 @@ public interface WalkChallengeMapper {
     WHERE uwc.challenge_id = #{challengeId}
     """)
     void syncUserWalkChallengeDistances(@Param("challengeId") Integer challengeId);
+
+    // 특정 챌린지 ID로 챌린지 정보 조회 (NEW)
+    @Select("""
+        SELECT 
+            challenge_id as challengeId,
+            family_id as familyId,
+            walk_challenge_target_distance as targetDistance,
+            walk_challenge_start_date as startDate
+        FROM walk_challenge
+        WHERE challenge_id = #{challengeId}
+        """)
+    WalkChallengeDto findChallengeByChallengeId(@Param("challengeId") Integer challengeId);
+
+    // 특정 날짜에 종료되는 챌린지 목록 조회 (NEW)
+    @Select("""
+        SELECT 
+            challenge_id as challengeId,
+            family_id as familyId,
+            walk_challenge_target_distance as targetDistance,
+            walk_challenge_start_date as startDate
+        FROM walk_challenge
+        WHERE DATE_ADD(walk_challenge_start_date, INTERVAL 7 DAY) = #{endDate}
+        """)
+    List<WalkChallengeDto> findChallengesEndingOn(@Param("endDate") LocalDate endDate);
 }
