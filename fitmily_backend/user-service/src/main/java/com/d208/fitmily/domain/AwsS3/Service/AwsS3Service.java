@@ -1,5 +1,6 @@
 package com.d208.fitmily.domain.AwsS3.Service;
 
+import com.d208.fitmily.domain.AwsS3.Dto.uploadUrlRequestDto;
 import com.d208.fitmily.global.config.AwsS3Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,14 @@ public class AwsS3Service {
     private final AwsS3Config awsS3Config;
 
     //파일 업로드용 Presigned URL 생성
-    public String generatePresignedUploadUrl(String fileName, String contentType) {
+    public String generatePresignedUploadUrl(uploadUrlRequestDto dto) {
         S3Presigner presigner = awsS3Config.s3Presigner();
 
         // 어떤 객체를 올릴지 정의
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(awsS3Config.getS3().getBucket()) // 업로드할 S3 버킷 이름
-                .key(fileName)                           // s3에 저장될 경로 + 이름
-                .contentType(contentType)                // MIME 타입
+                .bucket(awsS3Config.getS3().getBucket())          // 업로드할 S3 버킷 이름
+                .key(dto.getFilename())                           // s3에 저장될 경로 + 이름
+                .contentType(dto.getContentType())                // MIME 타입
                 .build();
 
         // Presigned URL 설정
