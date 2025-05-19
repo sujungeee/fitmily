@@ -1,5 +1,6 @@
 package com.d208.fitmily.domain.walk.service;
 
+import com.d208.fitmily.domain.AwsS3.Service.AwsS3Service;
 import com.d208.fitmily.domain.walkchallenge.service.WalkChallengeService;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 //import com.d208.fitmily.health.entity.Health;
@@ -24,15 +25,15 @@ import static java.time.Duration.between;
 @RequiredArgsConstructor
 public class WalkService {
 
+    //    private final SseService sseService;
     private final WalkMapper walkMapper;
     private final UserService userService;
     private final HealthService healthService;
     private final StringRedisTemplate redisTemplate;
     private final GpsRedisService gpsRedisService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final SseService sseService;
     private final WalkChallengeService walkChallengeService;
-
+    private final AwsS3Service awsS3Service;
 
 
     // 산책 중지
@@ -71,6 +72,9 @@ public class WalkService {
 
         //gps 데이터 삭제
         gpsRedisService.removeWalkData(userId);
+
+//        awsS3Service.generatePresignedUploadUrl(dto.get());
+
     }
 
 
