@@ -90,13 +90,21 @@ public class FamilyService {
                 throw new CustomException(ErrorCode.INVALID_INVITE_CODE);
             }
 
-            // 사용자 패밀리 ID 업데이트
-            familyMapper.updateUserFamilyId(userId, family.getFamilyId());
+            int familyId = family.getFamilyId();
+
+            // 현재 패밀리의 최대 순서 번호 조회
+            Integer maxSequence = familyMapper.findMaxFamilySequence(familyId);
+            int newSequence = (maxSequence != null && maxSequence > 0) ? maxSequence + 1 : 1;
+
+            System.out.println("새로 할당할 패밀리 순서: " + newSequence);
+
+            // 사용자의 패밀리 ID와 순서 함께 업데이트
+            familyMapper.updateUserFamilyIdAndSequence(userId, familyId, newSequence);
 
             // 패밀리 인원 수 증가
-            familyMapper.incrementFamilyPeople(family.getFamilyId());
+            familyMapper.incrementFamilyPeople(familyId);
 
-            return family.getFamilyId();
+            return familyId;
         } catch (Exception e) {
             // 예외 발생 시 스택 트레이스 출력
             System.out.println("패밀리 가입 중 오류 발생: " + e.getMessage());
