@@ -35,7 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ssafy.fitmily_android.model.dto.response.home.FamilyDashboardDto
 import com.ssafy.fitmily_android.model.dto.response.home.GoalDto
 import com.ssafy.fitmily_android.presentation.ui.main.home.HomeViewModel
-import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
