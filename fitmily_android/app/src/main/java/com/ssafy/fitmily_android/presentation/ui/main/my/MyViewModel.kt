@@ -92,15 +92,15 @@ class MyViewModel @Inject constructor(
                     val error = result.error
                     val exception = result.exception
 
-                    Log.d("test1234", "Error 발생 : ${error?.code}")
-                    Log.d("test1234", "Error 발생 : ${error?.message}")
+                    Log.d("test1234", "getMyGoalInfo Error 발생 : ${error?.code}")
+                    Log.d("test1234", "getMyGoalInfo Error 발생 : ${error?.message}")
 
-                    Log.d("test1234", "Exception 발생 : ${exception?.message}")
-                    Log.d("test1234", "Exception 발생 : ${exception?.stackTrace}")
+                    Log.d("test1234", "getMyGoalInfo Exception 발생 : ${exception?.message}")
+                    Log.d("test1234", "getMyGoalInfo Exception 발생 : ${exception?.stackTrace}")
                 }
 
                 is Result.NetworkError -> {
-                    Log.d("test1234", "Network 에러 발생")
+                    Log.d("test1234", "getMyGoalInfo Network 에러 발생")
                 }
             }
         }
