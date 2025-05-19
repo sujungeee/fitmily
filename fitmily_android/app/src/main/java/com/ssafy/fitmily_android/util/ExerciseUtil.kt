@@ -14,7 +14,7 @@ class ExerciseUtil {
             "데드리프트" to R.drawable.dead_lift,
             "풀업" to R.drawable.pull_up,
             "딥스" to R.drawable.dips,
-            "사이드 레터럴 라이즈" to R.drawable.side_lateral_raise
+            "사이드레터럴레이즈" to R.drawable.side_lateral_raise
         )
 
         return exerciseMap[name]
