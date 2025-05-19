@@ -23,12 +23,12 @@ import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 
 @Composable
 fun MyExerciseInputText(
+    selectedExercise: String?,
     onClick: () -> Unit,
     modifier: Modifier
 ) {
-
-    /* TODO 추후 UI STATE로 추출 */
-    var selectedExercise by remember { mutableStateOf<String?>(null) }
+    val displaySelectedExercise = if (selectedExercise.isNullOrBlank()) "운동을 선택해주세요."
+                                    else selectedExercise
 
     Box(
         modifier = modifier
@@ -48,8 +48,8 @@ fun MyExerciseInputText(
             }
     ) {
         Text(
-            text = selectedExercise ?: "운동을 선택해 주세요.",
-            color = if (selectedExercise == null) mainDarkGray else mainBlack,
+            text = displaySelectedExercise,
+            color = if (selectedExercise.isNullOrBlank()) mainDarkGray else mainBlack,
             style = Typography.bodyLarge,
             modifier = Modifier.align(Alignment.CenterStart)
         )

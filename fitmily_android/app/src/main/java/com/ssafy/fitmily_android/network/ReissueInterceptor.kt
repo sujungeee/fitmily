@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.network
 
+import android.util.Log
 import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.model.dto.request.auth.ReissueRequest
 import com.ssafy.fitmily_android.model.service.AuthService
@@ -20,9 +21,12 @@ class ReissueInterceptor @Inject constructor(
 
     override fun authenticate(route: Route?, response: Response): Request? {
         val authService = authServiceProvider.get()
-        val isPathReissue = response.request.url.encodedPath.contains("/reissue")
-        if (isPathReissue) {
+
+        if (response.request.url.encodedPath.contains("/reissue")) {
             runBlocking { authDataStore.setAuthExpired(true) }
+            return null
+        }
+        if (response.request.url.encodedPath.contains("/login")) {
             return null
         }
 

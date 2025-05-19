@@ -1,7 +1,7 @@
 package com.ssafy.fitmily_android.presentation.ui.auth.login
 
 data class LoginUiState(
-    val loginResult: Boolean = false
+    val loginResult: String = ""
     , val loginSideEffect: List<LoginSideEffect>? = null
 )
 

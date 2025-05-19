@@ -16,7 +16,7 @@ import com.ssafy.fitmily_android.ui.theme.mainBlack
 
 @Composable
 fun MyExerciseStatusGraph(
-    progress: Float,
+    progress: Int,
     modifier: Modifier
 ) {
     Column(

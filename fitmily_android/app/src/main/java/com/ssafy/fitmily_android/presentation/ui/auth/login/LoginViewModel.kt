@@ -59,14 +59,14 @@ class LoginViewModel @Inject constructor(
                     }
                     _loginUiState.update {
                         it.copy(
-                            loginResult = true
+                            loginResult = "SUCCESS"
                             , loginSideEffect = listOf(LoginSideEffect.NavigateToMain, LoginSideEffect.InitFCM)
                         )
                     }
                 },
                 onError = { msg ->
                     _loginUiState.update {
-                        it.copy(loginResult = false)
+                        it.copy(loginResult = "FAIL")
                     }
                     Log.e(TAG, msg)
                 }

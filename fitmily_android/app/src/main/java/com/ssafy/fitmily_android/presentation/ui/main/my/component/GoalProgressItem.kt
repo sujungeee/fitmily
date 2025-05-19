@@ -11,14 +11,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
+import com.ssafy.fitmily_android.model.dto.response.home.GoalDto
+import com.ssafy.fitmily_android.model.dto.response.my.MyGoalDto
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 
 @Composable
-fun GoalProgressItem(goal: GoalItem) {
+fun GoalProgressItem(goal: MyGoalDto) {
+
+    val unit = when(goal.exerciseGoalName) {
+
+        "산책" -> {
+            "km"
+        }
+
+        else -> {
+            "회"
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -28,17 +41,17 @@ fun GoalProgressItem(goal: GoalItem) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = goal.name,
+                text = goal.exerciseGoalName,
                 color = mainBlack,
                 style = Typography.bodyMedium
             )
             Spacer(Modifier.weight(1f))
             Text(
                 text =
-                    if(goal.unit == "km")
-                        "${goal.current} / ${goal.total} ${goal.unit}"
+                    if(unit == "km")
+                        "${goal.exerciseRecordValue} / ${goal.exerciseGoalValue} ${unit}"
                     else
-                        "${goal.current.toInt()} / ${goal.total.toInt()} ${goal.unit}",
+                        "${goal.exerciseRecordValue.toInt()} / ${goal.exerciseGoalValue.toInt()} ${unit}",
                 color = mainBlack,
                 style = Typography.bodyMedium
             )
@@ -48,7 +61,7 @@ fun GoalProgressItem(goal: GoalItem) {
 
         // 선 프로그레스바
         LinearProgressIndicator(
-            progress = (goal.current / goal.total).coerceIn(0f, 1f),
+            progress = (goal.exerciseRecordValue / goal.exerciseGoalValue).coerceIn(0f, 1f),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(6.dp),

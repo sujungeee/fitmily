@@ -14,18 +14,18 @@ class ProfileUtil {
     // 활용: painterResource(typeToProfile("horse"))
     fun typeToProfile(iconType: String): Int? {
         val map = mapOf(
-            "mouse" to R.drawable.mouse_icon
-            , "cow" to R.drawable.cow_icon
-            , "tiger" to R.drawable.tiger_icon
-            , "rabbit" to R.drawable.rabbit_icon
-            , "dragon" to R.drawable.dragon_icon
-            , "snake" to R.drawable.snake_icon
-            , "horse" to R.drawable.horse_icon
-            , "sheep" to R.drawable.sheep_icon
-            , "monkey" to R.drawable.monkey_icon
-            , "chicken" to R.drawable.chicken_icon
-            , "dog" to R.drawable.dog_icon
-            , "pig" to R.drawable.pig_icon
+            "Mouse" to R.drawable.mouse_icon
+            , "Cow" to R.drawable.cow_icon
+            , "Tiger" to R.drawable.tiger_icon
+            , "Rabbit" to R.drawable.rabbit_icon
+            , "Dragon" to R.drawable.dragon_icon
+            , "Snake" to R.drawable.snake_icon
+            , "Horse" to R.drawable.horse_icon
+            , "Sheep" to R.drawable.sheep_icon
+            , "Monkey" to R.drawable.monkey_icon
+            , "Chicken" to R.drawable.chicken_icon
+            , "Dog" to R.drawable.dog_icon
+            , "Pig" to R.drawable.pig_icon
         )
 
         return map[iconType]

@@ -73,9 +73,16 @@ fun LoginScreen(
                             inclusive = true
                         }
                     }
-                    Toast.makeText(context, "로그인이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+    }
+
+    LaunchedEffect (uiState.loginResult) {
+        if (uiState.loginResult == "SUCCESS") {
+            Toast.makeText(context, "로그인이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+        } else if (uiState.loginResult == "FAIL") {
+            Toast.makeText(context, "아이디와 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
