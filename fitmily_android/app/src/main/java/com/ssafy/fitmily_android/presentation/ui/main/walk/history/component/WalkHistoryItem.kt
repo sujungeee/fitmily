@@ -27,28 +27,28 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.model.dto.response.walk.HistoryDto
+import com.ssafy.fitmily_android.presentation.ui.main.walk.history.WalkHistoryUiState
+import com.ssafy.fitmily_android.util.ProfileUtil
 
 @Composable
 fun WalkHistoryItem(
     navController: NavHostController,
-    thumbnailRes: Int,
-    name: String,
-    time: String,
-    distance: String,
-    recordTime: String,
-    dotColor: Color
+    item: HistoryDto,
+    onClick: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 24.dp)
             .clickable {
-                navController.navigate("walk/detail")
+                onClick()
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = thumbnailRes),
+            painter = painterResource(ProfileUtil().typeToProfile(item.walkRouteImg)?: R.drawable.ic_launcher_background),
             contentDescription = "산책 썸네일",
             modifier = Modifier
                 .weight(0.8f)
@@ -61,24 +61,24 @@ fun WalkHistoryItem(
 
         Column(modifier = Modifier.weight(2f)){
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = name, style = typography.bodyLarge)
-                Text(text = recordTime, style = typography.bodySmall, color = Color.Gray)
+                Text(text = item.userNickname, style = typography.bodyLarge)
+                Text(text = item.walkStartTime, style = typography.bodySmall, color = Color.Gray)
             }
             Spacer(modifier = Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("거리", style = typography.bodySmall, color = Color.Gray)
-                    Text(distance, style = typography.bodyLarge)
+                    Text("${item.walkDistance}km", style = typography.bodyLarge)
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text("산책 시간", style = typography.bodySmall, color = Color.Gray)
-                    Text(time, style = typography.bodyLarge)
+                    Text(item.walkStartTime, style = typography.bodyLarge)
                 }
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
                         .size(12.dp)
-                        .background(color = dotColor, shape = CircleShape),
+                        .background(color = ProfileUtil().seqToColor(item.userFamilySequence), shape = CircleShape),
                 )
             }
         }
