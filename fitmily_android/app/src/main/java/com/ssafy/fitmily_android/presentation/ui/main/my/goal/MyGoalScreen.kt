@@ -25,7 +25,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.model.dto.response.my.MyGoalDto
-import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalEditDialog
 import com.ssafy.fitmily_android.presentation.ui.main.my.goal.component.MyGoalItem

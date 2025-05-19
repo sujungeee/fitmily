@@ -5,6 +5,7 @@ import com.ssafy.fitmily_android.domain.repository.ChatRepository
 import com.ssafy.fitmily_android.domain.repository.FileRepository
 import com.ssafy.fitmily_android.domain.repository.MyHealthRepository
 import com.ssafy.fitmily_android.domain.repository.HomeRepository
+import com.ssafy.fitmily_android.domain.repository.MyExerciseRepository
 import com.ssafy.fitmily_android.domain.repository.MyGoalRepository
 import com.ssafy.fitmily_android.domain.repository.NotificationRepository
 import com.ssafy.fitmily_android.domain.repository.S3Repository
@@ -14,6 +15,7 @@ import com.ssafy.fitmily_android.model.repositoryimpl.AuthRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.ChatRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.FileRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.HomeRepositoryImpl
+import com.ssafy.fitmily_android.model.repositoryimpl.MyExerciseRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.MyGoalRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.WalkRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.MyHealthRepositoryImpl
@@ -91,4 +93,10 @@ abstract class RepositoryModule {
     abstract fun provideFileRepository(
         fileRepositoryImpl: FileRepositoryImpl
     ): FileRepository
+
+    @Singleton
+    @Binds
+    abstract fun providesMyExerciseRepository(
+        myExerciseRepositoryImpl: MyExerciseRepositoryImpl
+    ): MyExerciseRepository
 }

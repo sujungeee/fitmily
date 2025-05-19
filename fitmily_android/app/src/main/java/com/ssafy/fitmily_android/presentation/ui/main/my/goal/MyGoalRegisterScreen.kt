@@ -141,6 +141,7 @@ fun MyGoalRegisterScreen(
         }
 
         MyExerciseSelectBottomSheet(
+            mode = 0,
             selectedExercise = selectedExercise,
             onItemSelected = { exercise ->
                 selectedExercise = exercise

@@ -4,6 +4,7 @@ import com.ssafy.fitmily_android.model.service.AuthService
 import com.ssafy.fitmily_android.model.service.ChatService
 import com.ssafy.fitmily_android.model.service.FileService
 import com.ssafy.fitmily_android.model.service.HomeService
+import com.ssafy.fitmily_android.model.service.MyExerciseService
 import com.ssafy.fitmily_android.model.service.MyGoalService
 import com.ssafy.fitmily_android.model.service.MyHealthService
 import com.ssafy.fitmily_android.model.service.NotificationService
@@ -158,6 +159,12 @@ object NetworkModule {
     @Provides
     fun provideFileService(@MainRetrofit retrofit: Retrofit): FileService {
         return retrofit.create(FileService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideMyExerciseService(@MainRetrofit retrofit: Retrofit): MyExerciseService {
+        return retrofit.create(MyExerciseService::class.java)
     }
 
     @Singleton
