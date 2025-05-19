@@ -14,10 +14,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.time.Duration.between;
 
 
 @Service
@@ -34,17 +36,26 @@ public class WalkService {
     private final WalkChallengeService walkChallengeService;
 
 
-    // 산책 중지 (칼로리 계산에서 막힘 일단 패스 )
+
+    // 산책 중지
     @Transactional
     public void endWalk(Integer userId, EndWalkRequestDto dto){
-        User user = userService.getUserById(userId);
+//        User user = userService.getUserById(userId);
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
-        float weight = health.getWeight();
-//        long walkTime = between(dto.getStartTime(), dto.getEndTime()).toMinutes();
+        float weight = Optional.ofNullable(health.getWeight()).orElse(66.0f);
+        Instant startTime = dto.getStartTime().toInstant();
+        Instant endTime = dto.getEndTime().toInstant();
 
-        final double MET_WALKING = 3.5;
-        double caloriesBurned = MET_WALKING * weight * (MET_WALKING / 60.0); // kcal
+        long walkingTime = Duration.between(startTime, endTime).toMinutes();
+
+        // 칼로리계산식 = MET × 체중(kg) × 운동시간(hr)
+        // MET = 운동강도 (3.5가 평균)
+        final float  MET = 3.5f;
+        float walkHours = walkingTime / 60.0f;
+        float floatWalkCalories = MET * weight * walkHours;
+
+        int walkCalories = Math.round(floatWalkCalories);
 
         StopWalkDto stopWalkDto = StopWalkDto.builder()
                 .userId(userId)
@@ -52,14 +63,20 @@ public class WalkService {
                 .startTime(dto.getStartTime())
                 .endTime(dto.getEndTime())
                 .distance(dto.getDistance())
-                .calories((float) caloriesBurned)
+                .calories(walkCalories)
                 .build();
 
         walkMapper.insertStopWalk(stopWalkDto);
 
         // 산책 챌린지 거리 업데이트
         walkChallengeService.updateChallengeDistance(stopWalkDto);
+
+        //gps 데이터 삭제
+        gpsRedisService.removeWalkData(userId);
     }
+
+
+
 
     // 산책 기록 조회
     public List<WalkResponseDto> findWalks(Integer userId, LocalDateTime start, LocalDateTime end) {
@@ -71,57 +88,80 @@ public class WalkService {
         return walkMapper.selectWalks(params);
     }
 
+
+
     // 산책 목표 여부 조회
     public Boolean walkGoalExists(Integer userId){
         return walkMapper.walkGoalExists(userId);
     }
 
+
+
+
     // 산책 시작했을때
     public void processGps(Integer userId, GpsDto gpsDto){
-
+    System.out.println("서비스 들어옴");
         boolean isFirst = !redisTemplate.hasKey("walk:gps:" + userId); //키가 없으면, 산책 시작
         gpsRedisService.saveGps(userId, gpsDto); //gps redis에 저장
 
-        if (isFirst){
-            UserDto user = userService.getUserDtoById(userId);
-
-            Integer familyId = user.getFamilyId();
-
-            WalkStartDto data = WalkStartDto.builder()
-                    .userId(user.getUserId())
-                    .userNickname(user.getUserNickname())
-                    .userZodiacName(user.getUserZodiacName())
-                    .build();
-
-            //sse 전송
-            sseService.sendFamilyWalkingEvent(familyId, data);
-        }
+//        if (isFirst){
+//            UserDto user = userService.getUserDtoById(userId);
+//
+//            Integer familyId = user.getFamilyId();
+//
+//            WalkStartDto data = WalkStartDto.builder()
+//                    .userId(user.getUserId())
+//                    .userNickname(user.getUserNickname())
+//                    .userZodiacName(user.getUserZodiacName())
+//                    .build();
+//
+//            //sse 전송
+////            sseService.sendFamilyWalkingEvent(familyId, data);
+//        }
 
         // 데이터 전송
         String topic = "/topic/walk/gps/" + userId;
         messagingTemplate.convertAndSend(topic, gpsDto);
+        System.out.println("topic"+ gpsDto.getLat());
+        System.out.println("데이터 발송완료");
     }
 
+
     // 산책중인 가족 구성원 조회
-//    public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
-//
-//        // familyId로 가족 구성원의 userId 다 리스트로 가져옴
-//        List<Integer> userIds = familyService.getUserIdsByFamilyId(familyId);
-//        List<UserDto> result = new ArrayList<>();
-//
-//        for (Integer userId : userIds) {
-//            if (redisTemplate.hasKey("walk:gps:" + userId)) {
-//                result.add(UserDto.builder()
-//                        .userId(user.getUserId())
-////                        .name(user.getName())
-////                        .profileImg(user.getProfileImg())
-//                        .build());
-//            }
-//        }
-//        return result;
-//            }
-//        }
-}
+    public List<UserDto> getWalkingFamilyMembers(Integer familyId) {
+
+        // familyId로 가족 구성원의 userId 다 리스트로 가져옴
+        List<Integer> userIds = userService.getUserIdsByFamilyId(familyId);
+        System.out.println(userIds);
+
+        if (userIds == null || userIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> walkingUserIds = new ArrayList<>();
+        for (Integer userId : userIds) {
+            if (redisTemplate.hasKey("walk:gps:" + userId)) {
+                walkingUserIds.add(userId);
+            }
+        }
+        //산책중인 userId로 이름,가족가입순서, 띠 정보 가져옴
+        List<User> walkingUsers = userService.getUsersByIds(walkingUserIds);
+
+
+        List<UserDto> result = new ArrayList<>();
+        for (User user : walkingUsers) {
+            result.add(UserDto.builder()
+                    .userId(user.getUserId())
+                    .userNickname(user.getUserNickname())
+                    .userFamilySequence(user.getUserFamilySequence())
+                    .userZodiacName(user.getUserZodiacName())
+                    .build());
+        }
+        return result;
+
+            }
+        }
+
 
 
 
