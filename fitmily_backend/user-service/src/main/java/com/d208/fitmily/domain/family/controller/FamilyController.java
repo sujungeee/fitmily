@@ -56,13 +56,14 @@ public class FamilyController {
     public ResponseEntity<FamilyDetailResponse> getFamily(@PathVariable int familyId) {
         Family family = familyService.getFamily(familyId);
 
-        FamilyDetailResponse.FamilyData familyData = new FamilyDetailResponse.FamilyData(
-                family.getFamilyName(),
-                family.getFamilyInviteCode(),
-                family.getFamilyPeople()  // 패밀리 인원 수 추가
-        );
+        // 내부 클래스를 사용하지 않고 직접 응답 객체 생성
+        FamilyDetailResponse response = FamilyDetailResponse.builder()
+                .familyName(family.getFamilyName())
+                .familyInviteCode(family.getFamilyInviteCode())
+                .familyPeople(family.getFamilyPeople())
+                .build();
 
-        return ResponseEntity.ok(new FamilyDetailResponse(familyData));
+        return ResponseEntity.ok(response);
     }
 
 
@@ -83,6 +84,24 @@ public class FamilyController {
     @GetMapping("/{familyId}/health-status")
     public ResponseEntity<FamilyHealthStatusResponse> getFamilyHealthStatus(@PathVariable int familyId) {
         FamilyHealthStatusResponse response = familyService.getFamilyHealthStatus(familyId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{familyId}/calendar")
+    public ResponseEntity<FamilyCalendarResponse> getFamilyCalendar(
+            @PathVariable int familyId,
+            @RequestParam int year,
+            @RequestParam String month) {
+
+        FamilyCalendarResponse response = familyService.getFamilyCalendar(familyId, year, month);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{familyId}/daily")
+    public ResponseEntity<FamilyDailyExerciseResponse> getFamilyDailyExercise(
+            @PathVariable int familyId,
+            @RequestParam String date) {
+        FamilyDailyExerciseResponse response = familyService.getFamilyDailyExercise(familyId, date);
         return ResponseEntity.ok(response);
     }
 

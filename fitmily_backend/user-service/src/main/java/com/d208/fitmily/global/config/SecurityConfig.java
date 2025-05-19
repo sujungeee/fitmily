@@ -109,6 +109,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/reissue").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
                         .requestMatchers("/api/users/check-id").permitAll()
+//                        .requestMatchers("/api/family/**").hasRole("USER")
+                        .requestMatchers("/api/family/**").permitAll()
 
                         // swagger 설정
                         .requestMatchers( "/swagger-ui/**").permitAll()
@@ -120,6 +122,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/ws-connect/**").permitAll()
                         .requestMatchers("/chat-test.html").permitAll()
                         .requestMatchers("/.well-known/**").permitAll()
+
+                        .requestMatchers("/api/ws-connect/**").permitAll()
 
                         .requestMatchers( "/*").permitAll()
 

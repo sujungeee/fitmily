@@ -14,9 +14,9 @@ public interface WalkMapper {
     // 1. 산책 중지 시 데이터 저장
     @Insert("""
         INSERT INTO walk (
-            user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_calories
+            user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_calories,walk_created_at,walk_updated_at
         ) VALUES (
-            #{userId}, #{routeImg}, #{startTime}, #{endTime}, #{distance}, #{calories}
+            #{userId}, #{routeImg}, #{startTime}, #{endTime}, #{distance}, #{calories},NOW(),NOW()
         )
         """)
     @Options(useGeneratedKeys = true, keyProperty = "walkId")
