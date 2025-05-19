@@ -55,12 +55,18 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.ui.theme.secondaryBlue
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 private const val TAG = "WalkScreen"
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun WalkScreen(
-    navController: NavHostController
+    navController: NavHostController,
+
 )  {
 
     val context = LocalContext.current
@@ -72,15 +78,39 @@ fun WalkScreen(
     var path = remember { mutableStateOf(listOf<LatLng>()) }
 
     val locationSource = rememberFusedLocationSource()
-
+    val elapsedTime = remember { mutableStateOf(0L) }
+    val totalDistance = remember { mutableStateOf(0.0) }
     LaunchedEffect(WalkLiveData.gpsList.value) {
         Log.d(TAG, "WalkScreen: ${WalkLiveData.gpsList.value}")
         WalkLiveData.gpsList.value?.let { list ->
             path.value = list.map {
                 LatLng(it.lat, it.lon)
             }
+            totalDistance.value = calculateTotalDistance(path.value)
         }
     }
+
+    LaunchedEffect(WalkLiveData.isServiceRunning) {
+        isWalking.value = WalkLiveData.isServiceRunning.value
+    }
+
+    LaunchedEffect(isWalking.value) {
+        if (isWalking.value) {
+            while (true) {
+                val now = System.currentTimeMillis()
+                val started = WalkLiveData.startedTime // Long 값 (ms)
+
+                if (started != 0L) {
+                    elapsedTime.value = (now - started) / 1000L // 초 단위
+                }
+
+                kotlinx.coroutines.delay(1000L)
+            }
+        } else {
+            elapsedTime.value = 0L
+        }
+    }
+
     var tmp = GpsDto(
         0.0,
         0.0,
@@ -88,11 +118,11 @@ fun WalkScreen(
     )
     WalkLiveData.gpsList.observeForever(
         { list ->
-            Log.d(TAG, "WalkScreen: $list")
-            path.value = list.map {
-                LatLng(it.lat, it.lon)
+            if (list.isNotEmpty()) {
+                path.value = list.map {
+                    LatLng(it.lat, it.lon)
+                }
             }
-            tmp = GpsDto(list.last().lat, list.last().lon, System.currentTimeMillis().toString())
         }
     )
 
@@ -132,7 +162,7 @@ fun WalkScreen(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("${tmp.lat}", style = typography.titleMedium)
+                Text("${String.format("%.2f m", totalDistance.value)}", style = typography.titleMedium)
                 Text("거리", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -141,19 +171,12 @@ fun WalkScreen(
                     .height(50.dp)
                     .background(mainGray)
             )
+            val minutes = elapsedTime.value / 60
+            val seconds = elapsedTime.value % 60
+
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("${tmp.lon}", style = typography.titleMedium)
+                Text(String.format("%02d:%02d", minutes, seconds), style = typography.titleMedium)
                 Text("시간", style = typography.bodyMedium, color = Color.Gray)
-            }
-            Spacer(
-                modifier = Modifier
-                    .width(1.dp)
-                    .height(60.dp)
-                    .background(mainGray)
-            )
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("90", style = typography.titleMedium)
-                Text("페이스", style = typography.bodyMedium, color = Color.Gray)
             }
         }
             }
@@ -197,7 +220,7 @@ fun WalkScreen(
                         },
                         selected = if(index==watching.value) true else false,
                         label = {
-                            ProfileItem(typography.bodySmall)
+                            ProfileItem(typography.bodySmall, 1, "상태", "mouse",)
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = mainWhite,
@@ -265,6 +288,29 @@ fun WalkScreen(
         )
     }
 }
+
+fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    val R = 6371000.0 // 지구 반지름 (단위: m)
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLon = Math.toRadians(lon2 - lon1)
+    val a = sin(dLat / 2).pow(2) +
+            cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+            sin(dLon / 2).pow(2)
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c // 결과 단위: m
+}
+
+fun calculateTotalDistance(path: List<LatLng>): Double {
+    var totalDistance = 0.0
+    for (i in 0 until path.size - 1) {
+        totalDistance += calculateDistance(
+            path[i].latitude, path[i].longitude,
+            path[i + 1].latitude, path[i + 1].longitude
+        )
+    }
+    return totalDistance // 단위: m
+}
+
 
 
 @Composable

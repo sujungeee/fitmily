@@ -7,22 +7,31 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.MainActivity
 import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData.isServiceRunning
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
-
+private const val TAG = "WalkLiveService"
 class WalkLiveService: Service() {
     private lateinit var walkLiveWorker: WalkLiveWorker
     val channelId = "walk_live_service_channel"
-
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        val application = MainApplication.getInstance().getDataStore()
+
 
         try {
             startForeground(
@@ -34,12 +43,21 @@ class WalkLiveService: Service() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        // Todo 웹소켓 시작
-        if(!WebSocketManager.isConnected) {
-            WebSocketManager.connectStomp()
+
+        serviceScope.launch {
+
+            WebSocketManager.TOKEN = application.getAccessToken()
+            WalkLiveData.userId = application.getUserId()
+
+            WalkLiveData.startedTime = System.currentTimeMillis()
+            Log.d(TAG, "onStartCommand: ${WebSocketManager.TOKEN}")
+            if(!WebSocketManager.isConnected) {
+                WebSocketManager.connectStomp()
+            }
+
+
         }
-
-
+        // Todo 웹소켓 시작
 
         // WalkLiveWorker를 시작, stompClient 보내서 send 할 수 있게끔
         walkLiveWorker = WalkLiveWorker(this)

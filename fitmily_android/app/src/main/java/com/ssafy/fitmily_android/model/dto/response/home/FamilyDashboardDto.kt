@@ -4,5 +4,7 @@ data class FamilyDashboardDto(
     val goalDtos: List<GoalDto>,
     val totalProgressRate: Int,
     val userId: Int,
-    val userNickname: String
+    val userNickname: String,
+    val userZodiacName: String,
+    val userFamilySequence: Int,
 )

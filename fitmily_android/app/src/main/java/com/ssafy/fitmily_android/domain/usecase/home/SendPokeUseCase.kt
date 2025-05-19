@@ -7,7 +7,7 @@ import javax.inject.Inject
 class SendPokeUseCase @Inject constructor(
     private val homeRepository: HomeRepository
 ) {
-    suspend operator fun invoke(userId: Int): Result<Any> {
+    suspend operator fun invoke(userId: Int): Result<Unit> {
         return homeRepository.sendPoke(userId)
     }
 }

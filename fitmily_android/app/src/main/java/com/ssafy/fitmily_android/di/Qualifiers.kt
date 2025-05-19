@@ -9,3 +9,8 @@ annotation class MainRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class WeatherRetrofit
+
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class S3Retrofit

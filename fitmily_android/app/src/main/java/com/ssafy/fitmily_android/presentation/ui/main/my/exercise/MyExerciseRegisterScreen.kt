@@ -15,14 +15,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyButton
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyExerciseSelectBottomSheet
@@ -36,14 +37,27 @@ import com.ssafy.fitmily_android.ui.theme.backGroundGray
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyExerciseRegisterScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    myExerciseRegisterViewModel: MyExerciseRegisterViewModel = hiltViewModel()
 ) {
 
-    /* TODO 추후 UI STATE로 추출 */
-    var selectedExercise by remember { mutableStateOf<String?>("런지") }
+    val myExerciseRegisterUiState by myExerciseRegisterViewModel.myExerciseRegisterUiState.collectAsState()
+
+    var selectedExercise by remember { mutableStateOf<String?>(null) }
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
+    val inputValue = myExerciseRegisterUiState.exerciseValueInput
+    val inputTime = myExerciseRegisterUiState.exerciseTimeInput
+
+    LaunchedEffect(myExerciseRegisterUiState.myExerciseSideEffect) {
+        when (myExerciseRegisterUiState.myExerciseSideEffect) {
+            is MyExerciseSideEffect.NavigateToMy -> {
+                navController.popBackStack()
+                myExerciseRegisterViewModel.consumeSideEffect()
+            }
+            null -> Unit
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -70,7 +84,7 @@ fun MyExerciseRegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(80.dp))
                 MyExerciseImage(
-                    exerciseName = "산책",
+                    exerciseName = myExerciseRegisterUiState.exerciseName,
                     modifier = Modifier.padding(horizontal = 28.dp)
                 )
             }
@@ -80,19 +94,23 @@ fun MyExerciseRegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(80.dp))
                 MyExerciseInputText(
+                    selectedExercise = myExerciseRegisterUiState.exerciseName,
                     onClick = {
                         showBottomSheet = true
-                        Log.d("test1234", "운동 선택 클릭됌")
                     },
                     modifier = Modifier.padding(horizontal = 28.dp)
                 )
             }
 
-            // 운동 목표 영역
+            // 운동 값 영역
             item {
                 Spacer(modifier = Modifier.height(32.dp))
                 MyExerciseValueInputText(
-                    modifier = Modifier.padding(horizontal = 28.dp)
+                    modifier = Modifier.padding(horizontal = 28.dp),
+                    onValueChange = { newValue ->
+                        myExerciseRegisterViewModel.updateExerciseValue(newValue)
+                    },
+                    value = inputValue
                 )
             }
 
@@ -100,7 +118,11 @@ fun MyExerciseRegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(32.dp))
                 MyExerciseTimeInputText(
-                    modifier = Modifier.padding(horizontal = 28.dp)
+                    modifier = Modifier.padding(horizontal = 28.dp),
+                    onValueChange = { newValue ->
+                        myExerciseRegisterViewModel.updateExerciseTime(newValue)
+                    },
+                    value = inputTime
                 )
                 Spacer(modifier = Modifier.height(80.dp))
             }
@@ -109,8 +131,7 @@ fun MyExerciseRegisterScreen(
         MyButton(
             text = "기록하기",
             onClick = {
-                /* TODO 운동 기록 하기 로직 */
-                navController.popBackStack()
+                myExerciseRegisterViewModel.insertMyExerciseInfo()
             },
             modifier = Modifier
                 .padding(bottom = 24.dp)
@@ -130,9 +151,11 @@ fun MyExerciseRegisterScreen(
         }
 
         MyExerciseSelectBottomSheet(
+            mode = 1,
             selectedExercise = selectedExercise,
-            onItemSelected = { selectedExercise ->
-                /*  TODO 선택된 운동 처리 */
+            onItemSelected = { exercise ->
+                selectedExercise = exercise
+                myExerciseRegisterViewModel.updateExerciseName(exercise)
                 showBottomSheet = false
             },
             onDismiss = { showBottomSheet = false },
