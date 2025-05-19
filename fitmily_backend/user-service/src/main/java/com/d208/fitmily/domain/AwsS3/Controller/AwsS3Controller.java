@@ -1,14 +1,12 @@
 package com.d208.fitmily.domain.AwsS3.Controller;
 
+import com.d208.fitmily.domain.AwsS3.Dto.uploadUrlRequestDto;
 import com.d208.fitmily.domain.AwsS3.Service.AwsS3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,10 +23,9 @@ public class AwsS3Controller {
     @Operation(summary = "업로드용 Presigned URL 발급")
     @GetMapping("/upload-url")
     public ResponseEntity<Map<String, Object>> getPresignedUploadUrl(
-            @RequestParam String filename,
-            @RequestParam String contenttype
+            @RequestBody uploadUrlRequestDto dto
     ) {
-        String presignedUrl = awsS3Service.generatePresignedUploadUrl(filename, contenttype);
+        String presignedUrl = awsS3Service.generatePresignedUploadUrl(dto);
         Map<String, Object> response = new HashMap<>();
         response.put("data", presignedUrl);
 
