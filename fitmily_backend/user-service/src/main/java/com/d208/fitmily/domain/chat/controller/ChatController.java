@@ -37,18 +37,18 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "안 읽은 메시지 수 조회", description = "특정 가족 채팅방의 안 읽은 메시지 수를 조회합니다.")
-    @GetMapping("/family/{familyId}/unread")
-    public ResponseEntity<Integer> getUnreadCount(
-            @PathVariable String familyId,
-            Authentication authentication) {
-
-        String userId = extractUserId(authentication);
-        log.debug("안 읽은 메시지 수 조회 요청 - familyId: {}, userId: {}", familyId, userId);
-
-        int unreadCount = chatService.getUnreadCount(familyId, userId);
-        return ResponseEntity.ok(unreadCount);
-    }
+//    @Operation(summary = "안 읽은 메시지 수 조회", description = "특정 가족 채팅방의 안 읽은 메시지 수를 조회합니다.")
+//    @GetMapping("/family/{familyId}/unread")
+//    public ResponseEntity<Integer> getUnreadCount(
+//            @PathVariable String familyId,
+//            Authentication authentication) {
+//
+//        String userId = extractUserId(authentication);
+//        log.debug("안 읽은 메시지 수 조회 요청 - familyId: {}, userId: {}", familyId, userId);
+//
+//        int unreadCount = chatService.getUnreadCount(familyId, userId);
+//        return ResponseEntity.ok(unreadCount);
+//    }
 
     // 사용자 ID 추출 메서드
     private String extractUserId(Authentication authentication) {
