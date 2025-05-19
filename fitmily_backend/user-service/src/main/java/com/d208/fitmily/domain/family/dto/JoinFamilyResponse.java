@@ -1,6 +1,7 @@
 package com.d208.fitmily.domain.family.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,14 +10,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class JoinFamilyResponse {
-    private FamilyData data;
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class FamilyData {
-        private int familyId;
-    }
+    // data 래퍼 제거하고 직접 필드 노출
+    private int familyId;
 }
