@@ -13,18 +13,31 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.main.home.profile.component.FamilyProfileItem
+import com.ssafy.fitmily_android.presentation.ui.main.home.profile.component.FamilyProfileViewModel
 
 @Composable
-fun FamilyProfileScreen(navController: NavHostController) {
+fun FamilyProfileScreen(navController: NavHostController, familyId:Int,
+                        familyProfileViewModel: FamilyProfileViewModel = hiltViewModel()
+) {
+    val familyProfileUiState by familyProfileViewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit){
+        familyProfileViewModel.getFamilyHealth(familyId)
+    }
+
     Column(
         modifier = Modifier
             .padding(
@@ -53,8 +66,8 @@ fun FamilyProfileScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.size(10.dp))
         }
         LazyColumn(Modifier.padding(top = 32.dp, start = 28.dp, end = 28.dp)) {
-            items(3) { index ->
-                FamilyProfileItem()
+            items(familyProfileUiState.familyHealthListData.familyHealthDto.size) { index ->
+                FamilyProfileItem(familyProfileUiState.familyHealthListData.familyHealthDto[index])
             }
         }
     }
@@ -70,5 +83,5 @@ fun FamilyProfileScreen(navController: NavHostController) {
 @Composable
 @Preview(showSystemUi = true)
 fun FamilyProfileScreenPreview() {
-    FamilyProfileScreen(rememberNavController())
+    FamilyProfileScreen(rememberNavController(),1)
 }
