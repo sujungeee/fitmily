@@ -24,9 +24,9 @@ public class AwsS3Service {
 
     public String generatePresignedUploadUrl(String fileName, String contentType) {
         try {
+
             S3Presigner presigner = awsS3Config.s3Presigner();
             if (presigner == null) {
-                log.error("S3Presigner가 초기화되지 않았습니다");
                 return null;
             }
 
@@ -56,7 +56,6 @@ public class AwsS3Service {
         if (fileName == null || fileName.isBlank()) {
             return null;
         }
-
         try {
             S3Presigner presigner = awsS3Config.s3Presigner();
             if (presigner == null) {

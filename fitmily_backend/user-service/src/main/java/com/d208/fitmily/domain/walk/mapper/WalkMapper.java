@@ -26,7 +26,7 @@ public interface WalkMapper {
     @Select("""
         <script>
         SELECT
-            w.walk_id, w.user_id, u.user_nickname,u.user_zodiac_name, u.user_family_sequence, u.family_id
+            w.walk_id, w.user_id, u.user_nickname,u.user_zodiac_name, u.user_family_sequence, u.family_id,
             w.walk_route_img, w.walk_start_time, w.walk_end_time,
             w.walk_distance, w.walk_calories
         FROM walk w
