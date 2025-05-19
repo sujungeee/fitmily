@@ -35,17 +35,30 @@ public class SecurityConfig {
 
     public static int getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
             throw new RuntimeException("인증 정보가 없습니다.");
         }
 
         Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails) {
-            return Integer.parseInt(((UserDetails) principal).getUsername());
+        try {
+            if (principal instanceof UserDetails) {
+                String username = ((UserDetails) principal).getUsername();
+                if (username != null && !username.isEmpty()) {
+                    return Integer.parseInt(username);
+                }
+            } else if (principal != null) {
+                String principalStr = principal.toString();
+                if (principalStr != null && !principalStr.isEmpty()) {
+                    return Integer.parseInt(principalStr);
+                }
+            }
+            throw new RuntimeException("사용자 ID를 찾을 수 없습니다.");
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("사용자 ID 형식이 올바르지 않습니다: " + principal);
         }
-
-        return Integer.parseInt(principal.toString());
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -65,7 +78,7 @@ public class SecurityConfig {
         configuration.addAllowedOriginPattern("*"); // 모든 origin 허용 (운영환경에선 도메인 제한 필요) http://k12d208.p.ssafy.io
         configuration.addAllowedMethod("*");        // GET, POST, PUT, DELETE 등 모두 허용
         configuration.addAllowedHeader("*");        // 모든 헤더 허용
-        configuration.setAllowCredentials(false);    // 쿠키, 인증정보 포함 여부 (필요에 따라 true/false)
+        configuration.setAllowCredentials(true);    // 쿠키, 인증정보 포함 여부 (필요에 따라 true/false)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -103,7 +116,7 @@ public class SecurityConfig {
                         .requestMatchers( "/api-docs/**").permitAll()
                         .requestMatchers( "/swagger-ui.html").permitAll()
 //
-                         //chat-test.html 허용 코드 3가지
+                        //chat-test.html 허용 코드 3가지
                         .requestMatchers("/api/ws-connect/**").permitAll()
                         .requestMatchers("/chat-test.html").permitAll()
                         .requestMatchers("/.well-known/**").permitAll()

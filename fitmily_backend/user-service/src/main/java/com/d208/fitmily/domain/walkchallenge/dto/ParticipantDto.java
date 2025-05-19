@@ -9,7 +9,8 @@ import lombok.*;
 public class ParticipantDto {
     private Integer userId;
     private String nickname;
-    private String profileColor;
+    private Integer familySequence;
+    private String zodiacName;
     private Float distanceCompleted;
     private Integer rank;
 }
