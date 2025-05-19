@@ -56,17 +56,17 @@ public interface FamilyMapper {
     @Select("SELECT * FROM user WHERE family_id = #{familyId}")
     @Results(id = "userMap", value = {
             @Result(property = "userId", column = "user_id"),
-            @Result(property = "loginId", column = "login_id"),
-            @Result(property = "password", column = "password"),
-            @Result(property = "nickname", column = "nickname"),
-            @Result(property = "birth", column = "birth"),
-            @Result(property = "gender", column = "gender"),
+            @Result(property = "loginId", column = "user_login_id"),
+            @Result(property = "password", column = "user_pw"),
+            @Result(property = "nickname", column = "user_nickname"),
+            @Result(property = "birth", column = "user_birth"),
+            @Result(property = "gender", column = "user_gender"),
             @Result(property = "familyId", column = "family_id"),
-            @Result(property = "role", column = "role"),
-            @Result(property = "zodiacName", column = "zodiac_name"),
-            @Result(property = "familySequence", column = "user_family_sequence"), // userFamilySequence → familySequence
-            @Result(property = "createdAt", column = "created_at"),
-            @Result(property = "updatedAt", column = "updated_at")
+            @Result(property = "role", column = "user_role"),
+            @Result(property = "zodiacName", column = "user_zodiac_name"),
+            @Result(property = "familySequence", column = "user_family_sequence"),
+            @Result(property = "createdAt", column = "user_created_at"),
+            @Result(property = "updatedAt", column = "user_updated_at")
     })
     List<User> findFamilyMembers(@Param("familyId") int familyId);
 
