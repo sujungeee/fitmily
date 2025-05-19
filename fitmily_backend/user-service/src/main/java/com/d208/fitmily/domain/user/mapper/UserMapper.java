@@ -83,7 +83,7 @@ public interface UserMapper {
 
     @Select("""
         <script>
-        SELECT user_id, user_nickname, user_zodiac_name, user_family_sequence
+        SELECT user_id, user_nickname, user_zodiac_name, user_family_sequence,family_id
         FROM user
         WHERE user_id IN
         <foreach collection='userIds' item='id' open='(' separator=',' close=')'>
