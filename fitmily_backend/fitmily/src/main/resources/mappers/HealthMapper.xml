@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.d208.fitmily.domain.health.mapper.HealthMapper">
+
+    <insert id="insertHealth"
+            parameterType="com.d208.fitmily.domain.health.dto.AddHealthRequestDto"
+            useGeneratedKeys="true"
+            keyProperty="healthId">
+        INSERT INTO health(
+        user_id, health_bmi, health_height, health_weight, health_other_diseases, health_five_major_diseases)
+        VALUES(
+        #{userId}, #{bmi}, #{height}, #{weight}, #{otherDiseases}, #{fiveMajorDiseases})
+    </insert>
+
+    <select id="selectLatestByUserId"
+            parameterType="int"
+            resultType="com.d208.fitmily.domain.health.dto.HealthResponseDto">
+        SELECT
+        health_id AS healthId,
+        health_bmi AS bmi,
+        health_height AS height,
+        health_weight AS weight,
+        health_other_diseases AS otherDiseases,
+        health_five_major_diseases AS fiveMajorDiseases,
+        health_created_at AS createdAt,
+        health_updated_at AS updatedAt
+        FROM health
+        WHERE user_id = #{userId}
+        ORDER BY health_created_at DESC
+        LIMIT 1
+    </select>
+
+    <update id="updateHealth" parameterType="com.d208.fitmily.domain.health.dto.UpdateHealthResponseDto">
+        UPDATE health
+        SET
+        health_bmi = #{bmi},
+        health_height = #{height},
+        health_weight = #{weight},
+        health_other_diseases = #{otherDiseases},
+        health_five_major_diseases = #{fiveMajorDiseases}
+        WHERE user_id = #{userId}
+    </update>
+
+
+
+
+</mapper>
