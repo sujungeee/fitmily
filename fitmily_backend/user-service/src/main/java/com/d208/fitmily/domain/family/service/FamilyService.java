@@ -233,21 +233,34 @@ public class FamilyService {
             // 사용자의 최신 건강 정보 조회
             HealthResponseDto healthInfo = healthMapper.selectLatestByUserId(member.getUserId());
 
-            if (healthInfo == null) continue;
+            // 기본값 초기화 (float 타입으로 변경)
+            float height = 0.0f;
+            float weight = 0.0f;
+            float bmi = 0.0f;
+            List<String> fiveMajorDiseases = Collections.emptyList();
+            List<String> otherDiseases = Collections.emptyList();
 
-            // JSON 문자열을 리스트로 변환 - 표준 getter 사용
-            List<String> fiveMajorDiseases = parseJsonList(healthInfo.getFiveMajorDiseases());
-            List<String> otherDiseases = parseJsonList(healthInfo.getOtherDiseases());
+            // 건강 정보가 있으면 실제 값 사용
+            if (healthInfo != null) {
+                // 실제 값이 있는 경우에만 기본값 대신 사용 (float로 변환)
+                height = healthInfo.getHeight() != null ? healthInfo.getHeight().floatValue() : height;
+                weight = healthInfo.getWeight() != null ? healthInfo.getWeight().floatValue() : weight;
+                bmi = healthInfo.getBmi() != null ? healthInfo.getBmi().floatValue() : bmi;
 
+                // JSON 문자열을 리스트로 변환
+                fiveMajorDiseases = parseJsonList(healthInfo.getFiveMajorDiseases());
+                otherDiseases = parseJsonList(healthInfo.getOtherDiseases());
+            }
+
+            // 모든 구성원에 대해 응답 객체 생성
             FamilyHealthStatusResponse.MemberHealthInfo memberHealthInfo = FamilyHealthStatusResponse.MemberHealthInfo.builder()
                     .userId(member.getUserId())
                     .userNickname(member.getUserNickname())
                     .userBirth(member.getUserBirth())
                     .userGender(member.getUserGender())
-                    // 표준 getter 사용
-                    .healthHeight(healthInfo.getHeight())
-                    .healthWeight(healthInfo.getWeight())
-                    .healthBmi(healthInfo.getBmi())
+                    .healthHeight(height)
+                    .healthWeight(weight)
+                    .healthBmi(bmi)
                     .healthFiveMajorDiseases(fiveMajorDiseases)
                     .healthOtherDiseases(otherDiseases)
                     .build();
@@ -260,6 +273,7 @@ public class FamilyService {
                 .members(memberHealthInfoList)
                 .build();
     }
+
 
     /**
      * JSON 문자열을 List<String>으로 변환
