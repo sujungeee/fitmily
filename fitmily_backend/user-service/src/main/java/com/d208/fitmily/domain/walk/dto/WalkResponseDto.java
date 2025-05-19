@@ -17,7 +17,6 @@ public class WalkResponseDto {
     private LocalDateTime endTime;
     private Float distance;
     private Integer calories;
-
     private String nickname;
     private String zodiacName;
 
