@@ -130,7 +130,7 @@ public class WalkService {
 
         // familyId로 가족 구성원의 userId 다 리스트로 가져와서
         List<Integer> userIds = userService.getUserIdsByFamilyId(familyId);
-        System.out.println(userIds);
+        System.out.println("패밀리 구성원 : " + userIds);
 
         // userId가 없다면 return
         if (userIds == null || userIds.isEmpty()) {
@@ -144,6 +144,7 @@ public class WalkService {
                 walkingUserIds.add(userId);
             }
         }
+        System.out.println("산책한 구성원 : " + walkingUserIds);
 
         // 운동중인 사용자 배열이 비었다면 return
         if (walkingUserIds.isEmpty()) {
@@ -153,17 +154,19 @@ public class WalkService {
         //산책중인 userId로 이름,가족가입순서, 띠 정보 가져옴
         List<User> walkingUsers = userService.getUsersByIds(walkingUserIds);
 
-
         List<UserDto> result = new ArrayList<>();
         for (User user : walkingUsers) {
+            System.out.println("산책중인 사람들" + user.getUserId()+ user.getFamilySequence()+ user.getNickname()+user.getFamilyId());
             if (user == null) continue;
             result.add(UserDto.builder()
                     .userId(user.getUserId())
                     .userNickname(user.getUserNickname())
                     .userFamilySequence(user.getUserFamilySequence())
                     .userZodiacName(user.getUserZodiacName())
+                    .familyId(user.getFamilyId())
                     .build());
         }
+
         return result;
             }
         }

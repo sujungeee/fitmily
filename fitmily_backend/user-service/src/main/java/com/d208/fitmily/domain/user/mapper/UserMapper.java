@@ -83,7 +83,7 @@ public interface UserMapper {
 
     @Select("""
         <script>
-        SELECT user_nickname, user_zodiac_name, user_family_sequence
+        SELECT user_id, user_nickname, user_zodiac_name, user_family_sequence,family_id
         FROM user
         WHERE user_id IN
         <foreach collection='userIds' item='id' open='(' separator=',' close=')'>
@@ -91,6 +91,14 @@ public interface UserMapper {
         </foreach>
         </script>
     """)
+    @Results({
+            @Result(column = "user_id", property = "userId"),
+            @Result(column = "user_nickname", property = "nickname"),
+            @Result(column = "user_zodiac_name", property = "zodiacName"),
+            @Result(column = "user_family_sequence", property = "familySequence"),
+            @Result(column = "family_id", property = "familyId")
+
+    })
     List<User> getUsersByIds(@Param("userIds") List<Integer> userIds);
 
 }

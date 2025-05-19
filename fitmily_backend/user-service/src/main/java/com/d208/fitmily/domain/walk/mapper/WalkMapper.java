@@ -26,7 +26,7 @@ public interface WalkMapper {
     @Select("""
         <script>
         SELECT
-            w.walk_id, w.user_id, u.user_nickname,u.user_zodiac_name,
+            w.walk_id, w.user_id, u.user_nickname,u.user_zodiac_name, u.user_family_sequence, u.family_id,
             w.walk_route_img, w.walk_start_time, w.walk_end_time,
             w.walk_distance, w.walk_calories
         FROM walk w
@@ -54,7 +54,8 @@ public interface WalkMapper {
             @Result(column = "walk_distance", property = "distance"),
             @Result(column = "walk_calories", property = "calories"),
             @Result(column = "user_zodiac_name", property = "zodiacName"),
-            @Result(column = "user_nickname", property = "nickname")
+            @Result(column = "user_nickname", property = "nickname"),
+            @Result(column = "user_family_sequence", property = "userFamilySequence")
     })
     List<WalkResponseDto> selectWalks(Map<String, Object> params);
 
