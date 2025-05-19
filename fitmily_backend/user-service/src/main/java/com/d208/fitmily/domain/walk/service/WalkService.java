@@ -154,7 +154,6 @@ public class WalkService {
         //산책중인 userId로 이름,가족가입순서, 띠 정보 가져옴
         List<User> walkingUsers = userService.getUsersByIds(walkingUserIds);
 
-
         List<UserDto> result = new ArrayList<>();
         for (User user : walkingUsers) {
             System.out.println("산책중인 사람들" + user.getUserId()+ user.getFamilySequence()+ user.getNickname()+user.getFamilyId());
