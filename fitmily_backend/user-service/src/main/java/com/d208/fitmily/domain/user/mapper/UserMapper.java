@@ -4,6 +4,8 @@ import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.domain.walk.dto.UserDto;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
 
@@ -75,20 +77,20 @@ public interface UserMapper {
         """)
     UserDto getUserDtoById(@Param("userId") Integer userId);
 
-    // 9) 사용자 ID로 사용자 정보 조회
+    // 9) 패밀리 id로 userId 조회
+    @Select("SELECT user_id FROM user WHERE family_id = #{familyId}")
+    List<Integer> getUserIdsByFamilyId(@Param("familyId") Integer familyId);
+
     @Select("""
-        SELECT 
-            user_id as userId,
-            family_id as familyId,
-            user_login_id as userLoginId,
-            user_nickname as userNickname,
-            user_birth as userBirth,
-            user_gender as userGender,
-            user_zodiac_name as userZodiacName,
-            user_family_sequence as userFamilySequence,
-            user_role as userRole
+        <script>
+        SELECT user_nickname, user_zodiac_name, user_family_sequence
         FROM user
-        WHERE user_id = #{userId}
-        """)
-    User findUserById(@Param("userId") int userId);
+        WHERE user_id IN
+        <foreach collection='userIds' item='id' open='(' separator=',' close=')'>
+            #{id}
+        </foreach>
+        </script>
+    """)
+    List<User> getUsersByIds(@Param("userIds") List<Integer> userIds);
+
 }

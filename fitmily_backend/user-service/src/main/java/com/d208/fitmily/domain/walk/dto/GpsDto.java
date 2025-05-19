@@ -8,6 +8,7 @@ import lombok.Setter;
 // gps로 저장할 데이터
 
 public class GpsDto {
+    private Integer userId;
     private Double lat;
     private Double lon;
     private Long timestamp;

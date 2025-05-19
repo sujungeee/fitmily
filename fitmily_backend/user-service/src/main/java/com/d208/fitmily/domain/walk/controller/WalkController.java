@@ -5,6 +5,7 @@ package com.d208.fitmily.domain.walk.controller;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import com.d208.fitmily.domain.walk.dto.EndWalkRequestDto;
 import com.d208.fitmily.domain.walk.dto.GpsDto;
+import com.d208.fitmily.domain.walk.dto.UserDto;
 import com.d208.fitmily.domain.walk.dto.WalkResponseDto;
 import com.d208.fitmily.domain.walk.service.GpsRedisService;
 import com.d208.fitmily.domain.walk.service.SseService;
@@ -43,16 +44,18 @@ public class WalkController {
     private final GpsRedisService gpsRedisService;
     private final SseService sseService;
 
-    @MessageMapping("/walk/gps")
-    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
-        if (principal != null) {
-            Integer userId = Integer.parseInt(principal.getName());
-            System.out.println("✅ [Controller] userId = " + userId);
-            walkService.processGps(userId, gpsDto);
-        } else {
-            System.out.println("❌ [Controller] 인증 실패: Principal 없음");
-        }
-    }
+//    @MessageMapping("/walk/gps")
+//    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
+//        System.out.println("🔍 Principal = " + principal);
+//
+//        if (principal != null) {
+//            String userIdStr = principal.getName(); // StompPrincipal의 name 필드
+//            Integer userId = Integer.parseInt(userIdStr);
+//            walkService.processGps(userId, gpsDto);
+//        } else {
+//            System.out.println("❌ [Controller] 인증 실패: Principal 없음");
+//        }
+//    }
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")
@@ -94,11 +97,11 @@ public class WalkController {
         return sseService.connectFamilyEmitter(familyId);
     }
 
-//    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
-//    @GetMapping("/api/family/{familyId}/walking-members")
-//    public ApiResponse<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
-//        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
-//        return ApiResponse.ok(walkingUsers, "산책중인 가족인원 조회완료");
-//    }
+    @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
+    @GetMapping("/api/family/{familyId}/walking-members")
+    public ResponseEntity<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
+        List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
+        return ResponseEntity.ok(walkingUsers);
+    }
 }
 

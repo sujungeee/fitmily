@@ -46,4 +46,6 @@ public class HealthController {
         healthService.updateHealth(principal.getId(), dto);
         return ResponseEntity.ok(null);
     }
+
+
 }
