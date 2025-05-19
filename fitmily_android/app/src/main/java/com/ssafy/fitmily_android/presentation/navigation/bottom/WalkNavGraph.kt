@@ -4,6 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.google.gson.Gson
+import com.ssafy.fitmily_android.model.dto.response.walk.HistoryDto
 import com.ssafy.fitmily_android.presentation.ui.main.walk.history.WalkHistoryScreen
 import com.ssafy.fitmily_android.presentation.ui.main.walk.WalkScreen
 import com.ssafy.fitmily_android.presentation.ui.main.walk.history.WalkHistoryDetailScreen
@@ -20,8 +22,12 @@ fun NavGraphBuilder.walkNavGraph(navController: NavHostController) {
         composable("walk/history") {
             WalkHistoryScreen(navController)
         }
-        composable("walk/detail") {
-            WalkHistoryDetailScreen(navController)
+
+        composable("walk/detail/{historyJson}") { backStackEntry ->
+            val historyJson = backStackEntry.arguments?.getString("userJson")
+            val history = Gson().fromJson(historyJson, HistoryDto::class.java)
+            WalkHistoryDetailScreen(navController, history)
         }
+
     }
 }
