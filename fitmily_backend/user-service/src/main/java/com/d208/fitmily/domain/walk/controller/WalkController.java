@@ -44,16 +44,18 @@ public class WalkController {
     private final GpsRedisService gpsRedisService;
     private final SseService sseService;
 
-    @MessageMapping("/walk/gps")
-    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
-        if (principal != null) {
-            Integer userId = Integer.parseInt(principal.getName());
-            System.out.println("✅ [Controller] userId = " + userId);
-            walkService.processGps(userId, gpsDto);
-        } else {
-            System.out.println("❌ [Controller] 인증 실패: Principal 없음");
-        }
-    }
+//    @MessageMapping("/walk/gps")
+//    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
+//        System.out.println("🔍 Principal = " + principal);
+//
+//        if (principal != null) {
+//            String userIdStr = principal.getName(); // StompPrincipal의 name 필드
+//            Integer userId = Integer.parseInt(userIdStr);
+//            walkService.processGps(userId, gpsDto);
+//        } else {
+//            System.out.println("❌ [Controller] 인증 실패: Principal 없음");
+//        }
+//    }
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")

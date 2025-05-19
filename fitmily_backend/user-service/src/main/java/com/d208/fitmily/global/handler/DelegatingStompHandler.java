@@ -17,21 +17,21 @@ public class DelegatingStompHandler implements ChannelInterceptor {
 
     private final WalkStompHandler walkStompHandler;
 
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        StompCommand command = accessor.getCommand();
-
-        // ✅ CONNECT 시만 WalkStompHandler로 위임
-        if (StompCommand.CONNECT.equals(command)) {
-            return walkStompHandler.handle(message, channel);
-        }
-
-        // ✅ 인증 정보가 있으면 SecurityContext에 반영 (SEND/SUBSCRIBE 시)
-        if (accessor.getUser() instanceof Authentication auth) {
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-        return message;
-    }
+//    @Override
+//    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+//        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+//        StompCommand command = accessor.getCommand();
+//
+//        // ✅ CONNECT 시만 WalkStompHandler로 위임
+//        if (StompCommand.CONNECT.equals(command)) {
+//            return walkStompHandler.handle(message, channel);
+//        }
+//
+//        // ✅ 인증 정보가 있으면 SecurityContext에 반영 (SEND/SUBSCRIBE 시)
+//        if (accessor.getUser() instanceof Authentication auth) {
+//            SecurityContextHolder.getContext().setAuthentication(auth);
+//        }
+//
+//        return message;
+//    }
 }

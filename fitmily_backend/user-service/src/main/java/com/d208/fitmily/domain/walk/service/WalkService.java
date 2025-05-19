@@ -100,28 +100,30 @@ public class WalkService {
 
     // 산책 시작했을때
     public void processGps(Integer userId, GpsDto gpsDto){
-
+    System.out.println("서비스 들어옴");
         boolean isFirst = !redisTemplate.hasKey("walk:gps:" + userId); //키가 없으면, 산책 시작
         gpsRedisService.saveGps(userId, gpsDto); //gps redis에 저장
 
-        if (isFirst){
-            UserDto user = userService.getUserDtoById(userId);
-
-            Integer familyId = user.getFamilyId();
-
-            WalkStartDto data = WalkStartDto.builder()
-                    .userId(user.getUserId())
-                    .userNickname(user.getUserNickname())
-                    .userZodiacName(user.getUserZodiacName())
-                    .build();
-
-            //sse 전송
-            sseService.sendFamilyWalkingEvent(familyId, data);
-        }
+//        if (isFirst){
+//            UserDto user = userService.getUserDtoById(userId);
+//
+//            Integer familyId = user.getFamilyId();
+//
+//            WalkStartDto data = WalkStartDto.builder()
+//                    .userId(user.getUserId())
+//                    .userNickname(user.getUserNickname())
+//                    .userZodiacName(user.getUserZodiacName())
+//                    .build();
+//
+//            //sse 전송
+////            sseService.sendFamilyWalkingEvent(familyId, data);
+//        }
 
         // 데이터 전송
         String topic = "/topic/walk/gps/" + userId;
         messagingTemplate.convertAndSend(topic, gpsDto);
+        System.out.println("topic"+ gpsDto.getLat());
+        System.out.println("데이터 발송완료");
     }
 
 

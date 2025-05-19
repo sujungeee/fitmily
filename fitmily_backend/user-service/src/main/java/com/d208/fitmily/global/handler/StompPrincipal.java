@@ -5,13 +5,20 @@ import lombok.RequiredArgsConstructor;
 import java.security.Principal;
 
 
-@RequiredArgsConstructor
-public class StompPrincipal implements Principal {  //Principal은 "현재 인증된 사용자 누구냐?
+import java.io.Serializable;
+import java.security.Principal;
 
-    private final String name; // userId를 문자열로 저장
+public class StompPrincipal implements Principal, Serializable {
+
+    private static final long serialVersionUID = 1L;
+    private final String name;
+
+    public StompPrincipal(String name) {
+        this.name = name;
+    }
 
     @Override
-    public String getName() { // Principal는 이 메서드 하나뿐임
-        return name;     // Principal.getName() → userId
+    public String getName() {
+        return name;
     }
 }

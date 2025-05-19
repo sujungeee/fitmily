@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
-@ConfigurationProperties(prefix = "spring.cloud.aws")
+@ConfigurationProperties(prefix = "cloud.aws")
 @Getter
 @Setter
 public class AwsS3Config {
