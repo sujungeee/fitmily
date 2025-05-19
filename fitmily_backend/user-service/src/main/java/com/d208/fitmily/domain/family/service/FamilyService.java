@@ -290,8 +290,29 @@ public class FamilyService {
             while (!currentDate.isAfter(endDate)) {
                 String dateString = currentDate.format(DateTimeFormatter.ISO_DATE);
 
-                // 해당 날짜에 사용자의 운동 목표 달성 여부 확인
-                boolean isCompleted = checkDailyExerciseCompletion(member.getUserId(), dateString);
+                // 해당 날짜에 완료한 운동이 있는지 확인
+                boolean isCompleted = false;
+
+                try {
+                    // 운동 데이터 조회 시 NullPointerException 방지
+                    List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), dateString);
+
+                    if (exercises != null && !exercises.isEmpty()) {
+                        // 각 운동에 대해 목표 달성 여부 확인
+                        int completedExercises = 0;
+
+                        for (Exercise exercise : exercises) {
+                            if (exercise != null && exercise.getExerciseCount() > 0) {
+                                completedExercises++;
+                            }
+                        }
+
+                        isCompleted = completedExercises > 0 && completedExercises == exercises.size();
+                    }
+                } catch (Exception e) {
+                    // 오류 로그만 남기고 계속 진행
+                    System.out.println("운동 데이터 조회 중 오류: " + e.getMessage());
+                }
 
                 if (isCompleted) {
                     calendarEntries.add(FamilyCalendarResponse.CalendarEntry.builder()
