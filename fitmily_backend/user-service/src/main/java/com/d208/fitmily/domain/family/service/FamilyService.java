@@ -2,6 +2,7 @@ package com.d208.fitmily.domain.family.service;
 
 import com.d208.fitmily.domain.exercise.entity.Exercise;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
+import com.d208.fitmily.domain.family.dto.FamilyCalendarResponse;
 import com.d208.fitmily.domain.family.dto.FamilyDashboardResponse;
 import com.d208.fitmily.domain.family.dto.FamilyHealthStatusResponse;
 import com.d208.fitmily.domain.family.entity.Family;
@@ -27,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 @Slf4j
 @Service
@@ -252,6 +256,108 @@ public class FamilyService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public FamilyCalendarResponse getFamilyCalendar(int familyId, int year, String month) {
+        // 패밀리 존재 확인
+        Family family = familyMapper.findById(familyId);
+        if (family == null) {
+            throw new CustomException(ErrorCode.FAMILY_NOT_FOUND);
+        }
+
+        // 패밀리 구성원 목록 조회
+        List<User> familyMembers = familyMapper.findFamilyMembers(familyId);
+
+        // 멤버 정보 생성
+        List<FamilyCalendarResponse.MemberInfo> memberInfoList = familyMembers.stream()
+                .map(member -> FamilyCalendarResponse.MemberInfo.builder()
+                        .userId(member.getUserId())
+                        .userName(member.getUserNickname())
+                        .userFamilysequence(member.getUserFamilySequence())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 월의 첫날과 마지막날 계산
+        LocalDate startDate = LocalDate.of(year, Integer.parseInt(month), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        // 목표 달성한 날짜 및 사용자 조회
+        List<FamilyCalendarResponse.CalendarEntry> calendarEntries = new ArrayList<>();
+
+        // 각 사용자별, 날짜별로 목표 달성 여부 확인
+        for (User member : familyMembers) {
+            LocalDate currentDate = startDate;
+
+            while (!currentDate.isAfter(endDate)) {
+                String dateString = currentDate.format(DateTimeFormatter.ISO_DATE);
+
+                // 해당 날짜에 사용자의 운동 목표 달성 여부 확인
+                boolean isCompleted = checkDailyExerciseCompletion(member.getUserId(), dateString);
+
+                if (isCompleted) {
+                    calendarEntries.add(FamilyCalendarResponse.CalendarEntry.builder()
+                            .userId(member.getUserId())
+                            .date(dateString)
+                            .userNickname(member.getUserNickname())
+                            .userFamilySequence(member.getUserFamilySequence())
+                            .build());
+                }
+
+                currentDate = currentDate.plusDays(1);
+            }
+        }
+
+        return FamilyCalendarResponse.builder()
+                .members(memberInfoList)
+                .calendar(calendarEntries)
+                .build();
+    }
+
+    // 사용자의 특정 날짜 운동 완료 여부 확인 (기존 Exercise 클래스 활용)
+    private boolean checkDailyExerciseCompletion(int userId, String date) {
+        // 사용자의 해당 일자 운동 기록 조회
+        List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(userId, date);
+
+        if (exercises.isEmpty()) {
+            return false;  // 운동 기록이 없으면 달성 실패
+        }
+
+        // 각 운동별로 목표 달성 여부 확인
+        int completedExercises = 0;
+
+        for (Exercise exercise : exercises) {
+            // 운동 종류별 목표치 설정 (실제로는 DB에서 가져오거나 설정에 따라 결정)
+            int targetCount = getExerciseTarget(exercise.getExerciseName());
+
+            // 목표 달성 여부 확인
+            if (exercise.getExerciseCount() >= targetCount) {
+                completedExercises++;
+            }
+        }
+
+        // 모든 운동이 목표를 달성했는지 확인
+        return completedExercises == exercises.size() && !exercises.isEmpty();
+    }
+
+    // 운동 종류별 목표치 설정 (임시 하드코딩, 실제로는 DB에서 가져오는 것이 좋음)
+    private int getExerciseTarget(String exerciseName) {
+        switch (exerciseName.toLowerCase()) {
+            case "스쿼트":
+                return 20;
+            case "팔굽혀펴기":
+                return 15;
+            case "윗몸일으키기":
+                return 25;
+            case "달리기":
+            case "조깅":
+                return 30;  // 시간(분) 기준일 수 있음
+            default:
+                return 10;  // 기본값
+        }
+    }
+
+
+
+    //
     /**
      * 채팅방 초기화 - 시스템 메시지 전송
      */
