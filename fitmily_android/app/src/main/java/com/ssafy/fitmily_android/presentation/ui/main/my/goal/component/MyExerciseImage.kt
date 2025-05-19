@@ -21,16 +21,15 @@ fun MyExerciseImage(
 ) {
 
     val exerciseMap = mapOf(
-        "런지" to R.drawable.sample_walk,
-        "벤치프레스" to R.drawable.sample_walk,
-        "푸시업" to R.drawable.sample_walk,
-        "스쿼트" to R.drawable.sample_walk,
-        "버피테스트" to R.drawable.sample_walk,
-        "데드리프트" to R.drawable.sample_walk,
-        "풀업" to R.drawable.sample_walk,
-        "딥스" to R.drawable.sample_walk,
-        "사이드 레터럴 라이즈" to R.drawable.sample_walk,
-        "산책" to R.drawable.sample_walk
+        "런지" to R.drawable.lunge,
+        "벤치프레스" to R.drawable.bench_press,
+        "푸시업" to R.drawable.push_up,
+        "스쿼트" to R.drawable.squat,
+        "버피테스트" to R.drawable.burpee_test,
+        "데드리프트" to R.drawable.dead_lift,
+        "풀업" to R.drawable.pull_up,
+        "딥스" to R.drawable.dips,
+        "사이드 레터럴 라이즈" to R.drawable.side_lateral_raise
     )
 
     val imageResId = exerciseMap[exerciseName] ?: R.drawable.sample_walk
