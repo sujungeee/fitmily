@@ -57,7 +57,6 @@ public class WalkStompHandler implements ChannelInterceptor {
             System.out.println("userId: " +userId);
 
             // 🔑 커스텀 Principal 생성
-            accessor.setUser(new StompPrincipal(userId.toString()));
             System.out.println("생성완료");
             accessor.setLeaveMutable(true); // 안전하게 유지// 🔥 이거 안 하면 setUser 무시됨
             System.out.println(accessor.getId());
