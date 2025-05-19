@@ -56,6 +56,7 @@ fun MyScreen(
         Log.d("test1234", "userNickname : $userNickname")
         Log.d("test1234", "userZodiacName : $userZodiacName")
         myViewMdodel.getMyGoalInfo()
+        myViewMdodel.getMyExerciseInfo()
     }
 
     LaunchedEffect(uiState.mySideEffect) {
@@ -72,6 +73,10 @@ fun MyScreen(
                         }
                     }
                     Toast.makeText(context, "로그아웃이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+
+                is MySideEffect.NavigateToWalk -> {
+                    /* TODO 산책 Detail로 가기 */
                 }
             }
         }
@@ -162,8 +167,8 @@ fun MyScreen(
         item {
             Spacer(Modifier.height(32.dp))
             MyTodayExerciseHistory(
-                totalExerciseCalorie = 6300,
-                histories = histories,
+                totalExerciseCalorie = uiState.myExerciseTotalCalorie,
+                histories = uiState.myExerciseInfo?.exercise ?: emptyList(),
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
         }
@@ -176,14 +181,6 @@ fun MyScreen(
         }
     }
 }
-
-
-data class GoalItem(
-    val name: String,
-    val current: Float,
-    val total: Float,
-    val unit: String
-)
 
 data class AchievementDay(
     val day: String,
