@@ -86,4 +86,15 @@ public class FamilyController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{familyId}/calendar")
+    public ResponseEntity<FamilyCalendarResponse> getFamilyCalendar(
+            @PathVariable int familyId,
+            @RequestParam int year,
+            @RequestParam String month) {
+
+        FamilyCalendarResponse response = familyService.getFamilyCalendar(familyId, year, month);
+        return ResponseEntity.ok(response);
+    }
+
+
 }
