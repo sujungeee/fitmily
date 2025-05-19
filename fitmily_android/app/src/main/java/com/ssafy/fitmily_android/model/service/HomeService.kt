@@ -36,7 +36,7 @@ interface HomeService {
         @Query("date") today: String?
     ): Response<FamilyTodayResponse>
 
-    @GET("family/{familyId}//health-status")
+    @GET("family/{familyId}/health-status")
     suspend fun getFamilyHealth(
         @Path("familyId") familyId: Int,
     ): Response<FamilyHealthResponse>
@@ -48,6 +48,6 @@ interface HomeService {
     @POST("poke")
     suspend fun sendPoke(
         @Query("userId") userId: Int
-    ): Response<Any>
+    ): Response<Unit>
 
 }

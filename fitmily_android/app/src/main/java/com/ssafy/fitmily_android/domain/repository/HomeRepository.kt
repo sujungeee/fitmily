@@ -23,5 +23,5 @@ interface HomeRepository {
 
     suspend fun getChallenge(): Result<ChallengeResponse>
 
-    suspend fun sendPoke(userId: Int): Result<Any>
+    suspend fun sendPoke(userId: Int): Result<Unit>
 }
