@@ -52,6 +52,22 @@ public interface FamilyMapper {
     Family findById(@Param("familyId") int familyId);
 
     /**
+     * 패밀리의 최대 순서 번호 조회
+     */
+    @Select("SELECT MAX(user_family_sequence) FROM user WHERE family_id = #{familyId}")
+    Integer findMaxFamilySequence(@Param("familyId") int familyId);
+
+    /**
+     * 사용자의 패밀리 ID와 순서를 함께 업데이트
+     */
+    @Update("UPDATE user SET family_id = #{familyId}, user_family_sequence = #{sequence} WHERE user_id = #{userId}")
+    void updateUserFamilyIdAndSequence(
+            @Param("userId") int userId,
+            @Param("familyId") int familyId,
+            @Param("sequence") int sequence
+    );
+
+    /**
      * 패밀리 구성원 목록 조회
      */
     @Select("SELECT * FROM user WHERE family_id = #{familyId}")
@@ -89,7 +105,6 @@ public interface FamilyMapper {
         @Select("SELECT COALESCE(SUM(exercise_calories), 0) FROM exercise WHERE user_id = #{userId} AND DATE(exercise_created_at) = #{date}")
         int calculateUserTotalCalories(@Param("userId") int userId, @Param("date") String date);
     }
-
 
 
 
