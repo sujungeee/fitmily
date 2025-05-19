@@ -96,5 +96,12 @@ public class FamilyController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{familyId}/daily")
+    public ResponseEntity<FamilyDailyExerciseResponse> getFamilyDailyExercise(
+            @PathVariable int familyId,
+            @RequestParam String date) {
+        FamilyDailyExerciseResponse response = familyService.getFamilyDailyExercise(familyId, date);
+        return ResponseEntity.ok(response);
+    }
 
 }

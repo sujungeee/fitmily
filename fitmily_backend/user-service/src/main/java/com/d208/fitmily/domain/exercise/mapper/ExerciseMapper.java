@@ -85,5 +85,8 @@ public interface ExerciseMapper {
     List<ExerciseRecordResponseDto> findTodayExerciseRecords(Integer userId);
 
 
+    //
+    @Select("SELECT route_image FROM walk WHERE exercise_id = #{exerciseId}")
+    String findRouteImageByExerciseId(@Param("exerciseId") int exerciseId);
 
 }
