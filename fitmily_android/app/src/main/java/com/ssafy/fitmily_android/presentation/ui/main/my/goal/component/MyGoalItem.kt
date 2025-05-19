@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Surface
 import com.ssafy.fitmily_android.model.dto.response.my.MyGoalDto
-import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainWhite
