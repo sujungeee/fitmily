@@ -15,6 +15,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,12 +31,14 @@ import com.ssafy.fitmily_android.ui.theme.mainWhite
 @Composable
 fun FamilyDialog(
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
+    onConfirmation: (String) -> Unit,
     dialogState: DialogState = DialogState.NONE
 ) {
     var dialogTitle = ""
     var dialogContent = ""
     var confirmationText = "확인"
+
+    val textField = remember { mutableStateOf("") }
 
     when (dialogState) {
         DialogState.JOIN -> {
@@ -73,8 +77,10 @@ fun FamilyDialog(
                     modifier = Modifier.padding(16.dp),
                 )
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = textField.value,
+                    onValueChange = {
+                        textField.value = it
+                    },
                     placeholder = {
                         Text(
                             dialogContent,
@@ -104,7 +110,7 @@ fun FamilyDialog(
                         )
                     }
                     TextButton(
-                        onClick = { onConfirmation() },
+                        onClick = { onConfirmation(textField.value) },
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .weight(1f)
