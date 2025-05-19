@@ -22,9 +22,9 @@ public class AwsS3Service {
 
     private final AwsS3Config awsS3Config;
 
-    public String generatePresignedUploadUrl(String fileName, String contentType) {
+    // 업로드용
+    public String generatePresignedUploadUrl(UploadUrlRequestDto dto) {
         try {
-
             S3Presigner presigner = awsS3Config.s3Presigner();
             if (presigner == null) {
                 return null;
@@ -33,8 +33,8 @@ public class AwsS3Service {
             // 어떤 객체를 올릴지 정의
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(awsS3Config.getBucket()) // getBucket() 메서드 사용
-                    .key(fileName)
-                    .contentType(contentType)
+                    .key(dto.getFilename())
+                    .contentType(dto.getContentType())
                     .build();
 
             // Presigned URL 설정
@@ -52,6 +52,7 @@ public class AwsS3Service {
         }
     }
 
+    // 조회ro다운로드용
     public String generatePresignedDownloadUrl(String fileName) {
         if (fileName == null || fileName.isBlank()) {
             return null;
@@ -82,13 +83,5 @@ public class AwsS3Service {
             log.error("다운로드 URL 생성 실패: {}", e.getMessage());
             return null;
         }
-    }
-
-    public String generatePresignedUploadUrl(UploadUrlRequestDto dto) {
-        if (dto == null) {
-            log.error("UploadUrlRequestDto is null");
-            return null;
-        }
-        return generatePresignedUploadUrl(dto.getFilename(), dto.getContenttype());
     }
 }
