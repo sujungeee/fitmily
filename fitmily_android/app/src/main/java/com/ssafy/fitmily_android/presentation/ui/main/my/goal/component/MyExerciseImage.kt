@@ -23,7 +23,7 @@ fun MyExerciseImage(
     val exerciseMap = mapOf(
         "런지" to R.drawable.lunge,
         "벤치프레스" to R.drawable.bench_press,
-        "푸시업" to R.drawable.push_up,
+        "푸쉬업" to R.drawable.push_up,
         "스쿼트" to R.drawable.squat,
         "버피테스트" to R.drawable.burpee_test,
         "데드리프트" to R.drawable.dead_lift,
