@@ -32,8 +32,6 @@ class MyHealthViewModel @Inject constructor(
                 )
             }
 
-            Log.d("test1234", "url : ")
-
             when(val result = myHealthGetInfoUseCase()) {
 
                 is Result.Success -> {

@@ -15,7 +15,7 @@ import com.ssafy.fitmily_android.ui.theme.mainGray
 
 @Composable
 fun MyExerciseProgress(
-    percent: Float,
+    percent: Int,
 ) {
     val size = 120.dp
     Box(
@@ -30,7 +30,7 @@ fun MyExerciseProgress(
             modifier = Modifier.size(size)
         )
         Text(
-            text = "${percent.toInt()}%",
+            text = "${percent}%",
             style = Typography.bodyLarge,
             color = mainBlack
         )

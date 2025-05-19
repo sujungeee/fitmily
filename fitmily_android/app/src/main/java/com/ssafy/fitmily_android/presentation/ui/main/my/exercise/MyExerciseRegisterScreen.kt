@@ -40,7 +40,7 @@ fun MyExerciseRegisterScreen(
 ) {
 
     /* TODO 추후 UI STATE로 추출 */
-    var selectedExercise by remember { mutableStateOf<String?>("런지") }
+    var selectedExercise by remember { mutableStateOf<String?>(null) }
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -80,6 +80,7 @@ fun MyExerciseRegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(80.dp))
                 MyExerciseInputText(
+                    selectedExercise = selectedExercise,
                     onClick = {
                         showBottomSheet = true
                         Log.d("test1234", "운동 선택 클릭됌")
@@ -88,11 +89,15 @@ fun MyExerciseRegisterScreen(
                 )
             }
 
-            // 운동 목표 영역
+            // 운동 값 영역
             item {
                 Spacer(modifier = Modifier.height(32.dp))
                 MyExerciseValueInputText(
-                    modifier = Modifier.padding(horizontal = 28.dp)
+                    modifier = Modifier.padding(horizontal = 28.dp),
+                    onValueChange = { newValue ->
+                        /* TODO 값 등록 */
+                    },
+                    value = ""
                 )
             }
 
@@ -131,8 +136,8 @@ fun MyExerciseRegisterScreen(
 
         MyExerciseSelectBottomSheet(
             selectedExercise = selectedExercise,
-            onItemSelected = { selectedExercise ->
-                /*  TODO 선택된 운동 처리 */
+            onItemSelected = { exercise ->
+                selectedExercise = exercise
                 showBottomSheet = false
             },
             onDismiss = { showBottomSheet = false },
