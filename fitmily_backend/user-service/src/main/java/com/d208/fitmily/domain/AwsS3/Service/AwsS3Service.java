@@ -73,7 +73,6 @@ public class AwsS3Service {
 
     public String generatePresignedUploadUrl(UploadUrlRequestDto dto) {
         if (dto == null) {
-            log.error("UploadUrlRequestDto is null");
             return null;
         }
         return generatePresignedUploadUrl(dto.getFilename(), dto.getContenttype());
