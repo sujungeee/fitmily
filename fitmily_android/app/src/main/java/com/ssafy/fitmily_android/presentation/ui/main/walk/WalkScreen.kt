@@ -1,6 +1,7 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,12 +40,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.compose.CameraPositionState
 import com.naver.maps.map.compose.ExperimentalNaverMapApi
 import com.naver.maps.map.compose.LocationTrackingMode
 import com.naver.maps.map.compose.MapProperties
 import com.naver.maps.map.compose.MapUiSettings
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.PathOverlay
+import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.compose.rememberFusedLocationSource
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
@@ -55,6 +60,7 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.ui.theme.secondaryBlue
+import com.ssafy.fitmily_android.util.LocationUtil
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -71,13 +77,14 @@ fun WalkScreen(
 
     val context = LocalContext.current
 
+
+
     var isWalking = remember { mutableStateOf(false) }
     var isDialogOpen = remember { mutableStateOf(false) }
     var watching = remember { mutableStateOf(0) }
 
     var path = remember { mutableStateOf(listOf<LatLng>()) }
 
-    val locationSource = rememberFusedLocationSource()
     val elapsedTime = remember { mutableStateOf(0L) }
     val totalDistance = remember { mutableStateOf(0.0) }
     LaunchedEffect(WalkLiveData.gpsList.value) {
@@ -111,11 +118,18 @@ fun WalkScreen(
         }
     }
 
-    var tmp = GpsDto(
-        0.0,
-        0.0,
-        System.currentTimeMillis().toString(),
-    )
+
+    val cameraPositionState: CameraPositionState = rememberCameraPositionState {
+        LocationUtil().getLastLocation(context,
+            onLocationReceived = { lat, lon ->
+                position = CameraPosition(LatLng(lat, lon), 15.0)
+            },
+            onFailure = {
+                Log.d(TAG, "WalkScreen: 실패")
+            }
+        )
+    }
+
     WalkLiveData.gpsList.observeForever(
         { list ->
             if (list.isNotEmpty()) {
@@ -188,7 +202,7 @@ fun WalkScreen(
             NaverMap(
                 modifier = Modifier
                     .fillMaxSize(),
-                locationSource = locationSource,
+                locationSource = rememberFusedLocationSource(),
                 properties = MapProperties(
                     locationTrackingMode = LocationTrackingMode.Follow,
                 ),
@@ -196,6 +210,13 @@ fun WalkScreen(
                     isLocationButtonEnabled = true,
                     isZoomControlEnabled = false,
                 ),
+                cameraPositionState = cameraPositionState,
+                onMapClick= { _, it ->
+                    cameraPositionState.move(
+                        CameraUpdate.scrollTo(LatLng(it.latitude, it.longitude))
+                    )
+                },
+
             ){
                 if (path.value.size>2) {
                     PathOverlay(
@@ -210,7 +231,7 @@ fun WalkScreen(
                     .fillMaxWidth(0.5f),
                 horizontalAlignment = Alignment.End
             ) {
-                items(5) { index ->
+                items(1) { index ->
                     FilterChip(
                         modifier = Modifier
                             .padding(4.dp)
@@ -220,7 +241,7 @@ fun WalkScreen(
                         },
                         selected = if(index==watching.value) true else false,
                         label = {
-                            ProfileItem(typography.bodySmall, 1, "상태", "mouse",)
+                            ProfileItem(typography.bodySmall, 1, "내 산책", "mouse",)
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = mainWhite,
@@ -232,48 +253,87 @@ fun WalkScreen(
 
             }
 
-        }
+            Row(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom) {
+                Button(
+                    onClick = {
+                        if(isWalking.value){
+                            isDialogOpen.value = true
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = {
-                    if(isWalking.value){
-                        isDialogOpen.value = true
-
-                        //foregroundService 종료
+                            //foregroundService 종료
+                        }else {
+                            isWalking.value = !isWalking.value
+                            //foregroundService 시작
+                            WalkLiveData.startWalkLiveService(context)
+                        }},
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
+                    contentPadding = PaddingValues(0.dp),
+                    modifier = Modifier.size(80.dp)
+                ) {
+                    if (!isWalking.value) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.walk_start_icon), // 정지 아이콘
+                            contentDescription = "정지",
+                            tint = Color.White,
+                            modifier = Modifier.size(70.dp),
+                        )
                     }else {
-                        isWalking.value = !isWalking.value
-                        //foregroundService 시작
-                        WalkLiveData.startWalkLiveService(context)
-                    }},
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
-                contentPadding = PaddingValues(0.dp),
-                modifier = Modifier.size(80.dp)
-            ) {
-                if (!isWalking.value) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.walk_start_icon), // 정지 아이콘
-                        contentDescription = "정지",
-                        tint = Color.White,
-                        modifier = Modifier.size(70.dp),
-                    )
-                }else {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(mainWhite)
-                            .wrapContentSize(Alignment.Center)
-                    )
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(mainWhite)
+                                .wrapContentSize(Alignment.Center)
+                        )
+                    }
                 }
             }
 
         }
+
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(vertical = 16.dp),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Button(
+//                onClick = {
+//                    if(isWalking.value){
+//                        isDialogOpen.value = true
+//
+//                        //foregroundService 종료
+//                    }else {
+//                        isWalking.value = !isWalking.value
+//                        //foregroundService 시작
+//                        WalkLiveData.startWalkLiveService(context)
+//                    }},
+//                shape = CircleShape,
+//                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
+//                contentPadding = PaddingValues(0.dp),
+//                modifier = Modifier.size(80.dp)
+//            ) {
+//                if (!isWalking.value) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.walk_start_icon), // 정지 아이콘
+//                        contentDescription = "정지",
+//                        tint = Color.White,
+//                        modifier = Modifier.size(70.dp),
+//                    )
+//                }else {
+//                    Box(
+//                        modifier = Modifier
+//                            .size(36.dp)
+//                            .background(mainWhite)
+//                            .wrapContentSize(Alignment.Center)
+//                    )
+//                }
+//            }
+//
+//        }
 
 
     }
@@ -284,6 +344,11 @@ fun WalkScreen(
                 isWalking.value = !isWalking.value
                 isDialogOpen.value = false
                 WalkLiveData.stopWalkLiveService(context)
+
+                // 캡쳐한 후에 path 초기화
+
+                WalkLiveData.gpsList.value = listOf()
+                Toast.makeText(context, "산책이 종료되었습니다.", Toast.LENGTH_SHORT).show()
             }
         )
     }

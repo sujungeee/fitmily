@@ -8,6 +8,6 @@ data class WalkHistoryUiState(
     val isLoading: Boolean = false,
     val tstMessage: String = "",
     val walkHistoryResponse: WalkHistoryResponse = WalkHistoryResponse(
-        historyDto = emptyList()
+        walk = emptyList()
     ),
 )

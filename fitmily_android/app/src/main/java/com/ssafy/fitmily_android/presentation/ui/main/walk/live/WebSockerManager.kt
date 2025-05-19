@@ -40,6 +40,7 @@ object WebSocketManager {
 
     @SuppressLint("CheckResult")
     fun connectStomp() {
+        Log.d(TAG, "connectStomp: ${TOKEN}")
         var headerList: MutableList<StompHeader> = mutableListOf(
             StompHeader("Authorization", "Bearer ${TOKEN}")
         )

@@ -30,6 +30,7 @@ import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.model.dto.response.walk.HistoryDto
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ProfileItem
 import com.ssafy.fitmily_android.ui.theme.mainGray
+import com.ssafy.fitmily_android.util.DateUtil
 
 @Composable
 fun WalkHistoryDetailScreen(
@@ -70,7 +71,7 @@ fun WalkHistoryDetailScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp),){
-            ProfileItem(sequence = item.userFamilySequence, name = item.userNickname, animal = item.userZodiacName)
+            ProfileItem(sequence = item.userFamilySequence, name = item.nickname, animal = item.zodiacName)
             Text(
                 modifier = Modifier.padding(start = 8.dp),
                 text = "님의 산책 결과",
@@ -86,7 +87,7 @@ fun WalkHistoryDetailScreen(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(horizontalAlignment = Alignment.Start) {
-                Text("${item.walkDistance}km", style = typography.titleMedium)
+                Text("${item.distance}km", style = typography.titleMedium)
                 Text("거리", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -96,7 +97,7 @@ fun WalkHistoryDetailScreen(
                     .background(mainGray)
             )
             Column(horizontalAlignment = Alignment.Start) {
-                Text(item.walkStartTime, style = typography.titleMedium)
+                Text(DateUtil().getDurationTime(item.startTime, item.endTime), style = typography.titleMedium)
                 Text("시간", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -106,7 +107,7 @@ fun WalkHistoryDetailScreen(
                     .background(mainGray)
             )
             Column(horizontalAlignment = Alignment.Start) {
-                Text("${item.walkCalories}kcal", style = typography.titleMedium)
+                Text("${if(item.calories==0){"--"}else{item.calories}}kcal", style = typography.titleMedium)
                 Text("칼로리", style = typography.bodyMedium, color = Color.Gray)
             }
         }

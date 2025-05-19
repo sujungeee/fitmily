@@ -45,7 +45,7 @@ object WalkLiveData {
     fun stopWalkLiveService(context: Context) {
         val intent = Intent(context, WalkLiveService::class.java)
         context.stopService(intent)
-        WebSocketManager.unsubscribeStomp("/topic/walk/gps/1")
+        WebSocketManager.unsubscribeStomp("/topic/walk/gps/13")
     }
 
     // 서비스의 실행 상태를 반환하는 메서드
