@@ -6,8 +6,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.stereotype.Component;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -22,20 +22,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 @Slf4j
 public class AwsS3Config {
 
-    @PostConstruct
-    public void init() {
-        System.out.println("✅ AWS region = " + region);
-        System.out.println("✅ AWS accessKey = " + credentials.getAccessKey());
-    }
-//    cloud:
-//    aws:
-//    s3:
-//    bucket: pop4u
-//    stack.auto: false
-//    region.static: us-east-1
-//    credentials:
-//    accessKey: AKIAXZ2CK3QV4WQ7TVW5
-//    secretKey: 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
     private Credentials credentials;
     private String region;
     private String regionStatic;
@@ -65,14 +51,23 @@ public class AwsS3Config {
     @PostConstruct
     public void init() {
         try {
+            // 디버깅 로그 (첫 번째 init 메서드의 내용)
+            System.out.println("✅ AWS region = " + region);
+            if (credentials != null) {
+                System.out.println("✅ AWS accessKey = " + credentials.getAccessKey());
+            } else {
+                System.out.println("❌ AWS credentials is null");
+                return;
+            }
+
             // 실제 사용할 리전 결정 (regionStatic이 우선)
             String effectiveRegion = regionStatic != null ? regionStatic : region;
 
             log.info("AWS S3 설정 초기화 - 리전: {}", effectiveRegion);
 
             // 안전한 null 체크
-            if (credentials == null || credentials.getAccessKey() == null ||
-                    credentials.getSecretKey() == null || effectiveRegion == null) {
+            if (credentials.getAccessKey() == null || credentials.getSecretKey() == null ||
+                    effectiveRegion == null) {
                 log.warn("AWS 자격 증명이 올바르게 구성되지 않았습니다. S3 기능이 제한됩니다.");
                 return; // 클라이언트 초기화 없이 종료
             }
