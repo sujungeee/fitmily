@@ -21,7 +21,7 @@ public class SwaggerConfig {
                 .scheme("bearer")
                 .bearerFormat("JWT")
         );
-
+//
        Server server = new Server();
        server.setUrl("https://k12d208.p.ssafy.io");
 
