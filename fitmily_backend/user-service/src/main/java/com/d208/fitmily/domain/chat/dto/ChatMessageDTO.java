@@ -28,6 +28,7 @@ public class ChatMessageDTO {
     public static class SenderInfoDTO {
         private String nickname;
         private String familySequence;
+        private String userZodiacName;
     }
 
     @Data
@@ -38,17 +39,5 @@ public class ChatMessageDTO {
         private String messageType;
         private String text;
         private String imageUrl;
-//        private List<MentionDTO> mentions;
     }
-
-//    @Data
-//    @Builder
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class MentionDTO {
-//        private String userId;
-//        private String nickname;
-//        private int startIndex;
-//        private int endIndex;
-//    }
 }

@@ -74,4 +74,21 @@ public interface UserMapper {
         WHERE user_id = #{userId}
         """)
     UserDto getUserDtoById(@Param("userId") Integer userId);
+
+    // 9) 사용자 ID로 사용자 정보 조회
+    @Select("""
+        SELECT 
+            user_id as userId,
+            family_id as familyId,
+            user_login_id as userLoginId,
+            user_nickname as userNickname,
+            user_birth as userBirth,
+            user_gender as userGender,
+            user_zodiac_name as userZodiacName,
+            user_family_sequence as userFamilySequence,
+            user_role as userRole
+        FROM user
+        WHERE user_id = #{userId}
+        """)
+    User findUserById(@Param("userId") int userId);
 }
