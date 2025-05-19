@@ -72,7 +72,8 @@ class MyGoalRegisterViewModel @Inject constructor(
 
         _myGoalRegisterUiState.update { state ->
             state.copy(
-                exerciseGoalValue = floatValue
+                exerciseGoalValue = floatValue,
+                exerciseGoalValueInput = value
             )
         }
     }

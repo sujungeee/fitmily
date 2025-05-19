@@ -1,6 +1,8 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my.goal
 
+import android.app.Activity
 import android.util.Log
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -41,13 +44,16 @@ fun MyGoalRegisterScreen(
     myGoalRegisterViewModel: MyGoalRegisterViewModel = hiltViewModel()
 ) {
 
+    val context = LocalContext.current
+    val activity = context as? Activity
+    activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
     val myGoalRegisterUiState by myGoalRegisterViewModel.myGoalRegisterUiState.collectAsState()
 
     var selectedExercise by remember { mutableStateOf<String?>("런지") }
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
-    val inputValue = if(myGoalRegisterUiState.exerciseGoalValue == 1f) ""
-                     else myGoalRegisterUiState.exerciseGoalValue.toString()
+    val inputValue = myGoalRegisterUiState.exerciseGoalValueInput
 
     LaunchedEffect(myGoalRegisterUiState.myGoalSideEffect) {
         when (myGoalRegisterUiState.myGoalSideEffect) {
@@ -100,7 +106,7 @@ fun MyGoalRegisterScreen(
                 )
             }
 
-            // 운동 목표 영역
+            // 운동 값 영역
             item {
                 Spacer(modifier = Modifier.height(32.dp))
                 MyExerciseValueInputText(
