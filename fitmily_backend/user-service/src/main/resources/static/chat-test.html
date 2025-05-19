@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FitMily 채팅 테스트</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 8px 16px; margin-right: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:disabled { background-color: #cccccc; }
+        .logs { border: 1px solid #ddd; height: 200px; overflow-y: auto; padding: 10px; font-family: monospace; margin-top: 20px; }
+        .messages { height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #ddd; margin-bottom: 15px; }
+        .message { padding: 8px; margin-bottom: 5px; border-radius: 5px; display: flex; flex-direction: column; }
+        .sent { background-color: #e3f2fd; text-align: right; margin-left: auto; max-width: 80%; }
+        .received { background-color: #f5f5f5; margin-right: auto; max-width: 80%; }
+        .status { font-weight: bold; margin: 10px 0; }
+        .success { color: green; }
+        .error { color: red; }
+        .debug-info { font-size: 12px; color: #777; margin-top: 3px; }
+        .sections { display: flex; gap: 20px; }
+        .section { flex: 1; }
+        .test-section { border: 1px dashed #ccc; padding: 10px; margin-bottom: 10px; }
+        .section-title { background: #eee; padding: 5px; font-weight: bold; }
+        .user-info { font-size: 18px; font-weight: bold; color: #2196F3; margin: 10px 0; }
+        .badge {
+            display: inline-block;
+            background-color: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>FitMily 채팅 테스트</h1>
+    <div class="user-info">현재 사용자 ID: <span id="current-user-id">-</span></div>
+
+    <div class="test-section">
+        <div class="section-title">1. 웹소켓 연결 - CONNECT /api/ws-connect</div>
+        <div class="form-group">
+            <label>JWT 토큰:</label>
+            <input type="text" id="token" placeholder="Bearer eyJhbGciOi...">
+        </div>
+        <button id="connect-btn">웹소켓 연결</button>
+        <button id="disconnect-btn" disabled>연결 해제</button>
+    </div>
+
+    <div class="test-section">
+        <div class="section-title">2. 채팅방 입장 및 구독 - SUB /topic/chat/family/{familyId}</div>
+        <div class="form-group">
+            <label>가족 ID:</label>
+            <input type="text" id="family-id" value="1">
+        </div>
+        <button id="enter-room-btn" disabled>채팅방 들어가기</button>
+        <button id="leave-room-btn" disabled>채팅방 나가기</button>
+        <div>안 읽은 메시지: <span class="badge" id="unread-count">0</span></div>
+    </div>
+
+    <div class="test-section">
+        <div class="section-title">3. 메시지 조회 - GET /api/chat/family/{familyId}/messages</div>
+        <button id="load-messages-btn" disabled>이전 메시지 조회</button>
+        <div id="load-status" class="status"></div>
+    </div>
+
+    <div class="sections">
+        <div class="section">
+            <h3>채팅창</h3>
+            <div id="messages" class="messages"></div>
+
+            <div class="form-group">
+                <input type="text" id="message" placeholder="전송할 메시지를 입력하세요" disabled>
+                <button id="send-btn" disabled>메시지 전송</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>테스트 기능</h3>
+
+            <div class="test-section">
+                <div class="section-title">4. 디버그 정보</div>
+                <p>연결 상태: <span id="status" class="status">연결 대기 중...</span></p>
+                <p>서버 URL: <input type="text" id="server-url" value="http://localhost:8080" style="width:200px"></p>
+            </div>
+
+            <h3>로그</h3>
+            <div id="logs" class="logs"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js"></script>
+<script>
+    // DOM 요소
+    const tokenInput = document.getElementById('token');
+    const familyIdInput = document.getElementById('family-id');
+    const serverUrlInput = document.getElementById('server-url');
+    const connectBtn = document.getElementById('connect-btn');
+    const disconnectBtn = document.getElementById('disconnect-btn');
+    const enterRoomBtn = document.getElementById('enter-room-btn');
+    const leaveRoomBtn = document.getElementById('leave-room-btn');
+    const loadMessagesBtn = document.getElementById('load-messages-btn');
+    const loadStatus = document.getElementById('load-status');
+    const sendBtn = document.getElementById('send-btn');
+    const messageInput = document.getElementById('message');
+    const messagesDiv = document.getElementById('messages');
+    const logsDiv = document.getElementById('logs');
+    const statusDiv = document.getElementById('status');
+    const currentUserIdSpan = document.getElementById('current-user-id');
+    const unreadCountSpan = document.getElementById('unread-count');
+
+    // 변수
+    let stompClient = null;
+    let subscription = null;
+    let connected = false;
+    let currentUserId = null;
+    let inRoom = false;
+    let lastMessageId = null;
+    let currentFamilyId = null;
+    let unreadCount = 0;
+
+    // 로그 함수
+    function log(message) {
+      const entry = document.createElement('div');
+      entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+      logsDiv.appendChild(entry);
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+
+    // 상태 표시 함수
+    function setStatus(message, isError = false) {
+      statusDiv.textContent = message;
+      statusDiv.className = isError ? 'status error' : 'status success';
+    }
+
+    // 메시지 표시 함수
+    function displayMessage(message, isSent = false) {
+      const messageElement = document.createElement('div');
+      messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
+      messageElement.id = `msg-${message.messageId}`;
+
+      // 메시지 헤더 (발신자 정보)
+      const headerDiv = document.createElement('div');
+      headerDiv.style.fontSize = '0.9em';
+      headerDiv.style.fontWeight = 'bold';
+
+      if (message.senderInfo && message.senderInfo.nickname) {
+        headerDiv.textContent = message.senderInfo.nickname;
+      } else {
+        headerDiv.textContent = `사용자 ${message.senderId}`;
+      }
+
+      // 메시지 내용
+      const contentDiv = document.createElement('div');
+      if (message.content && message.content.text) {
+        contentDiv.textContent = message.content.text;
+      } else {
+        contentDiv.textContent = '[메시지 내용 없음]';
+      }
+
+      // 메시지 요소에 추가
+      messageElement.appendChild(headerDiv);
+      messageElement.appendChild(contentDiv);
+
+      // 메시지 목록에 추가
+      messagesDiv.appendChild(messageElement);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      // 마지막 메시지 ID 저장
+      lastMessageId = message.messageId;
+
+      // 안 읽은 메시지 수 업데이트
+      updateUnreadCount(message.unreadCount);
+    }
+
+    // 안 읽은 메시지 수 업데이트
+    function updateUnreadCount(count) {
+      unreadCount = count;
+      unreadCountSpan.textContent = count;
+    }
+
+    // 안 읽은 메시지 수 조회
+    function fetchUnreadCount() {
+      if (!currentFamilyId || !currentUserId) return;
+
+      const serverUrl = serverUrlInput.value.trim();
+      const url = `${serverUrl}/api/chat/family/${currentFamilyId}/unread`;
+
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': tokenInput.value,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP 오류: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(count => {
+        updateUnreadCount(count);
+      })
+      .catch(error => {
+        log('안 읽은 메시지 수 조회 오류: ' + error.message);
+      });
+    }
+
+    // 1. 웹소켓 연결 버튼
+    connectBtn.addEventListener('click', function() {
+      const token = tokenInput.value;
+      const serverUrl = serverUrlInput.value.trim();
+
+      if (!token || !token.startsWith('Bearer ')) {
+        setStatus('유효한 Bearer 토큰을 입력하세요', true);
+        return;
+      }
+
+      if (!serverUrl) {
+        setStatus('서버 URL을 입력하세요', true);
+        return;
+      }
+
+      setStatus('연결 중...');
+      log('WebSocket 연결 시도...');
+
+      try {
+        // 토큰에서 사용자 ID 추출 시도
+        try {
+          const tokenParts = token.replace('Bearer ', '').split('.');
+          if (tokenParts.length === 3) {
+            const payload = JSON.parse(atob(tokenParts[1]));
+            currentUserId = payload.userId || payload.sub;
+            log(`토큰에서 사용자 ID 추출: ${currentUserId}`);
+            currentUserIdSpan.textContent = currentUserId;
+          }
+        } catch (e) {
+          log('토큰에서 사용자 ID 추출 실패: ' + e.message);
+        }
+
+        // SockJS 옵션
+        const options = {
+          transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
+          debug: true
+        };
+
+        // SockJS 연결 (전체 URL 사용)
+        const socket = new SockJS(`${serverUrl}/api/ws-connect`, null, options);
+
+        socket.onopen = function() {
+          log('SockJS 소켓 열림');
+        };
+
+        socket.onclose = function(e) {
+          log(`소켓 닫힘: code=${e.code}, reason=${e.reason}`);
+          disconnect();
+        };
+
+        stompClient = Stomp.over(socket);
+
+        // 디버그 로그
+        stompClient.debug = function(str) {
+          log('STOMP: ' + str);
+        };
+
+        // 연결 헤더
+        const headers = {
+          'Authorization': token,
+          'Connection-Type': 'chat'  // 채팅용 연결임을 표시
+        };
+
+        // STOMP 연결
+        stompClient.connect(
+          headers,
+          function(frame) {
+            connected = true;
+            log('STOMP 연결 성공: ' + frame);
+            setStatus('연결됨');
+
+            // 버튼 상태 변경
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+            enterRoomBtn.disabled = false;
+          },
+          function(error) {
+            log('STOMP 연결 실패: ' + error);
+            setStatus('연결 실패: ' + error, true);
+            disconnect();
+          }
+        );
+      } catch (e) {
+        log('연결 초기화 오류: ' + e.message);
+        setStatus('연결 오류: ' + e.message, true);
+      }
+    });
+
+    // 연결 해제 버튼
+    disconnectBtn.addEventListener('click', function() {
+      disconnect();
+    });
+
+    // 2. 채팅방 입장 버튼 - 메시지를 로드하면 백엔드에서 자동으로 읽음 처리
+    enterRoomBtn.addEventListener('click', function() {
+      const familyId = familyIdInput.value;
+      currentFamilyId = familyId;
+
+      if (!familyId) {
+        setStatus('가족 ID를 입력하세요', true);
+        return;
+      }
+
+      if (!connected || !stompClient) {
+        setStatus('먼저 서버에 연결하세요', true);
+        return;
+      }
+
+      log(`채팅방 입장 및 구독 시도: /topic/chat/family/${familyId}`);
+
+      try {
+        // 이전 구독 해제
+        if (subscription) {
+          subscription.unsubscribe();
+          log('이전 구독 해제됨');
+        }
+
+        // 새 구독 생성
+        subscription = stompClient.subscribe(`/topic/chat/family/${familyId}`, function(message) {
+          try {
+            log('메시지 수신: ' + message.body);
+            const data = JSON.parse(message.body);
+
+            // 메시지 타입에 따라 처리
+            if (data.type === 'CHAT_MESSAGE') {
+              const msgData = data.data;
+              log(`채팅 메시지 - 보낸이: ${msgData.senderInfo?.nickname || msgData.senderId}, 내용: ${msgData.content.text}`);
+
+              // 메시지 표시 (자신이 보낸 메시지인지 확인)
+              const isSent = msgData.senderId === currentUserId?.toString();
+              displayMessage(msgData, isSent);
+
+              // 새 메시지가 오면 안 읽은 메시지 수 조회
+              if (!isSent) {
+                fetchUnreadCount();
+              }
+            } else if (data.type === 'READ_RECEIPT') {
+              log(`읽음 확인 - 사용자: ${data.data.userId}, 메시지: ${data.data.messageId}`);
+              // 읽음 처리가 발생하면 안 읽은 메시지 수 조회
+              fetchUnreadCount();
+            }
+          } catch (e) {
+            log('메시지 처리 오류: ' + e.message);
+          }
+        });
+
+        log('채팅방 구독 성공');
+        setStatus(`채팅방 입장 완료: ${familyId}`);
+        inRoom = true;
+
+        // 버튼 상태 변경
+        enterRoomBtn.disabled = true;
+        leaveRoomBtn.disabled = false;
+        sendBtn.disabled = false;
+        messageInput.disabled = false;
+        loadMessagesBtn.disabled = false;
+        messageInput.focus();
+
+        // 기존 메시지 로드 (백엔드에서 자동으로 읽음 처리됨)
+        loadMessages(familyId);
+
+        // 안 읽은 메시지 수 조회
+        fetchUnreadCount();
+      } catch (e) {
+        log('채팅방 입장 오류: ' + e.message);
+        setStatus('채팅방 입장 실패: ' + e.message, true);
+      }
+    });
+
+    // 채팅방 나가기 버튼
+    leaveRoomBtn.addEventListener('click', function() {
+      if (subscription) {
+        try {
+          subscription.unsubscribe();
+          log('채팅방 구독 해제됨');
+          subscription = null;
+          inRoom = false;
+
+          // 버튼 상태 변경
+          enterRoomBtn.disabled = false;
+          leaveRoomBtn.disabled = true;
+          sendBtn.disabled = true;
+          messageInput.disabled = true;
+          loadMessagesBtn.disabled = true;
+
+          // 메시지 목록 초기화
+          messagesDiv.innerHTML = '';
+          setStatus('채팅방에서 나왔습니다');
+
+          // 안 읽은 메시지 수 초기화
+          updateUnreadCount(0);
+        } catch (e) {
+          log('구독 해제 오류: ' + e.message);
+        }
+      }
+    });
+
+    // 3. 이전 메시지 로드 버튼
+    loadMessagesBtn.addEventListener('click', function() {
+      const familyId = familyIdInput.value;
+      loadMessages(familyId);
+    });
+
+    // 메시지 로드 함수
+    function loadMessages(familyId, before = null) {
+      if (!familyId) return;
+
+      const serverUrl = serverUrlInput.value.trim();
+      let url = `${serverUrl}/api/chat/family/${familyId}/messages?limit=20`;
+      if (before) {
+        url += `&before=${before}`;
+      }
+
+      log(`이전 메시지 조회: ${url}`);
+      loadStatus.textContent = '메시지 로드 중...';
+
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': tokenInput.value,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP 오류: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        log(`메시지 ${data.messages.length}개 로드됨, 더 있음: ${data.hasMore}`);
+        loadStatus.textContent = `메시지 ${data.messages.length}개 로드됨` +
+                                (data.hasMore ? ' (더 있음)' : ' (더 없음)');
+
+        // 메시지 표시 (역순으로)
+        if (data.messages.length > 0) {
+          // 기존 메시지 제거 (첫 로드일 경우)
+          if (!before) {
+            messagesDiv.innerHTML = '';
+          }
+
+          // 최신 메시지부터 표시되므로 역순으로 추가
+          for (let i = data.messages.length - 1; i >= 0; i--) {
+            const message = data.messages[i];
+            const isSent = message.senderId === currentUserId?.toString();
+            displayMessage(message, isSent);
+          }
+
+          // 안 읽은 메시지 수 조회 - 백엔드에서 자동으로 읽음 처리했으므로 다시 조회
+          fetchUnreadCount();
+        }
+      })
+      .catch(error => {
+        log('메시지 로드 오류: ' + error.message);
+        loadStatus.textContent = '메시지 로드 실패: ' + error.message;
+      });
+    }
+
+    // 메시지 전송 버튼
+    sendBtn.addEventListener('click', function() {
+      sendMessage();
+    });
+
+    // 메시지 입력창 엔터키
+    messageInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // 메시지 전송 함수
+    function sendMessage() {
+      const familyId = familyIdInput.value;
+      const message = messageInput.value.trim();
+
+      if (!message) return;
+      if (!connected || !inRoom) {
+        setStatus('먼저 채팅방에 입장하세요', true);
+        return;
+      }
+
+      try {
+        const messageData = {
+          messageType: 'text',
+          content: message
+        };
+
+        stompClient.send(`/app/chat.sendMessage/family/${familyId}`, {}, JSON.stringify(messageData));
+        log(`메시지 전송: ${message}`);
+
+        // 입력창 초기화
+        messageInput.value = '';
+        messageInput.focus();
+      } catch (e) {
+        log('메시지 전송 오류: ' + e.message);
+        setStatus('메시지 전송 실패: ' + e.message, true);
+      }
+    }
+
+    // 연결 해제 함수
+    function disconnect() {
+      // 채팅방 나가기
+      if (subscription) {
+        try {
+          subscription.unsubscribe();
+          log('채팅방 구독 해제됨');
+        } catch (e) {
+          log('구독 해제 오류: ' + e.message);
+        }
+        subscription = null;
+        inRoom = false;
+      }
+
+      // 웹소켓 연결 해제
+      if (stompClient && connected) {
+        try {
+          stompClient.disconnect(function() {
+            log('STOMP 연결 해제됨');
+          });
+        } catch (e) {
+          log('연결 해제 오류: ' + e.message);
+        }
+        stompClient = null;
+      }
+
+      connected = false;
+      setStatus('연결 해제됨');
+
+      // 버튼 상태 초기화
+      connectBtn.disabled = false;
+      disconnectBtn.disabled = true;
+      enterRoomBtn.disabled = true;
+      leaveRoomBtn.disabled = true;
+      sendBtn.disabled = true;
+      messageInput.disabled = true;
+      loadMessagesBtn.disabled = true;
+
+      // 메시지 목록 초기화
+      messagesDiv.innerHTML = '';
+
+      // 안 읽은 메시지 수 초기화
+      updateUnreadCount(0);
+    }
+</script>
+</body>
+</html>

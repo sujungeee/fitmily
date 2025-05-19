@@ -1,0 +1,18 @@
+package com.d208.fitmily.domain.walk.dto;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+public class UserDto {
+    private Integer userId;
+    private Integer userFamilySequence;
+    private String userZodiacName;
+    private String userNickname;
+    private Integer familyId;
+
+}
