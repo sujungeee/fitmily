@@ -54,4 +54,10 @@ public class GpsRedisService {
         }
         return result;
     }
+
+    // gps 데이터 삭제
+    public void removeWalkData(Integer userId) {
+        String key = "walk:gps:" + userId;
+        redisTemplate.delete(key);
+    }
 }
