@@ -2,17 +2,21 @@ package com.ssafy.fitmily_android.di
 
 import com.ssafy.fitmily_android.domain.repository.AuthRepository
 import com.ssafy.fitmily_android.domain.repository.ChatRepository
+import com.ssafy.fitmily_android.domain.repository.FileRepository
 import com.ssafy.fitmily_android.domain.repository.MyHealthRepository
 import com.ssafy.fitmily_android.domain.repository.HomeRepository
 import com.ssafy.fitmily_android.domain.repository.NotificationRepository
+import com.ssafy.fitmily_android.domain.repository.S3Repository
 import com.ssafy.fitmily_android.domain.repository.WalkRepository
 import com.ssafy.fitmily_android.domain.repository.WeatherRepository
 import com.ssafy.fitmily_android.model.repositoryimpl.AuthRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.ChatRepositoryImpl
+import com.ssafy.fitmily_android.model.repositoryimpl.FileRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.HomeRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.WalkRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.MyHealthRepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.NotificationRepositoryImpl
+import com.ssafy.fitmily_android.model.repositoryimpl.S3RepositoryImpl
 import com.ssafy.fitmily_android.model.repositoryimpl.WeatherRepositoryImpl
 import com.ssafy.fitmily_android.model.service.AuthService
 import dagger.Binds
@@ -67,4 +71,16 @@ abstract class RepositoryModule {
     abstract fun providesNotificationRepository(
         notificationRepositoryImpl: NotificationRepositoryImpl
     ): NotificationRepository
+
+    @Singleton
+    @Binds
+    abstract fun provideS3Repository(
+        s3RepositoryImpl: S3RepositoryImpl
+    ): S3Repository
+
+    @Singleton
+    @Binds
+    abstract fun provideFileRepository(
+        fileRepositoryImpl: FileRepositoryImpl
+    ): FileRepository
 }
