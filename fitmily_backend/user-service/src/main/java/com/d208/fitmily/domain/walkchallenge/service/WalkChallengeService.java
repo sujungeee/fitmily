@@ -1,5 +1,6 @@
 package com.d208.fitmily.domain.walkchallenge.service;
 
+import com.d208.fitmily.domain.fcm.service.FcmService;
 import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.domain.walk.dto.UserDto;
 import com.d208.fitmily.domain.walkchallenge.dto.*;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ public class WalkChallengeService {
     private final UserService userService;
     private final FamilyMapper familyMapper;
     private static final int DEFAULT_INDIVIDUAL_TARGET_KM = 5;
+    private final FcmService fcmService;
 
     /**
      * 매주 월요일 오전 9시에 모든 가족에 대한 챌린지 생성
@@ -150,7 +153,6 @@ public class WalkChallengeService {
         walkChallengeMapper.syncUserWalkChallengeDistances(challengeId);
     }
 
-    // getCurrentChallenge 메서드 내 수정
     public WalkChallengeResponseDto getCurrentChallenge(Integer familyId) {
         // 현재 활성화된 챌린지 조회
         WalkChallengeDto challenge = walkChallengeMapper.findActiveChallenge(familyId);
@@ -258,5 +260,99 @@ public class WalkChallengeService {
                 .progressPercentage(progressPercentage)
                 .participants(participants)
                 .build();
+    }
+
+    /**
+     * 매주 일요일 오후 9시에 챌린지 종료 체크 및 알림 발송
+     */
+    @Scheduled(cron = "0 0 21 * * SUN")
+    @Transactional
+    public void checkChallengeCompletionAndNotify() {
+        log.info("주간 챌린지 종료 체크 시작");
+
+        // 모든 가족 ID 목록 조회
+        List<Integer> allFamilyIds = walkChallengeMapper.getAllFamilyIds();
+
+        LocalDate today = LocalDate.now();
+
+        for (Integer familyId : allFamilyIds) {
+            try {
+                // 가족의 현재 챌린지 조회
+                WalkChallengeDto challenge = walkChallengeMapper.findActiveChallenge(familyId);
+
+                if (challenge != null) {
+                    // 챌린지 시작일로부터 7일이 지났는지 확인 (종료 조건)
+                    LocalDate startDate = challenge.getStartDate();
+                    LocalDate endDate = startDate.plusDays(7);
+
+                    // 오늘이 종료일이면 알림 발송
+                    if (today.isEqual(endDate) || today.isAfter(endDate)) {
+                        // 모든 산책 기록을 기준으로 챌린지 거리 동기화
+                        walkChallengeMapper.syncUserWalkChallengeDistances(challenge.getChallengeId());
+
+                        // 총 달성 거리 조회
+                        Float totalDistance = walkChallengeMapper.getTotalDistanceByChallenge(challenge.getChallengeId());
+                        if (totalDistance == null) totalDistance = 0.0f;
+
+                        // 종료 알림 발송
+                        fcmService.sendChallengeCompletionNotification(
+                                familyId,
+                                challenge.getChallengeId(),
+                                startDate.format(DateTimeFormatter.ISO_DATE),
+                                endDate.format(DateTimeFormatter.ISO_DATE),
+                                challenge.getTargetDistance(),
+                                totalDistance
+                        );
+
+                        log.info("챌린지 종료 알림 발송 완료: familyId={}, challengeId={}, " +
+                                        "targetDistance={}, totalDistance={}",
+                                familyId, challenge.getChallengeId(),
+                                challenge.getTargetDistance(), totalDistance);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("챌린지 종료 처리 중 오류 발생: familyId={}, error={}", familyId, e.getMessage(), e);
+            }
+        }
+
+        log.info("주간 챌린지 종료 체크 완료");
+    }
+
+    /**
+     * 챌린지 수동 완료 처리 (테스트용)
+     */
+    @Transactional
+    public void completeChallenge(int familyId, int challengeId) {
+        // 챌린지 정보 조회
+        WalkChallengeDto challenge = walkChallengeMapper.findChallengeByChallengeId(challengeId);
+
+        if (challenge == null || challenge.getFamilyId() != familyId) {
+            log.error("챌린지를 찾을 수 없음: familyId={}, challengeId={}", familyId, challengeId);
+            throw new RuntimeException("해당 챌린지를 찾을 수 없습니다.");
+        }
+
+        // 거리 동기화
+        walkChallengeMapper.syncUserWalkChallengeDistances(challengeId);
+
+        // 총 달성 거리 조회
+        Float totalDistance = walkChallengeMapper.getTotalDistanceByChallenge(challengeId);
+        if (totalDistance == null) totalDistance = 0.0f;
+
+        // 종료 알림 발송
+        LocalDate startDate = challenge.getStartDate();
+        LocalDate endDate = startDate.plusDays(7);
+
+        fcmService.sendChallengeCompletionNotification(
+                familyId,
+                challengeId,
+                startDate.format(DateTimeFormatter.ISO_DATE),
+                endDate.format(DateTimeFormatter.ISO_DATE),
+                challenge.getTargetDistance(),
+                totalDistance
+        );
+
+        log.info("챌린지 수동 완료 처리: familyId={}, challengeId={}, " +
+                        "targetDistance={}, totalDistance={}",
+                familyId, challengeId, challenge.getTargetDistance(), totalDistance);
     }
 }

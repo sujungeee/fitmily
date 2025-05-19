@@ -1,6 +1,6 @@
 package com.d208.fitmily.domain.AwsS3.Controller;
 
-import com.d208.fitmily.domain.AwsS3.Dto.uploadUrlRequestDto;
+import com.d208.fitmily.domain.AwsS3.Dto.UploadUrlRequestDto;
 import com.d208.fitmily.domain.AwsS3.Service.AwsS3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +23,7 @@ public class AwsS3Controller {
     @Operation(summary = "업로드용 Presigned URL 발급")
     @PostMapping("/upload-url")
     public ResponseEntity<Map<String, Object>> getPresignedUploadUrl(
-            @RequestBody uploadUrlRequestDto dto
+            @RequestBody UploadUrlRequestDto dto
     ) {
         String presignedUrl = awsS3Service.generatePresignedUploadUrl(dto);
         Map<String, Object> response = new HashMap<>();
