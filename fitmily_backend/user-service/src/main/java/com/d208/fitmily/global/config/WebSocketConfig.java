@@ -63,41 +63,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         log.info("WebSocket 연결 완료: /api/ws-connect");
     }
 
-    // JWT 인증
-//    @Override
-//    // 컨트롤러로 가기전에 가로채는 인터셉터 등록 (여기서 JWT 인증)
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(new ChannelInterceptor() {
-//
-//            @Override
-//            //  STOMP 명령어, 헤더를 읽을 수 있게 래핑함
-//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-//                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-//
-//
-//                // CONNECT 명령일 때 JWT 인증 처리
-//                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-//                    String token = accessor.getFirstNativeHeader("Authorization");
-//
-//                    if (token != null && token.startsWith("Bearer ")) {
-//                        token = token.substring(7);
-//
-//                        //validateToken JWT 유효성 검사
-//                        if (jwtUtil.validateToken(token)) {
-//                            Integer userId = jwtUtil.getUserId(token);
-//                            accessor.setUser(new StompPrincipal(userId.toString())); //WebSocket 세션에 사용자 정보 등록
-//                        } else {
-//                            throw new IllegalArgumentException("Invalid JWT token"); //토큰 유효하지 않으면 예외
-//                        }
-//                    } else {
-//                        throw new IllegalArgumentException("Missing Authorization header"); //헤더 없다면 예외
-//                    }
-//                }
-//                return message;
-//            }
-//        });
-//    }
-//}
+
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new ChannelInterceptor() {
@@ -186,3 +152,39 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //        });
 //    }
 
+
+// JWT 인증
+//    @Override
+//    // 컨트롤러로 가기전에 가로채는 인터셉터 등록 (여기서 JWT 인증)
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(new ChannelInterceptor() {
+//
+//            @Override
+//            //  STOMP 명령어, 헤더를 읽을 수 있게 래핑함
+//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+//                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+//
+//
+//                // CONNECT 명령일 때 JWT 인증 처리
+//                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+//                    String token = accessor.getFirstNativeHeader("Authorization");
+//
+//                    if (token != null && token.startsWith("Bearer ")) {
+//                        token = token.substring(7);
+//
+//                        //validateToken JWT 유효성 검사
+//                        if (jwtUtil.validateToken(token)) {
+//                            Integer userId = jwtUtil.getUserId(token);
+//                            accessor.setUser(new StompPrincipal(userId.toString())); //WebSocket 세션에 사용자 정보 등록
+//                        } else {
+//                            throw new IllegalArgumentException("Invalid JWT token"); //토큰 유효하지 않으면 예외
+//                        }
+//                    } else {
+//                        throw new IllegalArgumentException("Missing Authorization header"); //헤더 없다면 예외
+//                    }
+//                }
+//                return message;
+//            }
+//        });
+//    }
+//}

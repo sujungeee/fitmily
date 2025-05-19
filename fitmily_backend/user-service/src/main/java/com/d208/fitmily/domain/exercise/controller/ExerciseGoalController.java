@@ -103,11 +103,11 @@ public class ExerciseGoalController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/api/goal-progress")
-    public ResponseEntity<Void> goalProgress(@AuthenticationPrincipal CustomUserDetails principal){
-        Integer userId = principal.getId();
-        List<goalprogress> achievementList = exerciseService.getWeeklyAchievement(userId);
-    }
+//    @GetMapping("/api/goal-progress")
+//    public ResponseEntity<Void> goalProgress(@AuthenticationPrincipal CustomUserDetails principal){
+//        Integer userId = principal.getId();
+//        List<goalprogress> achievementList = exerciseService.getWeeklyAchievement(userId);
+//    }
 
 
 
