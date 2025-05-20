@@ -113,7 +113,7 @@ public class ChatMessageService {
 
             // MongoDB에 저장
             chatMessage = messageRepository.save(chatMessage);
-            log.info("메시지 저장 완료: {}", messageId);
+            log.info("메시지 저장 완료: {}, 타임스탬프: {}", messageId, System.currentTimeMillis());
 
             // Redis에 읽음 상태 업데이트 (발신자)
             redisTemplate.opsForValue().set("read:" + familyId + ":" + userId, messageId);
@@ -252,34 +252,25 @@ public class ChatMessageService {
 
     // 메시지 읽음 처리 (기존 메서드, 호환성을 위해 유지)
     public void markAsRead(String familyId, String messageId, String userId) {
-        log.info("읽음 처리 시작 - familyId: {}, messageId: {}, userId: {}",
-                familyId, messageId, userId);
-
         try {
-            // Redis에 읽음 상태 업데이트
-            redisTemplate.opsForValue().set("read:" + familyId + ":" + userId, messageId);
-            redisTemplate.opsForValue().set("unread:" + familyId + ":" + userId, "0");
-
             // MongoDB 읽음 상태 일괄 업데이트
             int updatedCount = messageRepository.updateReadStatusBeforeId(familyId, messageId, userId);
-            log.debug("읽음 처리 완료: {} 개 메시지", updatedCount);
 
-            // 읽음 상태 이벤트 브로드캐스트
-            ReadReceiptResponseDTO readReceipt = ReadReceiptResponseDTO.builder()
-                    .type("READ_RECEIPT")
-                    .data(ReadReceiptResponseDTO.ReadReceiptData.builder()
-                            .userId(userId)
-                            .messageId(messageId)
-                            .timestamp(new Date())
-                            .build())
-                    .build();
+            // 업데이트된 메시지가 있을 때만 브로드캐스트
+            if (updatedCount > 0) {
+                // 읽음 상태 이벤트 브로드캐스트
+                ReadReceiptResponseDTO readReceipt = ReadReceiptResponseDTO.builder()
+                        .type("READ_RECEIPT")
+                        .data(ReadReceiptResponseDTO.ReadReceiptData.builder()
+                                .userId(userId)
+                                .messageId(messageId)
+                                .timestamp(new Date())
+                                .build())
+                        .build();
 
-            messagingTemplate.convertAndSend("/topic/chat/family/" + familyId, readReceipt);
-            log.info("읽음 상태 브로드캐스트 완료: {}", messageId);
-
+                messagingTemplate.convertAndSend("/topic/chat/family/" + familyId, readReceipt);
+            }
         } catch (Exception e) {
-            log.error("읽음 처리 오류", e);
-            throw new RuntimeException("읽음 처리 실패: " + e.getMessage(), e);
         }
     }
 }
