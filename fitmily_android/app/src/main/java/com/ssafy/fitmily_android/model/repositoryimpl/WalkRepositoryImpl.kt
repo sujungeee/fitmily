@@ -7,6 +7,7 @@ import com.ssafy.fitmily_android.model.dto.request.walk.WalkEndRequest
 import com.ssafy.fitmily_android.model.dto.response.walk.WalkEndResponse
 import com.ssafy.fitmily_android.model.dto.response.walk.WalkHistoryResponse
 import com.ssafy.fitmily_android.model.dto.response.walk.WalkPathResponse
+import com.ssafy.fitmily_android.model.dto.response.walk.WalkingFamilyResponse
 import com.ssafy.fitmily_android.model.service.WalkService
 import jakarta.inject.Inject
 
@@ -36,5 +37,12 @@ class WalkRepositoryImpl @Inject constructor(
             walkService.getWalkGoalExist()
         }
     }
+
+    override suspend fun getWalkingMembers(familyId: Int): Result<WalkingFamilyResponse> {
+        return ApiResultHandler.handleApi {
+            walkService.getWalkingMembers(familyId)
+        }
+    }
+
 
 }

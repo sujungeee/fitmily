@@ -47,4 +47,15 @@ class DateUtil {
         return localDate.format(DateTimeFormatter.ofPattern("MM.dd")) + " ~ " + addedDate.format(DateTimeFormatter.ofPattern("MM.dd"))
     }
 
+
+    fun getDurationTime(startTime: String, endTime: String): String {
+        val start = LocalDateTime.parse(startTime)
+        val end = LocalDateTime.parse(endTime)
+        val duration = java.time.Duration.between(start, end)
+        val hours = duration.toHours()
+        val minutes = duration.toMinutes() % 60
+        val seconds = duration.seconds % 60
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
 }

@@ -45,9 +45,9 @@ interface HomeService {
     suspend fun getChallenge(
     ): Response<ChallengeResponse>
 
-    @POST("poke")
+    @POST("poke/{userId}")
     suspend fun sendPoke(
-        @Query("userId") userId: Int
+        @Path("userId") userId: Int
     ): Response<Unit>
 
 }

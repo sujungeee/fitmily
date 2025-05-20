@@ -28,6 +28,8 @@ class WalkLiveService: Service() {
         return null
     }
 
+    val context = this
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         val application = MainApplication.getInstance().getDataStore()
@@ -54,14 +56,15 @@ class WalkLiveService: Service() {
             if(!WebSocketManager.isConnected) {
                 WebSocketManager.connectStomp()
             }
-
+            walkLiveWorker = WalkLiveWorker(context)
+            walkLiveWorker.startLocationUpdates()
 
         }
+
         // Todo 웹소켓 시작
 
         // WalkLiveWorker를 시작, stompClient 보내서 send 할 수 있게끔
-        walkLiveWorker = WalkLiveWorker(this)
-        walkLiveWorker.startLocationUpdates()
+
 
 
         return START_STICKY

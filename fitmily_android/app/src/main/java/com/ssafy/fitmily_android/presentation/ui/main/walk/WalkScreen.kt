@@ -1,6 +1,9 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk
 
+import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,29 +35,44 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.compose.CameraPositionState
 import com.naver.maps.map.compose.ExperimentalNaverMapApi
 import com.naver.maps.map.compose.LocationTrackingMode
 import com.naver.maps.map.compose.MapProperties
 import com.naver.maps.map.compose.MapUiSettings
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.PathOverlay
+import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.compose.rememberFusedLocationSource
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.model.dto.request.walk.WalkEndRequest
 import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ProfileItem
 import com.ssafy.fitmily_android.presentation.ui.main.walk.component.StopWalkDialog
 import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
+import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkMapCaptureHelper
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.ui.theme.secondaryBlue
+import com.ssafy.fitmily_android.util.LocationUtil
+import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+import java.time.Instant
+import java.time.ZoneId
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -66,18 +84,19 @@ private const val TAG = "WalkScreen"
 @Composable
 fun WalkScreen(
     navController: NavHostController,
-
+    walkViewModel: WalkViewModel = hiltViewModel(),
 )  {
 
     val context = LocalContext.current
+
+
 
     var isWalking = remember { mutableStateOf(false) }
     var isDialogOpen = remember { mutableStateOf(false) }
     var watching = remember { mutableStateOf(0) }
 
     var path = remember { mutableStateOf(listOf<LatLng>()) }
-
-    val locationSource = rememberFusedLocationSource()
+    var bitmapa = remember { mutableStateOf<Bitmap?>(null) }
     val elapsedTime = remember { mutableStateOf(0L) }
     val totalDistance = remember { mutableStateOf(0.0) }
     LaunchedEffect(WalkLiveData.gpsList.value) {
@@ -111,11 +130,18 @@ fun WalkScreen(
         }
     }
 
-    var tmp = GpsDto(
-        0.0,
-        0.0,
-        System.currentTimeMillis().toString(),
-    )
+
+    val cameraPositionState: CameraPositionState = rememberCameraPositionState {
+        LocationUtil().getLastLocation(context,
+            onLocationReceived = { lat, lon ->
+                position = CameraPosition(LatLng(lat, lon), 15.0)
+            },
+            onFailure = {
+                Log.d(TAG, "WalkScreen: 실패")
+            }
+        )
+    }
+
     WalkLiveData.gpsList.observeForever(
         { list ->
             if (list.isNotEmpty()) {
@@ -188,7 +214,7 @@ fun WalkScreen(
             NaverMap(
                 modifier = Modifier
                     .fillMaxSize(),
-                locationSource = locationSource,
+                locationSource = rememberFusedLocationSource(),
                 properties = MapProperties(
                     locationTrackingMode = LocationTrackingMode.Follow,
                 ),
@@ -196,6 +222,13 @@ fun WalkScreen(
                     isLocationButtonEnabled = true,
                     isZoomControlEnabled = false,
                 ),
+                cameraPositionState = cameraPositionState,
+                onMapClick= { _, it ->
+                    cameraPositionState.move(
+                        CameraUpdate.scrollTo(LatLng(it.latitude, it.longitude))
+                    )
+                },
+
             ){
                 if (path.value.size>2) {
                     PathOverlay(
@@ -210,7 +243,7 @@ fun WalkScreen(
                     .fillMaxWidth(0.5f),
                 horizontalAlignment = Alignment.End
             ) {
-                items(5) { index ->
+                items(1) { index ->
                     FilterChip(
                         modifier = Modifier
                             .padding(4.dp)
@@ -220,7 +253,7 @@ fun WalkScreen(
                         },
                         selected = if(index==watching.value) true else false,
                         label = {
-                            ProfileItem(typography.bodySmall, 1, "상태", "mouse",)
+                            ProfileItem(typography.bodySmall, 1, "내 산책", "mouse",)
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = mainWhite,
@@ -232,51 +265,51 @@ fun WalkScreen(
 
             }
 
-        }
+            Row(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom) {
+                Button(
+                    onClick = {
+                        if(isWalking.value){
+                            isDialogOpen.value = true
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = {
-                    if(isWalking.value){
-                        isDialogOpen.value = true
-
-                        //foregroundService 종료
+                            //foregroundService 종료
+                        }else {
+                            isWalking.value = !isWalking.value
+                            //foregroundService 시작
+                            WalkLiveData.startWalkLiveService(context)
+                        }},
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
+                    contentPadding = PaddingValues(0.dp),
+                    modifier = Modifier.size(80.dp)
+                ) {
+                    if (!isWalking.value) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.walk_start_icon), // 정지 아이콘
+                            contentDescription = "정지",
+                            tint = Color.White,
+                            modifier = Modifier.size(70.dp),
+                        )
                     }else {
-                        isWalking.value = !isWalking.value
-                        //foregroundService 시작
-                        WalkLiveData.startWalkLiveService(context)
-                    }},
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
-                contentPadding = PaddingValues(0.dp),
-                modifier = Modifier.size(80.dp)
-            ) {
-                if (!isWalking.value) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.walk_start_icon), // 정지 아이콘
-                        contentDescription = "정지",
-                        tint = Color.White,
-                        modifier = Modifier.size(70.dp),
-                    )
-                }else {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(mainWhite)
-                            .wrapContentSize(Alignment.Center)
-                    )
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(mainWhite)
+                                .wrapContentSize(Alignment.Center)
+                        )
+                    }
                 }
             }
 
         }
 
-
     }
+
+
+
     if (isDialogOpen.value) {
         StopWalkDialog(
             onDismissRequest = { isDialogOpen.value = false },
@@ -284,7 +317,43 @@ fun WalkScreen(
                 isWalking.value = !isWalking.value
                 isDialogOpen.value = false
                 WalkLiveData.stopWalkLiveService(context)
+
+                // 캡처 추가
+                if (path.value.isNotEmpty()) {
+                    Log.d(TAG, "WalkScreenaa: ${path.value}")
+                    WalkMapCaptureHelper(
+                        context = context,
+                        path = path.value,
+                        onCaptured = { bitmap ->
+                            bitmap?.let {
+                                bitmapa.value = it
+                                Log.d(TAG, "WalkScreen: ${it}")
+                                Log.d(TAG, "WalkScreensss: ${bitmapToByteArray(it)}")
+                                (context as? LifecycleOwner)?.lifecycleScope?.launch {
+                                    walkViewModel.postWalk(
+                                        WalkEndRequest(
+                                            walkDistance = totalDistance.value,
+                                            walkStartTime = Instant.ofEpochMilli(WalkLiveData.startedTime)
+                                                .atZone(ZoneId.systemDefault())
+                                                .toLocalDateTime().toString(),
+                                            walkEndTime = Instant.ofEpochMilli(System.currentTimeMillis())
+                                                .atZone(ZoneId.systemDefault())
+                                                .toLocalDateTime().toString(),
+                                            walkRouteImg = System.currentTimeMillis().toString(),
+                                        ),
+                                        byteArray = bitmapToByteArray(it)
+                                    )
+                                }
+                            }
+                        }
+                    ).capture()
+                }
+
+                // 초기화
+                WalkLiveData.gpsList.value = listOf()
+                Toast.makeText(context, "산책이 종료되었습니다.", Toast.LENGTH_SHORT).show()
             }
+
         )
     }
 }
@@ -310,6 +379,12 @@ fun calculateTotalDistance(path: List<LatLng>): Double {
     }
     return totalDistance // 단위: m
 }
+fun bitmapToByteArray(bitmap: Bitmap, format: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG, quality: Int = 100): ByteArray {
+    val outputStream = ByteArrayOutputStream()
+    bitmap.compress(format, quality, outputStream)
+    return outputStream.toByteArray()
+}
+
 
 
 

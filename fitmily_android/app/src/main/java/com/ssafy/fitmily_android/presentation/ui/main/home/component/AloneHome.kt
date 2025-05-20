@@ -143,12 +143,13 @@ fun AloneHome(
         FamilyDialog(
             onDismissRequest = { dialogState.value = DialogState.NONE },
             onConfirmation = {
-                dialogState.value = DialogState.NONE
                 if(dialogState.value == DialogState.JOIN) {
                     onClickJoin(it)
                 } else {
                     onClickCreate(it)
                 }
+                dialogState.value = DialogState.NONE
+
             },
             dialogState = dialogState.value
 

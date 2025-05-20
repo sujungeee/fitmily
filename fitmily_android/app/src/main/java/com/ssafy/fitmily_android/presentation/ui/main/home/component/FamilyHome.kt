@@ -107,7 +107,7 @@ fun FamilyHome(
                         onClickPoke = onClickPoke
                     )
                 }
-
+                if(homeUiState.challengeData.startDate.isNotBlank()) {
                 Column(
                     modifier = Modifier.padding(
                         top = 24.dp, start = 28.dp,
@@ -119,7 +119,7 @@ fun FamilyHome(
                         text = "산책 챌린지",
                         style = typography.titleLarge,
                     )
-                    if(homeUiState.challengeData.startDate.isNotBlank()) {
+
                     ChallengeCard(navController, homeUiState.challengeData)}
                 }
                 Column(

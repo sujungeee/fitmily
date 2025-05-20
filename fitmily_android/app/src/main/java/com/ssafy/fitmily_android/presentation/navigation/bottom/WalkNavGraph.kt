@@ -23,8 +23,8 @@ fun NavGraphBuilder.walkNavGraph(navController: NavHostController) {
             WalkHistoryScreen(navController)
         }
 
-        composable("walk/detail/{historyJson}") { backStackEntry ->
-            val historyJson = backStackEntry.arguments?.getString("userJson")
+        composable("walk/detail/{history}") { backStackEntry ->
+            val historyJson = backStackEntry.arguments?.getString("history")
             val history = Gson().fromJson(historyJson, HistoryDto::class.java)
             WalkHistoryDetailScreen(navController, history)
         }
