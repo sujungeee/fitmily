@@ -5,7 +5,6 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -23,14 +22,10 @@ public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
 
-    @Value("${spring.data.mongodb.host}")
-    private String mongoHost;
-
-    @Value("${spring.data.mongodb.port}")
-    private String mongoPort;
-
-    @Value("${spring.data.mongodb.database:fitmily}")
-    private String mongoDatabase;
+    // 업데이트된 IP 주소로 설정
+    private final String mongoHost = "172.18.0.3";
+    private final String mongoPort = "27017";
+    private final String mongoDatabase = "fitmily";
 
     @Bean
     public MongoClient mongoClient() {
