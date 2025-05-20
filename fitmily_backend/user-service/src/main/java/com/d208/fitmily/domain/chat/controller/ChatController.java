@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Tag(name = "채팅 API", description = "채팅 메시지 조회 및 관리")
+@Tag(name = "채팅 API", description = "채팅 메시지 조회")
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
@@ -20,66 +20,55 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @Operation(summary = "메시지 목록 조회", description = "가족 채팅방의 메시지 목록을 조회합니다.")
-    @GetMapping("/family/{familyId}/messages")
-    public ResponseEntity<ChatMessagesResponseDTO> getMessages(
+    @Operation(summary = "메시지 목록 조회", description = "가족 채팅방의 메시지 목록을 페이지 단위로 조회합니다.")
+    @GetMapping("/family/{familyId}/{page}/messages")
+    public ResponseEntity<ChatMessagesResponseDTO> getMessagesByPage(
             @PathVariable String familyId,
-            @RequestParam(required = false) String before,
+            @PathVariable int page,
             @RequestParam(defaultValue = "20") int limit,
             Authentication authentication) {
 
-        // 인증 객체에서 사용자 ID 추출
         String userId = extractUserId(authentication);
-        log.debug("메시지 조회 요청 - familyId: {}, userId: {}, before: {}, limit: {}",
-                familyId, userId, before, limit);
+        log.debug("페이지 기반 메시지 조회 - familyId: {}, userId: {}, page: {}, limit: {}",
+                familyId, userId, page, limit);
 
-        ChatMessagesResponseDTO response = chatService.getMessages(familyId, userId, before, limit);
+        if (userId == null) {
+            log.warn("사용자 ID를 추출할 수 없습니다. 인증 정보를 확인하세요.");
+            return ResponseEntity.badRequest().build();
+        }
+
+        ChatMessagesResponseDTO response = chatService.getMessagesByPage(familyId, userId, page, limit);
         return ResponseEntity.ok(response);
     }
 
-//    @Operation(summary = "안 읽은 메시지 수 조회", description = "특정 가족 채팅방의 안 읽은 메시지 수를 조회합니다.")
-//    @GetMapping("/family/{familyId}/unread")
-//    public ResponseEntity<Integer> getUnreadCount(
-//            @PathVariable String familyId,
-//            Authentication authentication) {
-//
-//        String userId = extractUserId(authentication);
-//        log.debug("안 읽은 메시지 수 조회 요청 - familyId: {}, userId: {}", familyId, userId);
-//
-//        int unreadCount = chatService.getUnreadCount(familyId, userId);
-//        return ResponseEntity.ok(unreadCount);
-//    }
-
     // 사용자 ID 추출 메서드
     private String extractUserId(Authentication authentication) {
-        if (authentication != null) {
+        if (authentication == null) {
+            log.warn("인증 정보가 없습니다");
+            return null;
+        }
+
+        try {
             Object principal = authentication.getPrincipal();
             log.debug("Principal 타입: {}", principal.getClass().getName());
 
             // CustomUserDetails 타입인 경우
             if (principal instanceof CustomUserDetails) {
-                return String.valueOf(((CustomUserDetails) principal).getId());
+                Integer id = ((CustomUserDetails) principal).getId();
+                return id != null ? id.toString() : null;
             }
 
-            // 문자열 타입인 경우
+            // 문자열 타입인 경우 (토큰 인증 등)
             if (principal instanceof String) {
                 return (String) principal;
             }
 
-            // 다른 타입인 경우 toString() 결과에서 ID만 추출 시도
-            String principalStr = principal.toString();
-            if (principalStr.contains("CustomUserDetails")) {
-                try {
-                    // CustomUserDetails에서 ID 추출 시도
-                    if (principal instanceof CustomUserDetails) {
-                        return String.valueOf(((CustomUserDetails) principal).getId());
-                    }
-                } catch (Exception e) {
-                    log.warn("CustomUserDetails에서 ID 추출 실패", e);
-                }
+            // 그 외 타입의 경우 toString 시도
+            if (principal != null) {
+                return principal.toString();
             }
-
-            return principalStr;
+        } catch (Exception e) {
+            log.error("사용자 ID 추출 중 오류 발생: {}", e.getMessage(), e);
         }
 
         return null;
