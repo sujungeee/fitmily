@@ -6,7 +6,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@EnableConfigurationProperties(AwsS3Config.class)
 @SpringBootApplication
 @MapperScan("com.d208.fitmily.domain")
 public class FitmilyApplication {
