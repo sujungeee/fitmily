@@ -10,9 +10,9 @@ import jakarta.inject.Inject
 class ChatRepositoryImpl @Inject constructor(
     private val chatService: ChatService
 ): ChatRepository {
-    override suspend fun getChatList(familyId: String): Result<ChatListResponse> {
+    override suspend fun getChatList(familyId: String, page: Int): Result<ChatListResponse> {
         return ApiResultHandler.handleApi {
-            chatService.getChatList(familyId)
+            chatService.getChatList(familyId, page)
         }
     }
 }

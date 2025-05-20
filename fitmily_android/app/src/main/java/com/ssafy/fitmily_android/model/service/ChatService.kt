@@ -6,8 +6,9 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface ChatService {
-    @GET("chat/family/{familyId}/messages")
+    @GET("chat/family/{familyId}/{page}/messages")
     suspend fun getChatList(
         @Path("familyId") familyId: String
+        , @Path("page") page: Int
     ): Response<ChatListResponse>
 }
