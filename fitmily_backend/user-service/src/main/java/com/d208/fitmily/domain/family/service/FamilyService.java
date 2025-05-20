@@ -258,6 +258,8 @@ public class FamilyService {
                     .userNickname(member.getUserNickname())
                     .userBirth(member.getUserBirth())
                     .userGender(member.getUserGender())
+                    .userZodiacName(member.getUserZodiacName())
+                    .userFamilySequence(member.getUserFamilySequence())
                     .healthHeight(height)
                     .healthWeight(weight)
                     .healthBmi(bmi)

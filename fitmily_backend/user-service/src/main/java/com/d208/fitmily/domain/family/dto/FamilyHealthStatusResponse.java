@@ -26,6 +26,8 @@ public class FamilyHealthStatusResponse {
         private String userNickname;
         private String userBirth;
         private int userGender;
+        private String userZodiacName;
+        private int userFamilySequence;
         private float healthHeight;
         private float healthWeight;
         private float healthBmi;
