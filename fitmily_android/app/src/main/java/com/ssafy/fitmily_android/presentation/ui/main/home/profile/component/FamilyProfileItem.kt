@@ -51,11 +51,13 @@ fun FamilyProfileItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ProfileItem(
-                sequence = item.userFamilySequence,
+                sequence = item.userFamilySequence?:1,
                 name = item.userNickname,
-                animal = item.userZodiacName,
+                animal = item.userZodiacName?:"Mouse",
             )
             Text(
+                modifier = Modifier
+                    .padding(start = 8.dp),
                 text = "${item.userBirth}  |  ${if(item.userGender==1){"여"}else{"남"}} ",
                 style = typography.bodyMedium,
                 color = mainDarkGray
@@ -78,12 +80,12 @@ fun FamilyProfileItem(
                 ) {
                     Column {
                         Text("키/몸무게", style = typography.bodySmall, color = Color.Gray)
-                        Text("${item.healthHeight}cm ${item.healthWeight}kg", style = typography.bodyMedium)
+                        Text("${item.healthHeight.takeIf { it != 0.0 }?.toString() ?: "--"}cm ${item.healthWeight.takeIf { it != 0.0 }?.toString() ?: "--"}kg", style = typography.bodyMedium)
                     }
                     Spacer(modifier = Modifier.width(20.dp))
                     Column {
                         Text("BMI", style = typography.bodySmall, color = Color.Gray)
-                        Text("${item.healthBmi}", style = typography.bodyMedium)
+                        Text(item.healthBmi.takeIf { it != 0 }?.toString() ?: "--", style = typography.bodyMedium)
                     }
                 }
 
@@ -92,6 +94,9 @@ fun FamilyProfileItem(
                 Column {
                     Text("지병", style = typography.bodySmall, color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
+                    if (item.healthFiveMajorDiseases.isEmpty() && item.healthOtherDiseases.isEmpty()) {
+                        Text("없음", style = typography.bodySmall)
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         for (i in item.healthFiveMajorDiseases){
                             IllnessItem(i, ProfileUtil().seqToColor(item.userFamilySequence))

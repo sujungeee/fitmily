@@ -56,7 +56,6 @@ fun HomeScreen(
                     }
                 )
             }
-            // 권한 거부
             else {
                 Toast.makeText(context, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
             }
@@ -113,12 +112,6 @@ fun HomeScreen(
             )
         }
     }
-
-//    if(WalkLiveData.isServiceRunning.value) {
-//        Log.d(TAG, "HomeScreen: ")
-//        navController.navigate("walk/main")
-//        Log.d(TAG, "HomeScreen: ${WalkLiveData.lat}, ${WalkLiveData.lon}, ${WalkLiveData.speed}, ${WalkLiveData.lastUpdatedTime}")
-//    }
 
 }
 

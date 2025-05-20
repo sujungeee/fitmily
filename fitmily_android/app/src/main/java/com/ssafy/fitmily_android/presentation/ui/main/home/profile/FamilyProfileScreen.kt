@@ -47,6 +47,8 @@ fun FamilyProfileScreen(navController: NavHostController, familyId:Int,
     LaunchedEffect(familyProfileUiState.familyHealthListData) {
         if (familyProfileUiState.familyHealthListData.familyHealthDto.isEmpty()) {
             isEmpty.value = true
+        }else{
+            isEmpty.value = false
         }
     }
 
