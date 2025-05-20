@@ -1,4 +1,4 @@
-package com.d208.fitmily.domain.user.dto;
+package com.d208.fitmily.domain.user.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class LoginRequestDTO {
+public class LoginRequest {
 
 
     private String loginId;
