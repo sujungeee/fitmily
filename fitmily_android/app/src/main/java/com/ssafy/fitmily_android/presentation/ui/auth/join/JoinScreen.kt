@@ -293,6 +293,10 @@ fun JoinScreen(
                 , onClick = {
                     // 회원가입
                     val isInputValid = JoinUtil().isInputValid(id, pwd, pwd2, nickname, birth)
+                    val isValidId = JoinUtil().isValidId(id)
+                    val isValidPwd = JoinUtil().isValidPwd(pwd)
+                    val isValidNickname = JoinUtil().isValidNickname(nickname)
+                    val isValidBirth = JoinUtil().isValidBirth(birth)
                     val isFormatValid = JoinUtil().isFormatValid(id, pwd, nickname, birth)
                     val isEqualsPwd = JoinUtil().isEqualsPwd(pwd, pwd2)
                     val joinStateValid = joinState == "Available"
@@ -302,7 +306,10 @@ fun JoinScreen(
                     } else {
                         val message = when {
                             !isInputValid -> "빈 칸을 입력해주세요."
-                            !isFormatValid -> "입력 형식이 맞지 않습니다."
+                            !isValidId -> "아이디 형식이 맞지 않습니다."
+                            !isValidPwd -> "비밀번호 형식이 맞지 않습니다."
+                            !isValidNickname -> "닉네임 형식이 맞지 않습니다."
+                            !isValidBirth -> "생년월일 형식이 맞지 않습니다."
                             !isEqualsPwd -> "비밀번호가 일치하지 않습니다."
                             !joinStateValid -> "아이디 중복을 확인해주세요."
                             else -> ""

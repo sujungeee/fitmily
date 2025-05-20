@@ -14,13 +14,13 @@ class ChatPagingSource(
         val page = params.key ?: 1
 
         return try {
-            val result = chatListUseCase(familyId) // TODO: page 추가
+            val result = chatListUseCase(familyId, page)
             if (result is Result.Success) {
                 var messages = emptyList<ChatMessage>()
                 result.data?.let {
                     messages = it.messages
                 }
-                val isEnd = messages.size < PAGE_SIZE // 다음 페이지 없으면 null
+                val isEnd = messages.size < PAGE_SIZE
                 LoadResult.Page(
                     data = messages,
                     prevKey = if (page == 1) null else page - 1,
