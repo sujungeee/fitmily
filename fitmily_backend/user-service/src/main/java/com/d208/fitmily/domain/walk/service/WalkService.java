@@ -85,7 +85,11 @@ public class WalkService {
         params.put("start",   start);
         params.put("end",     end);
 
-        return walkMapper.selectWalks(params);
+        //
+
+        walkMapper.selectWalks(params);
+
+
     }
 
 
