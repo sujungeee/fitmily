@@ -26,28 +26,34 @@ public class FamilyController {
 
 
     @PostMapping
-    public ResponseEntity<CreateFamilyResponse> createFamily(@RequestBody CreateFamilyRequest request) {
-        int familyId = familyService.createFamily(request.getFamilyName());
+    public ResponseEntity<CreateFamilyResponse> createFamily(
+            @RequestBody CreateFamilyRequest request,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        // 로그인한 사용자의 ID를 가져옴
+        int userId = principal.getId();
+
+        // 수정된 createFamily 메서드 호출 (userId 추가)
+        int familyId = familyService.createFamily(request.getFamilyName(), userId);
+
         return ResponseEntity.ok(new CreateFamilyResponse(familyId));
     }
+
 
     @PostMapping("/join")
     public ResponseEntity<JoinFamilyResponse> joinFamily(
             @RequestBody JoinFamilyRequest request,
             @AuthenticationPrincipal CustomUserDetails principal) {
 
-        // 디버깅 로그 추가
+        // 디버깅 로그 (유지)
         System.out.println("인증 정보: " + (principal != null ? "있음" : "없음"));
-
-        // CustomUserDetails에서 사용자 ID 직접 가져옴
         int userId = principal.getId();
         System.out.println("사용자 ID: " + userId);
 
         int familyId = familyService.joinFamily(request.getFamilyInviteCode(), userId);
 
-        JoinFamilyResponse response = new JoinFamilyResponse(
-                new JoinFamilyResponse.FamilyData(familyId)
-        );
+        // 변경된 응답 객체 생성 방식
+        JoinFamilyResponse response = new JoinFamilyResponse(familyId);
         return ResponseEntity.ok(response);
     }
 
