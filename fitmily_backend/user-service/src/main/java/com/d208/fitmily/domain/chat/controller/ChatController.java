@@ -62,38 +62,4 @@ public class ChatController {
             return ResponseEntity.ok(new ChatMessagesResponseDTO(Collections.emptyList(), false));
         }
     }
-
-//
-//    // 사용자 ID 추출 메서드
-//    private String extractUserId(Authentication authentication) {
-//        if (authentication == null) {
-//            log.warn("인증 정보가 없습니다");
-//            return null;
-//        }
-//
-//        try {
-//            Object principal = authentication.getPrincipal();
-//            log.debug("Principal 타입: {}", principal.getClass().getName());
-//
-//            // CustomUserDetails 타입인 경우
-//            if (principal instanceof CustomUserDetails) {
-//                Integer id = ((CustomUserDetails) principal).getId();
-//                return id != null ? id.toString() : null;
-//            }
-//
-//            // 문자열 타입인 경우 (토큰 인증 등)
-//            if (principal instanceof String) {
-//                return (String) principal;
-//            }
-//
-//            // 그 외 타입의 경우 toString 시도
-//            if (principal != null) {
-//                return principal.toString();
-//            }
-//        } catch (Exception e) {
-//            log.error("사용자 ID 추출 중 오류 발생: {}", e.getMessage(), e);
-//        }
-//
-//        return null;
-//    }
 }
