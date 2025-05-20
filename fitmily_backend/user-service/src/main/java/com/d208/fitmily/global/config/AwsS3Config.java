@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -13,11 +13,11 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
-@Slf4j
-@Configuration
-@ConfigurationProperties(prefix = "spring.cloud.aws")
+@Component // ✅ 추가
+@ConfigurationProperties(prefix = "cloud.aws")
 @Getter
 @Setter
+@Slf4j
 public class AwsS3Config {
 
     private Credentials credentials;
@@ -37,16 +37,16 @@ public class AwsS3Config {
 
     @PostConstruct
     public void logInitializedValues() {
-        System.out.println("✅ AwsS3Config 초기화됨:");
-        System.out.println("🔹 region = " + region);
-        System.out.println("🔹 accessKey = " + (credentials != null ? credentials.getAccessKey() : "null"));
-        System.out.println("🔹 secretKey = " + (credentials != null ? "[PROTECTED]" : "null"));
-        System.out.println("🔹 bucket = " + (s3 != null ? s3.getBucket() : "null"));
+        log.info("✅ AwsS3Config 초기화됨:");
+        log.info("🔹 region = {}", region);
+        log.info("🔹 accessKey = {}", credentials != null ? credentials.getAccessKey() : "null");
+        log.info("🔹 secretKey = {}", credentials != null ? "[PROTECTED]" : "null");
+        log.info("🔹 bucket = {}", s3 != null ? s3.getBucket() : "null");
     }
 
     public S3Client s3Client() {
         return S3Client.builder()
-                .region(software.amazon.awssdk.regions.Region.of(region))
+                .region(Region.of(region))
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
                                 AwsBasicCredentials.create(credentials.getAccessKey(), credentials.getSecretKey())
@@ -57,7 +57,7 @@ public class AwsS3Config {
 
     public S3Presigner s3Presigner() {
         return S3Presigner.builder()
-                .region(software.amazon.awssdk.regions.Region.of(region))
+                .region(Region.of(region))
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
                                 AwsBasicCredentials.create(credentials.getAccessKey(), credentials.getSecretKey())
