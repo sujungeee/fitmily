@@ -89,8 +89,10 @@ public class WalkService {
 
         for(WalkResponseDto walk : walks){
             String routeImg = walk.getRouteImg();
+            System.out.println("routeImg: " + routeImg);
             if (routeImg != null && !routeImg.isBlank()){
                 String presignedUrl = awsS3Service.generatePresignedDownloadUrl(routeImg);
+                System.out.println("presignedUrl" + presignedUrl);
                 walk.setRouteImg(presignedUrl);
             }
         }
