@@ -25,6 +25,7 @@ public class AwsS3Controller {
     @PostMapping("/upload-url")
     public ResponseEntity<UploadUrlResponseDto> getPresignedUploadUrl(@RequestBody UploadUrlRequestDto dto) {
         String presignedUrl = awsS3Service.generatePresignedUploadUrl(dto);
+        System.out.println(" [컨트롤러] Presigned URL 요청 들어옴");
 
         UploadUrlResponseDto responseDto = new UploadUrlResponseDto();
         responseDto.setUrl(presignedUrl);
