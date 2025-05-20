@@ -50,7 +50,7 @@ public class AwsS3Config {
     @PostConstruct
     public void init() {
         try {
-            // 디버깅 로그 (첫 번째 init 메서드의 내용)
+           System.out.println("초기화 시작");
             System.out.println("✅ AWS region = " + region);
             if (credentials != null) {
                 System.out.println("✅ AWS accessKey = " + credentials.getAccessKey());
