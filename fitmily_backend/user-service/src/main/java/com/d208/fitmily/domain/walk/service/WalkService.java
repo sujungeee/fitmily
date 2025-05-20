@@ -85,11 +85,16 @@ public class WalkService {
         params.put("start",   start);
         params.put("end",     end);
 
-        //
+        List<WalkResponseDto> walks = walkMapper.selectWalks(params);
 
-        walkMapper.selectWalks(params);
-
-
+        for(WalkResponseDto walk : walks){
+            String routeImg = walk.getRouteImg();
+            if (routeImg != null && !routeImg.isBlank()){
+                String presignedUrl = awsS3Service.generatePresignedDownloadUrl(routeImg);
+                walk.setRouteImg(presignedUrl);
+            }
+        }
+        return walks;
     }
 
 
