@@ -20,70 +20,111 @@ public class DelegatingStompHandler implements ChannelInterceptor {
     private final ChatStompHandler chatStompHandler;
 
     private static final Logger log = LoggerFactory.getLogger(DelegatingStompHandler.class);
-
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        StompCommand command = accessor.getCommand();
-
-        // 메시지 목적지 확인
-        String destination = accessor.getDestination();
-        log.debug("STOMP 메시지 - command: {}, destination: {}", command, destination);
-
-        try {
-            // CONNECT 시 기본적으로 WalkStompHandler로 처리
-            if (StompCommand.CONNECT.equals(command)) {
-                // 헤더에서 연결 타입 확인 (채팅용 커스텀 헤더 추가 가능)
-                String connectionType = accessor.getFirstNativeHeader("Connection-Type");
-                log.debug("CONNECT 요청: connectionType={}", connectionType);
-
-                if ("chat".equals(connectionType)) {
-                    return chatStompHandler.handle(message, channel);
-                } else {
-                    return walkStompHandler.handle(message, channel);
-                }
-            }
-
-            // SUBSCRIBE/SEND 시 목적지에 따라 라우팅
-            if ((StompCommand.SUBSCRIBE.equals(command) || StompCommand.SEND.equals(command))
-                    && destination != null) {
-
-                // 부분 문자열 포함 여부로 확인 (더 관대한 매칭)
-                if (destination.contains("chat")) {
-                    log.debug("Chat 메시지 라우팅: {}", destination);
-                    return chatStompHandler.handle(message, channel);
-                } else if (destination.contains("walk")) {
-                    log.debug("Walk 메시지 라우팅: {}", destination);
-                    return walkStompHandler.handle(message, channel);
-                }
-            }
-
-            // ✅ 인증 정보가 있으면 SecurityContext에 반영 (SEND/SUBSCRIBE 시)
-            if (accessor.getUser() instanceof Authentication auth) {
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            }
-        } catch (Exception e) {
-            log.error("메시지 처리 중 오류 발생", e);
-            // 오류가 발생해도 메시지 처리는 계속 진행
-        }
-
-        return message;
-    }
+//
 //    @Override
 //    public Message<?> preSend(Message<?> message, MessageChannel channel) {
 //        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 //        StompCommand command = accessor.getCommand();
 //
-//        // ✅ CONNECT 시만 WalkStompHandler로 위임
-//        if (StompCommand.CONNECT.equals(command)) {
-//            return walkStompHandler.handle(message, channel);
-//        }
+//        // 메시지 목적지 확인
+//        String destination = accessor.getDestination();
+//        log.debug("STOMP 메시지 - command: {}, destination: {}", command, destination);
 //
-//        // ✅ 인증 정보가 있으면 SecurityContext에 반영 (SEND/SUBSCRIBE 시)
-//        if (accessor.getUser() instanceof Authentication auth) {
-//            SecurityContextHolder.getContext().setAuthentication(auth);
+//        try {
+//            // CONNECT 시 기본적으로 WalkStompHandler로 처리
+//            if (StompCommand.CONNECT.equals(command)) {
+//                // 헤더에서 연결 타입 확인 (채팅용 커스텀 헤더 추가 가능)
+//                String connectionType = accessor.getFirstNativeHeader("Connection-Type");
+//                log.debug("CONNECT 요청: connectionType={}", connectionType);
+//
+//                if ("chat".equals(connectionType)) {
+//                    return chatStompHandler.handle(message, channel);
+//                } else {
+//                    return walkStompHandler.handle(message, channel);
+//                }
+//            }
+//
+//            // SUBSCRIBE/SEND 시 목적지에 따라 라우팅
+//            if ((StompCommand.SUBSCRIBE.equals(command) || StompCommand.SEND.equals(command))
+//                    && destination != null) {
+//
+//                // 부분 문자열 포함 여부로 확인 (더 관대한 매칭)
+//                if (destination.contains("chat")) {
+//                    log.debug("Chat 메시지 라우팅: {}", destination);
+//                    return chatStompHandler.handle(message, channel);
+//                } else if (destination.contains("walk")) {
+//                    log.debug("Walk 메시지 라우팅: {}", destination);
+//                    return walkStompHandler.handle(message, channel);
+//                }
+//            }
+//
+//            // ✅ 인증 정보가 있으면 SecurityContext에 반영 (SEND/SUBSCRIBE 시)
+//            if (accessor.getUser() instanceof Authentication auth) {
+//                SecurityContextHolder.getContext().setAuthentication(auth);
+//            }
+//        } catch (Exception e) {
+//            log.error("메시지 처리 중 오류 발생", e);
+//            // 오류가 발생해도 메시지 처리는 계속 진행
 //        }
 //
 //        return message;
 //    }
+//}
+
+
+    @Override
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompCommand command = accessor.getCommand();
+        String sessionId = accessor.getSessionId();
+
+        // 메시지 목적지 확인
+        String destination = accessor.getDestination();
+        log.info("STOMP 메시지 - command: {}, sessionId: {}, destination: {}",
+                command, sessionId, destination);
+
+        try {
+            // CONNECT 시 인증은 WebSocketConfig에서 이미 처리됨
+            // 여기서는 데스티네이션 기반으로만 라우팅
+            if (StompCommand.CONNECT.equals(command)) {
+                log.info("CONNECT 처리: sessionId={}", sessionId);
+
+                // CONNECT 시에는 두 핸들러 모두 실행
+                try {
+                    chatStompHandler.handle(message, channel);
+                } catch (Exception e) {
+                    log.error("채팅 핸들러 실행 오류: {}", e.getMessage(), e);
+                }
+
+                try {
+                    walkStompHandler.handle(message, channel);
+                } catch (Exception e) {
+                    log.error("산책 핸들러 실행 오류: {}", e.getMessage(), e);
+                }
+
+                return message;
+            }
+
+            // SUBSCRIBE/SEND 시 목적지에 따라 라우팅
+            if ((StompCommand.SUBSCRIBE.equals(command) || StompCommand.SEND.equals(command))
+                    && destination != null) {
+                if (destination.contains("chat")) {
+                    log.info("Chat 메시지 라우팅: {}", destination);
+                    return chatStompHandler.handle(message, channel);
+                } else if (destination.contains("walk")) {
+                    log.info("Walk 메시지 라우팅: {}", destination);
+                    return walkStompHandler.handle(message, channel);
+                }
+            }
+
+            // 인증 정보 설정
+            if (accessor.getUser() instanceof Authentication auth) {
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        } catch (Exception e) {
+            log.error("메시지 처리 중 오류: {}", e.getMessage(), e);
+        }
+
+        return message;
+    }
 }
