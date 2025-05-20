@@ -1,11 +1,11 @@
-package com.d208.fitmily.domain.user.dto;
+package com.d208.fitmily.domain.user.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-public class JoinRequestDTO {
+public class JoinRequest {
 
     private String loginId;
     private String password;
