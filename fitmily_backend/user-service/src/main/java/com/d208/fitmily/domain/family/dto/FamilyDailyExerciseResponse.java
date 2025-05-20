@@ -19,6 +19,7 @@ public class FamilyDailyExerciseResponse {
     public static class MemberDailyExercise {
         private int userId;
         private String userNickname;
+        private String userZodiacName; // request from 현슴
         private int userFamilySequence;
         private int exerciseGoalProgress;
         private int totalCalories;
