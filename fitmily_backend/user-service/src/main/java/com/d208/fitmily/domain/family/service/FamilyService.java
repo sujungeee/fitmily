@@ -1,6 +1,8 @@
 package com.d208.fitmily.domain.family.service;
 
 import com.d208.fitmily.domain.exercise.entity.Exercise;
+import com.d208.fitmily.domain.exercise.entity.ExerciseGoal;
+import com.d208.fitmily.domain.exercise.mapper.ExerciseGoalMapper;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
 import com.d208.fitmily.domain.family.dto.FamilyCalendarResponse;
 import com.d208.fitmily.domain.family.dto.FamilyDailyExerciseResponse;
@@ -40,6 +42,7 @@ public class FamilyService {
 
     private final FamilyMapper familyMapper;
     private final ExerciseMapper exerciseMapper;
+    private final ExerciseGoalMapper exerciseGoalMapper;
     private final HealthMapper healthMapper;
     private final ObjectMapper objectMapper;
     private final ChatMessageService chatMessageService;
@@ -328,29 +331,54 @@ public class FamilyService {
 
             while (!currentDate.isAfter(endDate)) {
                 String dateString = currentDate.format(DateTimeFormatter.ISO_DATE);
-
-                // 해당 날짜에 완료한 운동이 있는지 확인
                 boolean isCompleted = false;
 
                 try {
-                    // 운동 데이터 조회 시 NullPointerException 방지
-                    List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), dateString);
+                    // 1. 특정 날짜의 운동 목표 조회 (ExerciseGoal 활용)
+                    List<ExerciseGoal> goals = exerciseGoalMapper.findUserGoalsByDate(member.getUserId(), dateString);
 
-                    if (exercises != null && !exercises.isEmpty()) {
-                        // 각 운동에 대해 목표 달성 여부 확인
-                        int completedExercises = 0;
-
-                        for (Exercise exercise : exercises) {
-                            if (exercise != null && exercise.getExerciseCount() > 0) {
-                                completedExercises++;
+                    // 2. 목표가 하나라도 100% 완료되었는지 확인
+                    if (goals != null && !goals.isEmpty()) {
+                        for (ExerciseGoal goal : goals) {
+                            if (goal.getExerciseGoalProgress() >= 100) {
+                                isCompleted = true;
+                                break;
                             }
                         }
+                    }
 
-                        isCompleted = completedExercises > 0 && completedExercises == exercises.size();
+                    // 3. 목표가 없거나 완료되지 않았으면 운동 기록으로 확인
+                    if (!isCompleted) {
+                        List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), dateString);
+                        if (exercises != null && !exercises.isEmpty()) {
+                            for (Exercise exercise : exercises) {
+                                if (exercise != null) {
+                                    // 운동별 목표치 설정
+                                    int targetCount = getExerciseTarget(exercise.getExerciseName());
+
+                                    // 목표 달성 여부 확인
+                                    if (exercise.getExerciseCount() >= targetCount) {
+                                        isCompleted = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 4. 백업 방법: calculateProgress 메서드 활용 (오늘 날짜만)
+                    if (!isCompleted && dateString.equals(LocalDate.now().format(DateTimeFormatter.ISO_DATE))) {
+                        try {
+                            int progress = exerciseGoalMapper.calculateProgress(member.getUserId());
+                            if (progress >= 100) {
+                                isCompleted = true;
+                            }
+                        } catch (Exception e) {
+                            log.warn("운동 목표 진행률 조회 실패: {}", e.getMessage());
+                        }
                     }
                 } catch (Exception e) {
-                    // 오류 로그만 남기고 계속 진행
-                    System.out.println("운동 데이터 조회 중 오류: " + e.getMessage());
+                    log.error("운동 데이터 조회 중 오류: {}", e.getMessage());
                 }
 
                 if (isCompleted) {
@@ -371,6 +399,7 @@ public class FamilyService {
                 .calendar(calendarEntries)
                 .build();
     }
+
 
     // 사용자의 특정 날짜 운동 완료 여부 확인 (기존 Exercise 클래스 활용)
     private boolean checkDailyExerciseCompletion(int userId, String date) {
