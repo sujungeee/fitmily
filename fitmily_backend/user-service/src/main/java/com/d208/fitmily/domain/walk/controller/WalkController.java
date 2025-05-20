@@ -87,9 +87,9 @@ public class WalkController {
 
     @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
     @GetMapping("/api/family/walking-members")
-    public ResponseEntity<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
+    public ResponseEntity<Map<String, Object>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
         List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
-        return ResponseEntity.ok(walkingUsers);
+        return ResponseEntity.ok(Map.of("member", walkingUsers));
     }
 }
 

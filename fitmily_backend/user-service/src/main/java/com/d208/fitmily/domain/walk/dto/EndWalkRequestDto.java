@@ -17,5 +17,4 @@ public class EndWalkRequestDto {
     private Timestamp endTime;
     private Float distance;
     private String routeImg;
-
 }

@@ -73,8 +73,6 @@ public class WalkService {
         //gps 데이터 삭제
         gpsRedisService.removeWalkData(userId);
 
-//        awsS3Service.generatePresignedUploadUrl(dto.get());
-
     }
 
 
