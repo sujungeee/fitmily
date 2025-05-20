@@ -424,7 +424,7 @@ public class FamilyService {
         List<FamilyDailyExerciseResponse.MemberDailyExercise> memberList = new ArrayList<>();
 
         for (User member : familyMembers) {
-            // 1. 해당 일자의 운동 목표 조회
+            // 해당 일자의 운동 목표 조회
             List<ExerciseGoal> goals = exerciseGoalMapper.findUserGoalsByDate(member.getUserId(), date);
             Map<String, ExerciseGoal> goalMap = new HashMap<>();
 
@@ -435,11 +435,10 @@ public class FamilyService {
                 }
             }
 
-            // 2. 해당 일자의 운동 기록 조회
+            // 해당 일자의 운동 기록 조회
             List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), date);
-            if (exercises == null) exercises = new ArrayList<>();
 
-            // 3. 통계 집계 및 운동 정보 변환
+            // 통계 집계 및 운동 정보 변환
             int totalCalories = 0;
             int totalTime = 0;
             int completedGoals = 0;
@@ -447,50 +446,50 @@ public class FamilyService {
 
             List<FamilyDailyExerciseResponse.ExerciseInfo> exerciseInfoList = new ArrayList<>();
 
-            for (Exercise exercise : exercises) {
-                if (exercise == null) continue;
+            if (exercises != null) {
+                for (Exercise exercise : exercises) {
+                    if (exercise == null) continue;
 
-                // 칼로리와 시간 누적
-                totalCalories += exercise.getExerciseCalories();
-                totalTime += (exercise.getExerciseTime() != null) ? exercise.getExerciseTime() : 0;
+                    // 칼로리와 시간 누적
+                    totalCalories += exercise.getExerciseCalories();
+                    totalTime += (exercise.getExerciseTime() != null) ? exercise.getExerciseTime() : 0;
 
-                // 운동명에 해당하는 목표 찾기
-                ExerciseGoal matchedGoal = goalMap.get(exercise.getExerciseName().toLowerCase());
-                int goalValue = 0;
+                    // 운동명에 해당하는 목표 찾기
+                    ExerciseGoal matchedGoal = goalMap.get(exercise.getExerciseName().toLowerCase());
+                    int goalValue = 0;
 
-                if (matchedGoal != null) {
-                    // 목표가 있으면 목표값 사용
-                    goalValue = (int)matchedGoal.getExerciseGoalValue();
-                    totalMatches++;
+                    if (matchedGoal != null) {
+                        // 목표가 있으면 목표값 사용
+                        goalValue = (int)matchedGoal.getExerciseGoalValue();
+                        totalMatches++;
 
-                    // 목표 달성 여부 확인
-                    if (exercise.getExerciseCount() >= goalValue) {
-                        completedGoals++;
+                        // 목표 달성 여부 확인
+                        if (exercise.getExerciseCount() >= goalValue) {
+                            completedGoals++;
+                        }
                     }
+
+                    // 산책 경로 이미지 조회
+                    String routeImg = "";
+                    if ("산책".equals(exercise.getExerciseName())) {
+                        routeImg = exerciseMapper.findRouteImageByExerciseId(exercise.getExerciseId());
+                        if (routeImg == null) routeImg = "";
+                    }
+
+                    // 운동 정보 생성
+                    exerciseInfoList.add(FamilyDailyExerciseResponse.ExerciseInfo.builder()
+                            .exerciseId(exercise.getExerciseId())
+                            .exerciseName(exercise.getExerciseName())
+                            .exerciseRouteImg(routeImg)
+                            .exerciseCount(exercise.getExerciseCount())
+                            .exerciseGoalValue(goalValue)
+                            .exerciseCalories(exercise.getExerciseCalories())
+                            .exerciseTime(exercise.getExerciseTime() != null ? exercise.getExerciseTime() : 0)
+                            .build());
                 }
-
-                // 산책 경로 이미지 조회
-                String routeImg = "";
-                if ("산책".equals(exercise.getExerciseName())) {
-                    routeImg = exerciseMapper.findRouteImageByExerciseId(exercise.getExerciseId());
-                    if (routeImg == null) routeImg = "";
-                }
-
-                // 운동 정보 생성
-                FamilyDailyExerciseResponse.ExerciseInfo info = FamilyDailyExerciseResponse.ExerciseInfo.builder()
-                        .exerciseId(exercise.getExerciseId())
-                        .exerciseName(exercise.getExerciseName())
-                        .exerciseRouteImg(routeImg)
-                        .exerciseCount(exercise.getExerciseCount())
-                        .exerciseGoalValue(goalValue)  // 매칭된 목표값 사용
-                        .exerciseCalories(exercise.getExerciseCalories())
-                        .exerciseTime(exercise.getExerciseTime() != null ? exercise.getExerciseTime() : 0)
-                        .build();
-
-                exerciseInfoList.add(info);
             }
 
-            // 목표 진행률 계산 (매칭된 목표 중 달성한 것의 비율)
+            // 목표 진행률 계산
             int progressRate = totalMatches > 0 ?
                     (int)Math.round(((double)completedGoals / totalMatches) * 100) : 0;
 
@@ -499,6 +498,7 @@ public class FamilyService {
                     FamilyDailyExerciseResponse.MemberDailyExercise.builder()
                             .userId(member.getUserId())
                             .userNickname(member.getUserNickname())
+                            .userZodiacName(member.getUserZodiacName())  // userZodiacName 추가
                             .userFamilySequence(member.getUserFamilySequence())
                             .exerciseGoalProgress(progressRate)
                             .totalCalories(totalCalories)

@@ -10,19 +10,6 @@ import java.util.Map;
 
 @Mapper
 public interface ExerciseMapper {
-    /**
-     * 특정 사용자의 특정 날짜 운동 목록 조회
-     */
-    @Select("SELECT * FROM exercise WHERE user_id = #{userId} AND DATE(exercise_created_at) = #{date}")
-    List<Exercise> findUserExercisesByDate(@Param("userId") int userId, @Param("date") String date);
-
-    /**
-     * 특정 사용자의 특정 날짜 총 운동 칼로리 계산
-     */
-    @Select("SELECT COALESCE(SUM(exercise_calories), 0) FROM exercise WHERE user_id = #{userId} AND DATE(exercise_created_at) = #{date}")
-    int calculateUserTotalCalories(@Param("userId") int userId, @Param("date") String date);
-
-
     //    운동 기록 추가
     @Insert("""
         INSERT INTO exercise(
@@ -86,7 +73,39 @@ public interface ExerciseMapper {
 
 
     //
+
+    /**
+     * 특정 사용자의 특정 날짜 총 운동 칼로리 계산
+     */
+    @Select("SELECT COALESCE(SUM(exercise_calories), 0) FROM exercise WHERE user_id = #{userId} AND DATE_FORMAT(exercise_created_at, '%Y-%m-%d') = #{date}")
+    int calculateUserTotalCalories(@Param("userId") int userId, @Param("date") String date);
+
+
+    /**
+     * 특정 사용자의 특정 날짜 운동 목록 조회
+     */
+    @Select("SELECT * FROM exercise WHERE user_id = #{userId} AND DATE_FORMAT(exercise_created_at, '%Y-%m-%d') = #{date}")
+    @Results(id = "exerciseMap", value = {
+            @Result(property = "exerciseId", column = "exercise_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "exerciseName", column = "exercise_name"),
+            @Result(property = "exerciseTime", column = "exercise_time"),
+            @Result(property = "exerciseCount", column = "exercise_count"),
+            @Result(property = "exerciseCalories", column = "exercise_calories"),
+            @Result(property = "exerciseCreatedAt", column = "exercise_created_at"),
+            @Result(property = "exerciseUpdatedAt", column = "exercise_updated_at")
+    })
+    List<Exercise> findUserExercisesByDate(@Param("userId") int userId, @Param("date") String date);
+
+
+    /**
+     * 운동 ID로 경로 이미지 조회
+     */
     @Select("SELECT route_image FROM walk WHERE exercise_id = #{exerciseId}")
+    @Results(id = "walkRouteMap", value = {
+            @Result(property = "routeImage", column = "route_image")
+    })
     String findRouteImageByExerciseId(@Param("exerciseId") int exerciseId);
+
 
 }
