@@ -22,14 +22,14 @@ public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
 
-    // IP 주소 직접 하드코딩
-    private final String mongoHost = "172.18.0.6";
+    // 업데이트된 IP 주소로 설정
+    private final String mongoHost = "172.18.0.7";
     private final String mongoPort = "27017";
     private final String mongoDatabase = "fitmily";
 
     @Bean
     public MongoClient mongoClient() {
-        // 디버깅을 위한 추가 로그
+        // 디버깅을 위한 상세 로그
         log.info("=== MongoDB 연결 설정 ===");
         log.info("호스트: {}", mongoHost);
         log.info("포트: {}", mongoPort);
