@@ -1,4 +1,4 @@
-package com.d208.fitmily.domain.user.dto;
+package com.d208.fitmily.domain.user.dto.response;
 
 
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class LoginResponseDto {
+public class LoginResponse {
     private Integer userId;
     private String username;
     private String nickname;
