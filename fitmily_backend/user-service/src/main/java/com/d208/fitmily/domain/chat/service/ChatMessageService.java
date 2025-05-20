@@ -45,9 +45,9 @@ public class ChatMessageService {
         }
     }
 
-    // 메시지 전송
-    public void sendMessage(String familyId, MessageRequestDTO messageRequest, String userId) {
-        log.info("메시지 전송 시작 - familyId: {}, userId: {}, type: {}",
+    // 메시지 저장만 수행 (FCM 알림 제외)
+    public ChatMessage saveMessageOnly(String familyId, MessageRequestDTO messageRequest, String userId) {
+        log.info("메시지 저장 시작 - familyId: {}, userId: {}, type: {}",
                 familyId, userId, messageRequest.getMessageType());
 
         try {
@@ -121,6 +121,31 @@ public class ChatMessageService {
             // 온라인 사용자 목록에 발신자 추가
             redisTemplate.opsForSet().add("family:" + familyId + ":subscribers", userId);
 
+            return chatMessage;
+        } catch (Exception e) {
+            log.error("메시지 저장 오류", e);
+            throw new RuntimeException("메시지 저장 실패: " + e.getMessage(), e);
+        }
+    }
+
+    // FCM 알림만 전송
+    public void sendFCMNotifications(String familyId, ChatMessage message) {
+        try {
+            sendFCMNotificationsToOfflineUsers(familyId, message);
+        } catch (Exception e) {
+            log.error("FCM 알림 전송 오류", e);
+        }
+    }
+
+    // 전체 메시지 처리 (기존 메서드, 호환성을 위해 유지)
+    public void sendMessage(String familyId, MessageRequestDTO messageRequest, String userId) {
+        log.info("메시지 전송 시작 - familyId: {}, userId: {}, type: {}",
+                familyId, userId, messageRequest.getMessageType());
+
+        try {
+            // 메시지 저장
+            ChatMessage chatMessage = saveMessageOnly(familyId, messageRequest, userId);
+
             // 웹소켓으로 메시지 브로드캐스트
             Map<String, Object> response = new HashMap<>();
             response.put("type", "CHAT_MESSAGE");
@@ -139,7 +164,6 @@ public class ChatMessageService {
     }
 
     // 오프라인 사용자에게 FCM 알림 전송
-    // ChatMessageService.java에서 기존 sendFCMNotificationsToOfflineUsers 메서드 수정
     private void sendFCMNotificationsToOfflineUsers(String familyId, ChatMessage message) {
         try {
             // 1. 가족 구성원 목록 조회
@@ -196,7 +220,37 @@ public class ChatMessageService {
         }
     }
 
-    // 메시지 읽음 처리
+    // 메시지 읽음 처리 (새로운 버전)
+    public Map<String, Object> processMarkAsRead(String familyId, String messageId, String userId) {
+        log.info("읽음 처리 시작 - familyId: {}, messageId: {}, userId: {}",
+                familyId, messageId, userId);
+
+        try {
+            // Redis에 읽음 상태 업데이트
+            redisTemplate.opsForValue().set("read:" + familyId + ":" + userId, messageId);
+            redisTemplate.opsForValue().set("unread:" + familyId + ":" + userId, "0");
+
+            // MongoDB 읽음 상태 일괄 업데이트
+            int updatedCount = messageRepository.updateReadStatusBeforeId(familyId, messageId, userId);
+            log.debug("읽음 처리 완료: {} 개 메시지", updatedCount);
+
+            // 읽음 상태 응답 생성
+            Map<String, Object> readReceipt = new HashMap<>();
+            readReceipt.put("type", "READ_RECEIPT");
+            Map<String, Object> data = new HashMap<>();
+            data.put("userId", userId);
+            data.put("messageId", messageId);
+            data.put("timestamp", new Date());
+            readReceipt.put("data", data);
+
+            return readReceipt;
+        } catch (Exception e) {
+            log.error("읽음 처리 오류", e);
+            throw new RuntimeException("읽음 처리 실패: " + e.getMessage(), e);
+        }
+    }
+
+    // 메시지 읽음 처리 (기존 메서드, 호환성을 위해 유지)
     public void markAsRead(String familyId, String messageId, String userId) {
         log.info("읽음 처리 시작 - familyId: {}, messageId: {}, userId: {}",
                 familyId, messageId, userId);
