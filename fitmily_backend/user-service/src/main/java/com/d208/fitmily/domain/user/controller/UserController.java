@@ -2,6 +2,10 @@ package com.d208.fitmily.domain.user.controller;
 
 
 import com.d208.fitmily.domain.user.dto.*;
+import com.d208.fitmily.domain.user.dto.request.JoinRequest;
+import com.d208.fitmily.domain.user.dto.request.LoginRequest;
+import com.d208.fitmily.domain.user.dto.request.ReissueRequest;
+import com.d208.fitmily.domain.user.dto.response.ReissueResponse;
 import com.d208.fitmily.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +27,7 @@ public class UserController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/users")
-    public ResponseEntity<Void> join(@RequestBody JoinRequestDTO joinRequestDTO) {
+    public ResponseEntity<Void> join(@RequestBody JoinRequest joinRequestDTO) {
         userService.joinprocess(joinRequestDTO);
         return ResponseEntity.ok(null);
     }
@@ -31,7 +35,7 @@ public class UserController {
     // 실제 인증은 LoginFilter에서 진행함 이건 그냥 swagger용 컨트롤러임
     @Operation(summary = "로그인", description = "- ID, PW로 로그인하고 AccessToken, RefreshToken 발급")
     @PostMapping("/auth/login")
-    public void login(@RequestBody LoginRequestDTO request) {
+    public void login(@RequestBody LoginRequest request) {
     }
 
     @Operation(
@@ -55,9 +59,9 @@ public class UserController {
 
     @Operation(summary = "리이슈", description = "- access토큰 재발급")
     @PostMapping("/auth/reissue")
-    public ResponseEntity<ReissueResponseDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
+    public ResponseEntity<ReissueResponse> reissue(@RequestBody ReissueRequest reissueRequestDto) {
         String refreshToken = reissueRequestDto.getRefreshToken();
-        ReissueResponseDto newToken = userService.reissueAccessToken(refreshToken);
+        ReissueResponse newToken = userService.reissueAccessToken(refreshToken);
         return ResponseEntity.ok(newToken);
     }
 }

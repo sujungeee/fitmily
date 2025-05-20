@@ -1,4 +1,4 @@
-package com.d208.fitmily.domain.user.dto;
+package com.d208.fitmily.domain.user.dto.response;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ReissueResponseDto {
+public class ReissueResponse {
     private String accessToken;
     private String refreshToken;
 
