@@ -1,15 +1,20 @@
 package com.d208.fitmily.domain.chat.controller;
 
 import com.d208.fitmily.domain.chat.dto.ChatMessagesResponseDTO;
+import com.d208.fitmily.domain.chat.service.ChatMessageService;
 import com.d208.fitmily.domain.chat.service.ChatService;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 @Slf4j
 @Tag(name = "채팅 API", description = "채팅 메시지 조회")
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChatController {
 
     private final ChatService chatService;
+    private final ChatMessageService chatMessageService;
 
     @Operation(summary = "메시지 목록 조회", description = "가족 채팅방의 메시지 목록을 페이지 단위로 조회합니다.")
     @GetMapping("/family/{familyId}/{page}/messages")
@@ -26,51 +32,34 @@ public class ChatController {
             @PathVariable String familyId,
             @PathVariable int page,
             @RequestParam(defaultValue = "20") int limit,
-            Authentication authentication) {
-
-        String userId = extractUserId(authentication);
-        log.debug("페이지 기반 메시지 조회 - familyId: {}, userId: {}, page: {}, limit: {}",
-                familyId, userId, page, limit);
-
-        if (userId == null) {
-            log.warn("사용자 ID를 추출할 수 없습니다. 인증 정보를 확인하세요.");
-            return ResponseEntity.badRequest().build();
-        }
-
-        ChatMessagesResponseDTO response = chatService.getMessagesByPage(familyId, userId, page, limit);
-        return ResponseEntity.ok(response);
-    }
-
-    // 사용자 ID 추출 메서드
-    private String extractUserId(Authentication authentication) {
-        if (authentication == null) {
-            log.warn("인증 정보가 없습니다");
-            return null;
-        }
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
         try {
-            Object principal = authentication.getPrincipal();
-            log.debug("Principal 타입: {}", principal.getClass().getName());
-
-            // CustomUserDetails 타입인 경우
-            if (principal instanceof CustomUserDetails) {
-                Integer id = ((CustomUserDetails) principal).getId();
-                return id != null ? id.toString() : null;
+            if (principal == null) {
+                log.warn("인증된 사용자 정보가 없습니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
-            // 문자열 타입인 경우 (토큰 인증 등)
-            if (principal instanceof String) {
-                return (String) principal;
+            Integer userId = principal.getId();
+            if (userId == null) {
+                log.warn("사용자 ID가 null입니다.");
+                return ResponseEntity.badRequest().build();
             }
 
-            // 그 외 타입의 경우 toString 시도
-            if (principal != null) {
-                return principal.toString();
+            log.debug("페이지 기반 메시지 조회 - familyId: {}, userId: {}, page: {}, limit: {}",
+                    familyId, userId, page, limit);
+
+            // 권한 확인
+            if (!chatMessageService.validateUserFamilyAccess(userId.toString(), familyId)) {
+                log.warn("사용자 {}가 가족 {}의 채팅방에 접근할 권한이 없습니다.", userId, familyId);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
+
+            ChatMessagesResponseDTO response = chatService.getMessagesByPage(familyId, userId.toString(), page, limit);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("사용자 ID 추출 중 오류 발생: {}", e.getMessage(), e);
+            log.error("메시지 조회 API 오류", e);
+            return ResponseEntity.ok(new ChatMessagesResponseDTO(Collections.emptyList(), false));
         }
-
-        return null;
     }
 }

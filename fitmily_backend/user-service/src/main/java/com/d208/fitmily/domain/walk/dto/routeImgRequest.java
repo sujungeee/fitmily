@@ -1,15 +1,17 @@
-package com.d208.fitmily.domain.user.dto;
+package com.d208.fitmily.domain.walk.dto;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-public class ReissueRequestDto {
+public class routeImgRequest {
+    private String filename;
+    private String contentType;
 
-    private String refreshToken;
 }

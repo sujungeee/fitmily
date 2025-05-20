@@ -11,7 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UploadUrlRequestDto {
+
     private String filename;
-    private String contenttype;
+    private String contentType;
 }
 
