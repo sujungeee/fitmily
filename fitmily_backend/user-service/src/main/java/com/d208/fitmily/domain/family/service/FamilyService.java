@@ -331,57 +331,37 @@ public class FamilyService {
 
             while (!currentDate.isAfter(endDate)) {
                 String dateString = currentDate.format(DateTimeFormatter.ISO_DATE);
-                boolean isCompleted = false;
+                boolean allGoalsCompleted = false;
 
                 try {
-                    // 1. 특정 날짜의 운동 목표 조회 (ExerciseGoal 활용)
+                    // 1. 특정 날짜의 운동 목표 조회
                     List<ExerciseGoal> goals = exerciseGoalMapper.findUserGoalsByDate(member.getUserId(), dateString);
 
-                    // 2. 목표가 하나라도 100% 완료되었는지 확인
+                    // 2. 목표가 있고 모든 목표가 100% 달성되었는지 확인
                     if (goals != null && !goals.isEmpty()) {
+                        allGoalsCompleted = true; // 기본값 true로 설정
+
                         for (ExerciseGoal goal : goals) {
-                            if (goal.getExerciseGoalProgress() >= 100) {
-                                isCompleted = true;
+                            // 하나라도 100%가 안 되면 allGoalsCompleted = false
+                            if (goal.getExerciseGoalProgress() < 100) {
+                                allGoalsCompleted = false;
                                 break;
                             }
                         }
                     }
 
-                    // 3. 목표가 없거나 완료되지 않았으면 운동 기록으로 확인
-                    if (!isCompleted) {
-                        List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), dateString);
-                        if (exercises != null && !exercises.isEmpty()) {
-                            for (Exercise exercise : exercises) {
-                                if (exercise != null) {
-                                    // 운동별 목표치 설정
-                                    int targetCount = getExerciseTarget(exercise.getExerciseName());
-
-                                    // 목표 달성 여부 확인
-                                    if (exercise.getExerciseCount() >= targetCount) {
-                                        isCompleted = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                    // 3. 운동 목표 테이블에 데이터가 없는 경우(운동을 안 했거나 목표 설정이 안 됨)
+                    else {
+                        allGoalsCompleted = false;
                     }
 
-                    // 4. 백업 방법: calculateProgress 메서드 활용 (오늘 날짜만)
-                    if (!isCompleted && dateString.equals(LocalDate.now().format(DateTimeFormatter.ISO_DATE))) {
-                        try {
-                            int progress = exerciseGoalMapper.calculateProgress(member.getUserId());
-                            if (progress >= 100) {
-                                isCompleted = true;
-                            }
-                        } catch (Exception e) {
-                            log.warn("운동 목표 진행률 조회 실패: {}", e.getMessage());
-                        }
-                    }
                 } catch (Exception e) {
                     log.error("운동 데이터 조회 중 오류: {}", e.getMessage());
+                    allGoalsCompleted = false;
                 }
 
-                if (isCompleted) {
+                // 모든 목표를 달성한 경우에만 캘린더에 표시
+                if (allGoalsCompleted) {
                     calendarEntries.add(FamilyCalendarResponse.CalendarEntry.builder()
                             .userId(member.getUserId())
                             .date(dateString)
