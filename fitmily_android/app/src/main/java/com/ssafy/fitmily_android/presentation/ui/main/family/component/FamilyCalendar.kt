@@ -83,10 +83,6 @@ fun FamilyCalendar(
         )
         val coroutineScope = rememberCoroutineScope()
         val visibleMonth = state.firstVisibleMonth
-//        val indicatorMap: Map<CalendarDay, List<Color>> = mapOf(
-//            CalendarDay(LocalDate.of(2025, 5, 12), DayPosition.MonthDate) to
-//                    listOf(familyFirst, familySecond, familyThird, familyFourth, familyFifth, familySixth)
-//        )
 
         SimpleCalendarTitle(
             modifier = Modifier.background(mainWhite),
