@@ -3,6 +3,7 @@ package com.d208.fitmily.global.config;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
+@ToString
 @Component
 @ConfigurationProperties(prefix = "cloud.aws")
 @Getter
@@ -51,6 +53,7 @@ public class AwsS3Config {
     public void init() {
         try {
            System.out.println("초기화 시작");
+            System.out.println("✅ [AwsS3Config] 전체 상태: " + this.toString());
             System.out.println("✅ AWS region = " + region);
             if (credentials != null) {
                 System.out.println("✅ AWS accessKey = " + credentials.getAccessKey());
