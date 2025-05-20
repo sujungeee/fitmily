@@ -1,15 +1,21 @@
 package com.ssafy.fitmily_android.presentation.ui.main.family
 
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.DayPosition
 import com.ssafy.fitmily_android.domain.usecase.family.FamilyCalendarGetInfoUseCase
 import com.ssafy.fitmily_android.model.common.Result
+import com.ssafy.fitmily_android.model.dto.response.family.FamilyCalendarCalendar
+import com.ssafy.fitmily_android.util.ProfileUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,6 +64,14 @@ class FamilyViewModel @Inject constructor(
                     Log.d("test1234", "getFamilyCalendarInfo : 네트워크 에러")
                 }
             }
+        }
+    }
+
+    fun buildIndicatorMap(calendar: List<FamilyCalendarCalendar>): Map<CalendarDay, List<Color>> {
+        return calendar.groupBy {
+            CalendarDay(LocalDate.parse(it.date), DayPosition.MonthDate)
+        }.mapValues { entry ->
+            entry.value.map { ProfileUtil().seqToColor(it.userFamilySequence) }
         }
     }
 }
