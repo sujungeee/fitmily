@@ -14,7 +14,7 @@ public class SecretLogger {
     private String jwtSecret;
 
 //    @Value("${cloud.aws.region}")
-    private String region;
+//    private String region;
 
     @PostConstruct
     public void logJwtSecret() {
