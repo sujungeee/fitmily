@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatMessageDTO {
     private String messageId;
+    private String familyId;
     private String senderId;
     private SenderInfoDTO senderInfo;
     private MessageContentDTO content;
