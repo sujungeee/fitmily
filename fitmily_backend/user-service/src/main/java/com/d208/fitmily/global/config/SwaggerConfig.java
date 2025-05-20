@@ -22,14 +22,14 @@ public class SwaggerConfig {
                 .bearerFormat("JWT")
         );
 
-       Server server = new Server();
-       server.setUrl("https://k12d208.p.ssafy.io");
+//       Server server = new Server();
+//       server.setUrl("https://k12d208.p.ssafy.io");
 
         return new OpenAPI()
                 .components(new Components())
                 .info(apiInfo())
                 .addSecurityItem(securityRequirement)
-               .addServersItem(server) //서버 열렸을때 주석 풀기
+//               .addServersItem(server) //서버 열렸을때 주석 풀기
                 .components(components);
     }
     private Info apiInfo() {
