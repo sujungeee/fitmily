@@ -26,6 +26,7 @@ public class AwsS3Service {
         try {
             S3Presigner presigner = awsS3Config.s3Presigner();
             if (presigner == null) {
+                System.out.println("여기서문제인가?");
                 return null;
             }
 
@@ -45,6 +46,7 @@ public class AwsS3Service {
             // Presigned URL 생성
             PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
             return presignedRequest.url().toString();
+
         } catch (Exception e) {
             log.error("업로드 URL 생성 실패: {}", e.getMessage());
             return null;
