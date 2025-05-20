@@ -23,10 +23,19 @@ public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
 
-    // MongoDB 컨테이너의 실제 내부 IP 주소로 업데이트
-    private final String mongoHost = "172.18.0.3";
-    private final String mongoPort = "27017";
-    private final String mongoDatabase = "fitmily";
+//    // MongoDB 컨테이너의 실제 내부 IP 주소로 업데이트
+//    private final String mongoHost = "172.18.0.3";
+//    private final String mongoPort = "27017";
+//    private final String mongoDatabase = "fitmily";
+
+    @Value("${spring.data.mongodb.host:mongodb}")
+    private String mongoHost;
+
+    @Value("${spring.data.mongodb.port:27017}")
+    private String mongoPort;
+
+    @Value("${spring.data.mongodb.database:fitmily}")
+    private String mongoDatabase;
 
     @Bean
     public MongoClient mongoClient() {
