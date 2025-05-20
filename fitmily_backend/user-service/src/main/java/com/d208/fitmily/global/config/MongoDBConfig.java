@@ -22,8 +22,8 @@ public class MongoDBConfig {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
 
-    // 업데이트된 IP 주소로 설정
-    private final String mongoHost = "172.18.0.7";
+    // MongoDB 컨테이너의 실제 내부 IP 주소로 업데이트
+    private final String mongoHost = "172.18.0.9";
     private final String mongoPort = "27017";
     private final String mongoDatabase = "fitmily";
 
