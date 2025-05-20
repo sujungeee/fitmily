@@ -73,52 +73,75 @@ class HomeViewModel @Inject constructor(
                 result = result,
                 onSuccess = { data ->
                     data?.let { challenge ->
-                        // rank 기준 정렬 후 최대 3명까지 추출
-                        val sortedParticipants = challenge.participants
-                            .sortedBy { it.rank }
-                            .take(3)
-                            .toMutableList()
+                        if(challenge.participants != null) {
+                            // rank 기준 정렬 후 최대 3명까지 추출
+                            val sortedParticipants = challenge.participants
+                                .sortedBy { it.rank }
+                                .take(3)
+                                .toMutableList()
 
-                        // 부족한 등수만큼 "--" 채우기
-                        val missingCount = 3 - sortedParticipants.size
-                        repeat(missingCount) {
-                            sortedParticipants.add(
+                            // 부족한 등수만큼 "--" 채우기
+                            val missingCount = 3 - sortedParticipants.size
+                            repeat(missingCount) {
+                                sortedParticipants.add(
+                                    ChallengeMemberDto(
+                                        distanceCompleted = 0.0,
+                                        nickname = "--",
+                                        familySequence = -1,
+                                        zodiacName = "--",
+                                        rank = sortedParticipants.size + 1,
+                                        userId = -1
+                                    )
+                                )
+                            }
+
+                            _uiState.value = _uiState.value.copy(
+                                challengeData = data.copy(
+                                    challengeId = data!!.challengeId,
+                                    progressPercentage = data!!.progressPercentage,
+                                    startDate = data!!.startDate,
+                                    targetDistance = data!!.targetDistance,
+                                    participants = sortedParticipants
+                                ),
+
+                                )
+                        } else {
+                            // participants가 null일 경우에도 "--"로 3명 채워서 설정
+                            val dummyParticipants = List(3) { index ->
                                 ChallengeMemberDto(
                                     distanceCompleted = 0.0,
                                     nickname = "--",
                                     familySequence = -1,
                                     zodiacName = "--",
-                                    rank = sortedParticipants.size + 1,
+                                    rank = index + 1,
                                     userId = -1
                                 )
+                            }
+                            _uiState.value = _uiState.value.copy(
+                                challengeData = ChallengeResponse(
+                                    challengeId = data!!.challengeId ?: 0,
+                                    participants = dummyParticipants?: emptyList(),
+                                    progressPercentage = data!!.progressPercentage?: 0,
+                                    startDate = data!!.startDate?: "",
+                                    targetDistance = data!!.targetDistance?: 0,
+                                )
                             )
-                        }
-
-                        _uiState.value = _uiState.value.copy(
-                            challengeData = data.copy(
-                                challengeId = data!!.challengeId,
-                                progressPercentage = data!!.progressPercentage,
-                                startDate = data!!.startDate,
-                                targetDistance = data!!.targetDistance,
-                                participants = sortedParticipants
-                            ),
-
-                        )
-                    } ?: run {
-                        // data 자체가 null일 경우에도 "--"로 3명 채워서 설정
-                        val dummyParticipants = List(3) { index ->
-                            ChallengeMemberDto()
-                        }
-                        _uiState.value = _uiState.value.copy(
-                            challengeData = ChallengeResponse(
-                                challengeId = data!!.challengeId,
-                                participants = dummyParticipants,
-                                progressPercentage = data!!.progressPercentage,
-                                startDate = data!!.startDate,
-                                targetDistance = data!!.targetDistance,
+                        } ?: run {
+                            // data 자체가 null일 경우에도 "--"로 3명 채워서 설정
+                            val dummyParticipants = List(3) { index ->
+                                ChallengeMemberDto()
+                            }
+                            _uiState.value = _uiState.value.copy(
+                                challengeData = ChallengeResponse(
+                                    challengeId = data!!.challengeId,
+                                    participants = dummyParticipants,
+                                    progressPercentage = data!!.progressPercentage,
+                                    startDate = data!!.startDate,
+                                    targetDistance = data!!.targetDistance,
+                                )
                             )
-                        )
 
+                        }
                     }
                 },
                 onError = { msg ->
@@ -131,7 +154,7 @@ class HomeViewModel @Inject constructor(
 
     fun getDashboard() {
         viewModelScope.launch {
-            val result = getDashboardUseCase(familyId = uiState.value.familyId, today = "2025-05-19")
+            val result = getDashboardUseCase(familyId = uiState.value.familyId, today = "2025-05-20")
             ViewModelResultHandler.handle(
                 result = result,
                 onSuccess = { data ->
