@@ -13,13 +13,13 @@ public class SecretLogger {
     @Value("${spring.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${cloud.aws.region}")
+//    @Value("${cloud.aws.region}")
     private String region;
 
     @PostConstruct
     public void logJwtSecret() {
         System.out.println("✅✅✅ JWT 시크릿 = " + jwtSecret);
-        System.out.println("✅✅✅ region = " + region);
+//        System.out.println("✅✅✅ region = " + region);
 
     }
 }
