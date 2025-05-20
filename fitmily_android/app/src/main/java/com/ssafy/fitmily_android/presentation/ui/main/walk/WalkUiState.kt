@@ -7,5 +7,6 @@ data class WalkUiState(
     val isLoading: Boolean = false,
     val tstMessage: String = "",
     val otherGpsList: List<GpsDto> = emptyList<GpsDto>(),
-    val walkingFamilyList:List<WalkingFamilyResponse> = emptyList<WalkingFamilyResponse>()
-)
+    val walkingFamilyList:List<WalkingFamilyResponse.WalkingFamilyMember> = emptyList<WalkingFamilyResponse.WalkingFamilyMember>(),
+
+    )
