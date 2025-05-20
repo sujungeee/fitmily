@@ -1,8 +1,10 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk.live
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.view.ViewGroup
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.MapView
@@ -10,6 +12,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.PathOverlay
 
+private const val TAG = "WalkMapCaptureHelper"
 class WalkMapCaptureHelper(
     private val context: Context,
     private val path: List<LatLng>,
@@ -21,6 +24,11 @@ class WalkMapCaptureHelper(
     fun capture() {
         mapView = MapView(context)
         mapView.onCreate(null)
+        mapView.onResume()
+
+        val rootView = (context as? Activity)?.window?.decorView as? ViewGroup
+        rootView?.addView(mapView, ViewGroup.LayoutParams(1000, 1000)) // 원하는 사이즈
+
         mapView.getMapAsync(this)
     }
 
@@ -30,6 +38,7 @@ class WalkMapCaptureHelper(
             color = 0xFF3498DB.toInt()
             width = 10
         }
+
         pathOverlay.map = naverMap
 
         if (path.isNotEmpty()) {
@@ -40,6 +49,9 @@ class WalkMapCaptureHelper(
         mapView.postDelayed({
             naverMap.takeSnapshot { bitmap ->
                 onCaptured(bitmap)
+
+                val rootView = (context as? Activity)?.window?.decorView as? ViewGroup
+                rootView?.removeView(mapView)
                 mapView.onDestroy()
             }
         }, 1000L)

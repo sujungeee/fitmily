@@ -3,6 +3,7 @@ package com.ssafy.fitmily_android.presentation.ui.main.walk
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,11 +35,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.naver.maps.geometry.LatLng
@@ -65,6 +69,7 @@ import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.ui.theme.secondaryBlue
 import com.ssafy.fitmily_android.util.LocationUtil
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.ZoneId
@@ -91,7 +96,7 @@ fun WalkScreen(
     var watching = remember { mutableStateOf(0) }
 
     var path = remember { mutableStateOf(listOf<LatLng>()) }
-
+    var bitmapa = remember { mutableStateOf<Bitmap?>(null) }
     val elapsedTime = remember { mutableStateOf(0L) }
     val totalDistance = remember { mutableStateOf(0.0) }
     LaunchedEffect(WalkLiveData.gpsList.value) {
@@ -301,8 +306,10 @@ fun WalkScreen(
 
         }
 
-
     }
+
+
+
     if (isDialogOpen.value) {
         StopWalkDialog(
             onDismissRequest = { isDialogOpen.value = false },
@@ -313,26 +320,30 @@ fun WalkScreen(
 
                 // 캡처 추가
                 if (path.value.isNotEmpty()) {
+                    Log.d(TAG, "WalkScreenaa: ${path.value}")
                     WalkMapCaptureHelper(
                         context = context,
                         path = path.value,
                         onCaptured = { bitmap ->
                             bitmap?.let {
-                                // 저장하거나 공유 처리, 예: 파일로 저장
-                                bitmapToByteArray(it)
-                                walkViewModel.postWalk(
-                                    WalkEndRequest(
-                                        walkDistance = totalDistance.value,
-                                        walkStartTime = Instant.ofEpochMilli(WalkLiveData.startedTime)
-                                            .atZone(ZoneId.systemDefault())
-                                            .toLocalDateTime().toString(),
-                                        walkEndTime = Instant.ofEpochMilli(System.currentTimeMillis())
-                                            .atZone(ZoneId.systemDefault())
-                                            .toLocalDateTime().toString(),
-                                        walkRouteImg = System.currentTimeMillis().toString(),
-                                    ),
-                                    byteArray=bitmapToByteArray(it)
-                                )
+                                bitmapa.value = it
+                                Log.d(TAG, "WalkScreen: ${it}")
+                                Log.d(TAG, "WalkScreensss: ${bitmapToByteArray(it)}")
+                                (context as? LifecycleOwner)?.lifecycleScope?.launch {
+                                    walkViewModel.postWalk(
+                                        WalkEndRequest(
+                                            walkDistance = totalDistance.value,
+                                            walkStartTime = Instant.ofEpochMilli(WalkLiveData.startedTime)
+                                                .atZone(ZoneId.systemDefault())
+                                                .toLocalDateTime().toString(),
+                                            walkEndTime = Instant.ofEpochMilli(System.currentTimeMillis())
+                                                .atZone(ZoneId.systemDefault())
+                                                .toLocalDateTime().toString(),
+                                            walkRouteImg = System.currentTimeMillis().toString(),
+                                        ),
+                                        byteArray = bitmapToByteArray(it)
+                                    )
+                                }
                             }
                         }
                     ).capture()
