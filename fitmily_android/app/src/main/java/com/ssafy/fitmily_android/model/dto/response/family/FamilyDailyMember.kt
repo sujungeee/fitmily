@@ -7,5 +7,6 @@ data class FamilyDailyMember(
     val totalTime: Int,
     val userFamilySequence: Int,
     val userId: Int,
-    val userNickname: String
+    val userNickname: String,
+    val userZodiacName: String
 )
