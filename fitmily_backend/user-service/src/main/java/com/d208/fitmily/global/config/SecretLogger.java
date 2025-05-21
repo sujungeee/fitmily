@@ -13,7 +13,7 @@
 //    @Value("${spring.jwt.secret}")
 //    private String jwtSecret;
 //
-//    @Value("${cloud.aws.region}")
+//    @Value("${spring.cloud.aws.region.static}")
 //    private String region;
 //
 //    @PostConstruct

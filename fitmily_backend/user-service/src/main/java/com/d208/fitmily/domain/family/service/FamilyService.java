@@ -13,6 +13,7 @@ import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 import com.d208.fitmily.domain.health.mapper.HealthMapper;
 import com.d208.fitmily.domain.user.entity.User;
+import com.d208.fitmily.domain.walkchallenge.service.WalkChallengeService;
 import com.d208.fitmily.global.common.exception.CustomException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,6 +45,7 @@ public class FamilyService {
     private final HealthMapper healthMapper;
     private final ObjectMapper objectMapper;
     private final ChatMessageService chatMessageService;
+    private final WalkChallengeService walkChallengeService;
 
     private static final int MAX_FAMILY_MEMBERS = 6;
 
@@ -70,6 +72,9 @@ public class FamilyService {
 
         // 채팅방 초기화 - 시스템 메시지 전송
         initializeChat(String.valueOf(family.getFamilyId()), "system");
+
+        // 가족 생성 시 산책 챌린지 생성
+        walkChallengeService.handleUserJoinFamily(userId, family.getFamilyId());
 
         return family.getFamilyId();
     }
@@ -108,6 +113,9 @@ public class FamilyService {
 
             // 패밀리 인원 수 증가
             familyMapper.incrementFamilyPeople(familyId);
+
+            // 가족 가입 시 산책 챌린지 업데이트
+            walkChallengeService.handleUserJoinFamily(userId, familyId);
 
             return familyId;
         } catch (Exception e) {
@@ -168,13 +176,13 @@ public class FamilyService {
 
                 goalInfoList.add(goalInfo);
 
-                // 완료된 목표 카운트
+                // 완료된 목표 카운트 (진행률이 100% 이상인 경우)
                 if (goal.getExerciseGoalProgress() >= 100) {
                     completedGoals++;
                 }
             }
 
-            // 총 진행률 계산 (모든 목표의 평균 진행률)
+            // 총 진행률 계산 - 각 멤버의 목표 달성률
             int totalGoals = exerciseGoals.size();
             int progressRate = totalGoals > 0 ?
                     (int)Math.round((double)completedGoals / totalGoals * 100) : 0;
@@ -364,49 +372,6 @@ public class FamilyService {
                 .build();
     }
 
-
-    // 사용자의 특정 날짜 운동 완료 여부 확인 (기존 Exercise 클래스 활용)
-    private boolean checkDailyExerciseCompletion(int userId, String date) {
-        // 사용자의 해당 일자 운동 기록 조회
-        List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(userId, date);
-
-        if (exercises.isEmpty()) {
-            return false;  // 운동 기록이 없으면 달성 실패
-        }
-
-        // 각 운동별로 목표 달성 여부 확인
-        int completedExercises = 0;
-
-        for (Exercise exercise : exercises) {
-            // 운동 종류별 목표치 설정 (실제로는 DB에서 가져오거나 설정에 따라 결정)
-            int targetCount = getExerciseTarget(exercise.getExerciseName());
-
-            // 목표 달성 여부 확인
-            if (exercise.getExerciseCount() >= targetCount) {
-                completedExercises++;
-            }
-        }
-
-        // 모든 운동이 목표를 달성했는지 확인
-        return completedExercises == exercises.size() && !exercises.isEmpty();
-    }
-
-    // 운동 종류별 목표치 설정 (임시 하드코딩, 실제로는 DB에서 가져오는 것이 좋음)
-    private int getExerciseTarget(String exerciseName) {
-        switch (exerciseName.toLowerCase()) {
-            case "스쿼트":
-                return 20;
-            case "팔굽혀펴기":
-                return 15;
-            case "윗몸일으키기":
-                return 25;
-            case "달리기":
-            case "조깅":
-                return 30;  // 시간(분) 기준일 수 있음
-            default:
-                return 10;  // 기본값
-        }
-    }
 
     /**
      * 패밀리 일일 운동 기록 조회

@@ -11,7 +11,7 @@ public class Notification {
     private int notificationId;
     private int userId;
     private String notificationType;
-    private int notificationSenderId;
+    private Integer notificationSenderId;
     private int notificationReceiverId;
     private Integer notificationResourceId;
     private String notificationContent;

@@ -47,18 +47,4 @@ public class NotificationController {
 
         return ResponseEntity.ok(response);
     }
-
-//    @Operation(summary = "알림 읽음 처리", description = "특정 알림을 읽음 상태로 변경합니다.")
-//    @PatchMapping("/{notificationId}/read")
-//    public ResponseEntity<Map<String, Object>> markAsRead(
-//            @AuthenticationPrincipal CustomUserDetails principal,
-//            @PathVariable int notificationId) {
-//
-//        notificationService.markAsRead(notificationId);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("success", true);
-//
-//        return ResponseEntity.ok(response);
-//    }
 }
