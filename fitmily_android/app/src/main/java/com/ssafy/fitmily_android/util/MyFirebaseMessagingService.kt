@@ -13,6 +13,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.MainActivity
+import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
 
 class MyFirebaseMessagingService: FirebaseMessagingService() {
     override fun onNewToken(token: String) {
@@ -26,8 +27,13 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
     private fun sendNotificaton(remoteMessage: RemoteMessage) {
         val type = remoteMessage.data["type"] ?: "DEFAULT" // POKE, CHALLENGE, WALK, CHAT
+
         val channelId = type // CHAT
         val channelName = getChannelName(type) // 채팅 알림
+
+//        if (type == "WALK") {
+//            WalkLiveData.shouldUpdateOtherGps.postValue(true)
+//        }
 
         // notification channel
         val importance = NotificationManager.IMPORTANCE_HIGH
