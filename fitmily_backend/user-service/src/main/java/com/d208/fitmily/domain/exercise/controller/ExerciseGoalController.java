@@ -122,9 +122,13 @@ public class ExerciseGoalController {
 
     //
      //
-    @GetMapping("/weekly-progress")
-    public ResponseEntity<WeeklyGoalProgressResponse> getWeeklyGoalProgress() {
-        int userId = SecurityConfig.getCurrentUserId();
+    @@GetMapping("/weekly-progress/{userId}")
+    public ResponseEntity<WeeklyGoalProgressResponse> getWeeklyGoalProgress(
+            @PathVariable int userId) {
+
+        // 사용자 본인 확인 로직이 필요하면 여기에 추가할 수 있음
+        // checkUserPermission(userId);
+
         WeeklyGoalProgressResponse response = exerciseGoalService.getWeeklyGoalProgress(userId);
         return ResponseEntity.ok(response);
     }
