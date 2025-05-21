@@ -95,17 +95,18 @@ fun HomeScreen(
                 homeViewModel.joinFamily(it)
             },
         )
-    }else{
-        Box(
-            modifier = Modifier.fillMaxSize().background(Color(0x33000000)),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.completed_icon),
-                contentDescription = null,
-            )
-        }
     }
+//    else{
+//        Box(
+//            modifier = Modifier.fillMaxSize().background(Color(0x33000000)),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Image(
+//                painter = painterResource(id = R.drawable.completed_icon),
+//                contentDescription = null,
+//            )
+//        }
+//    }
     }
 
     LaunchedEffect(Unit){
