@@ -3,11 +3,8 @@ package com.d208.fitmily.domain.exercise.service;
 import com.d208.fitmily.domain.exercise.dto.DailyGoalProgressDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalResponse;
-<<<<<<< HEAD
 import com.d208.fitmily.domain.exercise.entity.ExerciseGoal;
-=======
 import com.d208.fitmily.domain.exercise.dto.WeeklyGoalProgressResponse;
->>>>>>> cicd
 import com.d208.fitmily.domain.exercise.mapper.ExerciseGoalMapper;
 import com.d208.fitmily.global.common.exception.BusinessException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
