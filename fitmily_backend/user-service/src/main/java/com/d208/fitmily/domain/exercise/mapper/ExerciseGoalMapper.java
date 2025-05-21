@@ -166,7 +166,6 @@ public interface ExerciseGoalMapper {
             @Result(property = "exerciseGoalCreatedAt", column = "exercise_goal_created_at"),
             @Result(property = "exerciseGoalUpdatedAt", column = "exercise_goal_updated_at")
     })
-    List<ExerciseGoal> findUserGoalsByDate(@Param("userId") int userId, @Param("date") String date);
 
 
     // 특정 날짜의 전체 운동 목표 진행률 계산
@@ -244,18 +243,36 @@ public interface ExerciseGoalMapper {
      * 특정 사용자, 특정 날짜의 총 목표 수 조회
      */
     @Select("SELECT COUNT(*) " +
-            "FROM exercise_goal eg " +  // 테이블 별칭 사용
+            "FROM exercise_goal eg " +
             "WHERE eg.user_id = #{userId} " +
-            "AND eg.goal_date = #{date}")
+            "AND DATE(eg.exercise_goal_created_at) = #{date}")
     int countGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
 
     /**
      * 특정 사용자, 특정 날짜의 완료된 목표 수 조회 (진행률 100% 이상)
      */
     @Select("SELECT COUNT(*) " +
-            "FROM exercise_goal eg " +  // 테이블 별칭 사용
+            "FROM exercise_goal eg " +
             "WHERE eg.user_id = #{userId} " +
-            "AND eg.goal_date = #{date} " +
+            "AND DATE(eg.exercise_goal_created_at) = #{date} " +
             "AND eg.exercise_goal_progress >= 100")
     int countCompletedGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
+
+    /**
+     * 특정 사용자, 특정 날짜의 목표 목록 조회
+     */
+    @Select("SELECT * FROM exercise_goal " +
+            "WHERE user_id = #{userId} " +
+            "AND DATE(exercise_goal_created_at) = #{date}")
+    @Results(id = "exerciseGoalMap", value = {
+            @Result(property = "exerciseGoalId", column = "exercise_goal_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "exerciseGoalName", column = "exercise_goal_name"),
+            @Result(property = "exerciseGoalValue", column = "exercise_goal_value"),
+            @Result(property = "exerciseGoalProgress", column = "exercise_goal_progress"),
+            @Result(property = "exerciseGoalCreatedAt", column = "exercise_goal_created_at"),
+            @Result(property = "exerciseGoalUpdatedAt", column = "exercise_goal_updated_at")
+    })
+    List<ExerciseGoal> findUserGoalsByDate(@Param("userId") int userId, @Param("date") String date);
+
 }
