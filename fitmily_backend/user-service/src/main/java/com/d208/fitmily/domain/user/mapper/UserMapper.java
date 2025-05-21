@@ -101,4 +101,7 @@ public interface UserMapper {
     })
     List<User> getUsersByIds(@Param("userIds") List<Integer> userIds);
 
+
+    @Select("SELECT user_id FROM user WHERE family_id = #{familyId}")
+    List<Integer> selectUserIdsByFamilyId(@Param("familyId") Integer familyId);
 }

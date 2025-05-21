@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EndWalkRequestDto {
-    private Timestamp startTime;
-    private Timestamp endTime;
-    private Float distance;
-    private String routeImg;
+    private Timestamp walkStartTime;
+    private Timestamp walkEndTime;
+    private Float walkDistance;
+    private String walkRouteImg;
 }
