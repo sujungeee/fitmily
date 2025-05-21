@@ -27,7 +27,7 @@ class MyNotificationViewModel @Inject constructor(
             ViewModelResultHandler.handle(
                 result = result,
                 onSuccess = { data ->
-                    val list = data?.map {
+                    val list = data?.notifications?.map {
                         Notification(
                             type = it.type
                             , date = DateUtil().getFullDate(it.receivedAt)
