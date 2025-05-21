@@ -1,11 +1,11 @@
 package com.d208.fitmily.global.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-
 
 @Configuration
 @EnableMongoRepositories(basePackages = "com.d208.fitmily.domain.chat.repository")
@@ -33,10 +32,17 @@ public class MongoDBConfig {
     @Value("${spring.data.mongodb.database:fitmily}")
     private String mongoDatabase;
 
+
     @Bean
     public MongoClient mongoClient() {
+        // 디버깅을 위한 상세 로그
+        log.info("=== MongoDB 연결 설정 ===");
+        log.info("호스트: {}", mongoHost);
+        log.info("포트: {}", mongoPort);
+        log.info("데이터베이스: {}", mongoDatabase);
+
         String mongoUri = String.format("mongodb://%s:%s/%s", mongoHost, mongoPort, mongoDatabase);
-        log.info("MongoDB 연결 설정 완료: {}", mongoUri);
+        log.info("MongoDB 연결 URI: {}", mongoUri);
 
         ConnectionString connectionString = new ConnectionString(mongoUri);
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -45,6 +51,55 @@ public class MongoDBConfig {
 
         return MongoClients.create(settings);
     }
+
+
+//package com.d208.fitmily.global.config;
+//
+//import com.mongodb.ConnectionString;
+//import com.mongodb.MongoClientSettings;
+//import com.mongodb.client.MongoClient;
+//import com.mongodb.client.MongoClients;
+//import org.slf4j.LoggerFactory;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.data.mongodb.MongoDatabaseFactory;
+//import org.springframework.data.mongodb.core.MongoTemplate;
+//import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+//import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+//import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+//import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+//import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+//import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+//
+//@Configuration
+//@EnableMongoRepositories(basePackages = "com.d208.fitmily.domain.chat.repository")
+//public class MongoDBConfig {
+//
+//    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MongoDBConfig.class);
+//
+//    // 로컬 테스트용 하드코딩 값
+//    private final String mongoHost = "localhost";
+//    private final String mongoPort = "27017";      // 기본 MongoDB 포트
+//    private final String mongoDatabase = "fitmily";
+//
+//    @Bean
+//    public MongoClient mongoClient() {
+//        // 디버깅을 위한 상세 로그
+//        log.info("=== MongoDB 연결 설정 ===");
+//        log.info("호스트: {}", mongoHost);
+//        log.info("포트: {}", mongoPort);
+//        log.info("데이터베이스: {}", mongoDatabase);
+//
+//        String mongoUri = String.format("mongodb://%s:%s/%s", mongoHost, mongoPort, mongoDatabase);
+//        log.info("MongoDB 연결 URI: {}", mongoUri);
+//
+//        ConnectionString connectionString = new ConnectionString(mongoUri);
+//        MongoClientSettings settings = MongoClientSettings.builder()
+//                .applyConnectionString(connectionString)
+//                .build();
+//
+//        return MongoClients.create(settings);
+//    }
 
     @Bean
     public MongoDatabaseFactory mongoDatabaseFactory() {

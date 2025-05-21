@@ -1,6 +1,8 @@
 package com.d208.fitmily.domain.family.service;
 
 import com.d208.fitmily.domain.exercise.entity.Exercise;
+import com.d208.fitmily.domain.exercise.entity.ExerciseGoal;
+import com.d208.fitmily.domain.exercise.mapper.ExerciseGoalMapper;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseMapper;
 import com.d208.fitmily.domain.family.dto.FamilyCalendarResponse;
 import com.d208.fitmily.domain.family.dto.FamilyDailyExerciseResponse;
@@ -11,6 +13,7 @@ import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 import com.d208.fitmily.domain.health.mapper.HealthMapper;
 import com.d208.fitmily.domain.user.entity.User;
+import com.d208.fitmily.domain.walkchallenge.service.WalkChallengeService;
 import com.d208.fitmily.global.common.exception.CustomException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,9 +28,7 @@ import com.d208.fitmily.domain.chat.dto.MessageRequestDTO;
 import com.d208.fitmily.domain.chat.service.ChatMessageService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -40,14 +41,16 @@ public class FamilyService {
 
     private final FamilyMapper familyMapper;
     private final ExerciseMapper exerciseMapper;
+    private final ExerciseGoalMapper exerciseGoalMapper;
     private final HealthMapper healthMapper;
     private final ObjectMapper objectMapper;
     private final ChatMessageService chatMessageService;
+    private final WalkChallengeService walkChallengeService;
 
     private static final int MAX_FAMILY_MEMBERS = 6;
 
     @Transactional
-    public int createFamily(String familyName) {
+    public int createFamily(String familyName, int userId) {  // userId 매개변수 추가
         Family family = new Family();
         family.setFamilyName(familyName);
 
@@ -64,8 +67,14 @@ public class FamilyService {
         // DB에 저장
         familyMapper.createFamily(family);
 
+        // 패밀리 생성자를 해당 패밀리의 첫 멤버로 등록 (sequence = 1)
+        familyMapper.updateUserFamilyIdAndSequence(userId, family.getFamilyId(), 1);
+
         // 채팅방 초기화 - 시스템 메시지 전송
         initializeChat(String.valueOf(family.getFamilyId()), "system");
+
+        // 가족 생성 시 산책 챌린지 생성
+        walkChallengeService.handleUserJoinFamily(userId, family.getFamilyId());
 
         return family.getFamilyId();
     }
@@ -105,6 +114,9 @@ public class FamilyService {
             // 패밀리 인원 수 증가
             familyMapper.incrementFamilyPeople(familyId);
 
+            // 가족 가입 시 산책 챌린지 업데이트
+            walkChallengeService.handleUserJoinFamily(userId, familyId);
+
             return familyId;
         } catch (Exception e) {
             // 예외 발생 시 스택 트레이스 출력
@@ -142,50 +154,36 @@ public class FamilyService {
         List<FamilyDashboardResponse.FamilyMember> memberList = new ArrayList<>();
 
         for (User member : familyMembers) {
-            // 사용자의 해당 일자 운동 목록 조회
-            List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), date);
-            List<FamilyDashboardResponse.GoalInfo> goalInfoList = new ArrayList<>();
+            // 사용자의 해당 일자 목표 정보 조회
+            List<ExerciseGoal> exerciseGoals = exerciseGoalMapper.findUserGoalsByDate(member.getUserId(), date);
 
-            // 안전 처리: exercises가 null이면 빈 목록으로 설정
-            if (exercises == null) {
-                exercises = new ArrayList<>();
+            // 안전 처리: exerciseGoals가 null이면 빈 목록으로 설정
+            if (exerciseGoals == null) {
+                exerciseGoals = new ArrayList<>();
             }
 
+            // 목표 정보를 GoalInfo 객체로 변환
+            List<FamilyDashboardResponse.GoalInfo> goalInfoList = new ArrayList<>();
             int completedGoals = 0;
 
-            for (Exercise exercise : exercises) {
-                // null 체크 추가
-                if (exercise != null) {
-                    // 운동 목표 정보 생성 (null 안전 접근)
-                    int goalValue = 100; // 기본값
-                    int progress = 0;
+            for (ExerciseGoal goal : exerciseGoals) {
+                FamilyDashboardResponse.GoalInfo goalInfo = FamilyDashboardResponse.GoalInfo.builder()
+                        .exerciseGoalId(goal.getExerciseGoalId())
+                        .exerciseGoalName(goal.getExerciseGoalName())
+                        .exerciseGoalValue((int) goal.getExerciseGoalValue())
+                        .exerciseGoalProgress(goal.getExerciseGoalProgress())
+                        .build();
 
-                    // 운동 횟수가 있는 경우
-                    if (exercise.getExerciseCount() > 0) {
-                        progress = exercise.getExerciseCount();
-                        goalValue = progress; // 임시로 달성한 값을 목표로 설정
-                    }
-                    // 운동 시간이 있는 경우
-                    else if (exercise.getExerciseTime() != null) {
-                        progress = exercise.getExerciseTime();
-                        goalValue = progress; // 임시로 달성한 값을 목표로 설정
-                    }
+                goalInfoList.add(goalInfo);
 
-                    if (progress >= goalValue) {
-                        completedGoals++;
-                    }
-
-                    goalInfoList.add(FamilyDashboardResponse.GoalInfo.builder()
-                            .exerciseGoalId(exercise.getExerciseId())
-                            .exerciseGoalName(exercise.getExerciseName())
-                            .exerciseGoalValue(goalValue)
-                            .exerciseGoalProgress(progress)
-                            .build());
+                // 완료된 목표 카운트 (진행률이 100% 이상인 경우)
+                if (goal.getExerciseGoalProgress() >= 100) {
+                    completedGoals++;
                 }
             }
 
-            // 총 진행률 계산
-            int totalGoals = exercises.size();
+            // 총 진행률 계산 - 각 멤버의 목표 달성률
+            int totalGoals = exerciseGoals.size();
             int progressRate = totalGoals > 0 ?
                     (int)Math.round((double)completedGoals / totalGoals * 100) : 0;
 
@@ -230,21 +228,36 @@ public class FamilyService {
             // 사용자의 최신 건강 정보 조회
             HealthResponseDto healthInfo = healthMapper.selectLatestByUserId(member.getUserId());
 
-            if (healthInfo == null) continue;
+            // 기본값 초기화 (float 타입으로 변경)
+            float height = 0.0f;
+            float weight = 0.0f;
+            float bmi = 0.0f;
+            List<String> fiveMajorDiseases = Collections.emptyList();
+            List<String> otherDiseases = Collections.emptyList();
 
-            // JSON 문자열을 리스트로 변환 - 표준 getter 사용
-            List<String> fiveMajorDiseases = parseJsonList(healthInfo.getFiveMajorDiseases());
-            List<String> otherDiseases = parseJsonList(healthInfo.getOtherDiseases());
+            // 건강 정보가 있으면 실제 값 사용
+            if (healthInfo != null) {
+                // 실제 값이 있는 경우에만 기본값 대신 사용 (float로 변환)
+                height = healthInfo.getHeight() != null ? healthInfo.getHeight().floatValue() : height;
+                weight = healthInfo.getWeight() != null ? healthInfo.getWeight().floatValue() : weight;
+                bmi = healthInfo.getBmi() != null ? healthInfo.getBmi().floatValue() : bmi;
 
+                // JSON 문자열을 리스트로 변환
+                fiveMajorDiseases = parseJsonList(healthInfo.getFiveMajorDiseases());
+                otherDiseases = parseJsonList(healthInfo.getOtherDiseases());
+            }
+
+            // 모든 구성원에 대해 응답 객체 생성
             FamilyHealthStatusResponse.MemberHealthInfo memberHealthInfo = FamilyHealthStatusResponse.MemberHealthInfo.builder()
                     .userId(member.getUserId())
                     .userNickname(member.getUserNickname())
                     .userBirth(member.getUserBirth())
                     .userGender(member.getUserGender())
-                    // 표준 getter 사용
-                    .healthHeight(healthInfo.getHeight())
-                    .healthWeight(healthInfo.getWeight())
-                    .healthBmi(healthInfo.getBmi())
+                    .userZodiacName(member.getUserZodiacName())
+                    .userFamilySequence(member.getUserFamilySequence())
+                    .healthHeight(height)
+                    .healthWeight(weight)
+                    .healthBmi(bmi)
                     .healthFiveMajorDiseases(fiveMajorDiseases)
                     .healthOtherDiseases(otherDiseases)
                     .build();
@@ -257,6 +270,7 @@ public class FamilyService {
                 .members(memberHealthInfoList)
                 .build();
     }
+
 
     /**
      * JSON 문자열을 List<String>으로 변환
@@ -309,32 +323,37 @@ public class FamilyService {
 
             while (!currentDate.isAfter(endDate)) {
                 String dateString = currentDate.format(DateTimeFormatter.ISO_DATE);
-
-                // 해당 날짜에 완료한 운동이 있는지 확인
-                boolean isCompleted = false;
+                boolean allGoalsCompleted = false;
 
                 try {
-                    // 운동 데이터 조회 시 NullPointerException 방지
-                    List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), dateString);
+                    // 1. 특정 날짜의 운동 목표 조회
+                    List<ExerciseGoal> goals = exerciseGoalMapper.findUserGoalsByDate(member.getUserId(), dateString);
 
-                    if (exercises != null && !exercises.isEmpty()) {
-                        // 각 운동에 대해 목표 달성 여부 확인
-                        int completedExercises = 0;
+                    // 2. 목표가 있고 모든 목표가 100% 달성되었는지 확인
+                    if (goals != null && !goals.isEmpty()) {
+                        allGoalsCompleted = true; // 기본값 true로 설정
 
-                        for (Exercise exercise : exercises) {
-                            if (exercise != null && exercise.getExerciseCount() > 0) {
-                                completedExercises++;
+                        for (ExerciseGoal goal : goals) {
+                            // 하나라도 100%가 안 되면 allGoalsCompleted = false
+                            if (goal.getExerciseGoalProgress() < 100) {
+                                allGoalsCompleted = false;
+                                break;
                             }
                         }
-
-                        isCompleted = completedExercises > 0 && completedExercises == exercises.size();
                     }
+
+                    // 3. 운동 목표 테이블에 데이터가 없는 경우(운동을 안 했거나 목표 설정이 안 됨)
+                    else {
+                        allGoalsCompleted = false;
+                    }
+
                 } catch (Exception e) {
-                    // 오류 로그만 남기고 계속 진행
-                    System.out.println("운동 데이터 조회 중 오류: " + e.getMessage());
+                    log.error("운동 데이터 조회 중 오류: {}", e.getMessage());
+                    allGoalsCompleted = false;
                 }
 
-                if (isCompleted) {
+                // 모든 목표를 달성한 경우에만 캘린더에 표시
+                if (allGoalsCompleted) {
                     calendarEntries.add(FamilyCalendarResponse.CalendarEntry.builder()
                             .userId(member.getUserId())
                             .date(dateString)
@@ -353,48 +372,6 @@ public class FamilyService {
                 .build();
     }
 
-    // 사용자의 특정 날짜 운동 완료 여부 확인 (기존 Exercise 클래스 활용)
-    private boolean checkDailyExerciseCompletion(int userId, String date) {
-        // 사용자의 해당 일자 운동 기록 조회
-        List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(userId, date);
-
-        if (exercises.isEmpty()) {
-            return false;  // 운동 기록이 없으면 달성 실패
-        }
-
-        // 각 운동별로 목표 달성 여부 확인
-        int completedExercises = 0;
-
-        for (Exercise exercise : exercises) {
-            // 운동 종류별 목표치 설정 (실제로는 DB에서 가져오거나 설정에 따라 결정)
-            int targetCount = getExerciseTarget(exercise.getExerciseName());
-
-            // 목표 달성 여부 확인
-            if (exercise.getExerciseCount() >= targetCount) {
-                completedExercises++;
-            }
-        }
-
-        // 모든 운동이 목표를 달성했는지 확인
-        return completedExercises == exercises.size() && !exercises.isEmpty();
-    }
-
-    // 운동 종류별 목표치 설정 (임시 하드코딩, 실제로는 DB에서 가져오는 것이 좋음)
-    private int getExerciseTarget(String exerciseName) {
-        switch (exerciseName.toLowerCase()) {
-            case "스쿼트":
-                return 20;
-            case "팔굽혀펴기":
-                return 15;
-            case "윗몸일으키기":
-                return 25;
-            case "달리기":
-            case "조깅":
-                return 30;  // 시간(분) 기준일 수 있음
-            default:
-                return 10;  // 기본값
-        }
-    }
 
     /**
      * 패밀리 일일 운동 기록 조회
@@ -412,110 +389,94 @@ public class FamilyService {
         List<FamilyDailyExerciseResponse.MemberDailyExercise> memberList = new ArrayList<>();
 
         for (User member : familyMembers) {
-            // 해당 멤버의 일일 운동 기록 조회
-            List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), date);
+            // 해당 일자의 운동 목표 조회
+            List<ExerciseGoal> goals = exerciseGoalMapper.findUserGoalsByDate(member.getUserId(), date);
+            Map<String, ExerciseGoal> goalMap = new HashMap<>();
 
-            // 안전성 처리: null인 경우 빈 리스트로 대체
-            if (exercises == null) {
-                exercises = new ArrayList<>();
+            // 운동명 -> 목표 객체 매핑
+            if (goals != null) {
+                for (ExerciseGoal goal : goals) {
+                    goalMap.put(goal.getExerciseGoalName().toLowerCase(), goal);
+                }
             }
 
-            // 총 칼로리와 총 시간 계산
+            // 해당 일자의 운동 기록 조회
+            List<Exercise> exercises = exerciseMapper.findUserExercisesByDate(member.getUserId(), date);
+
+            // 통계 집계 및 운동 정보 변환
             int totalCalories = 0;
             int totalTime = 0;
+            int completedGoals = 0;
+            int totalMatches = 0;
+
             List<FamilyDailyExerciseResponse.ExerciseInfo> exerciseInfoList = new ArrayList<>();
 
-            // 목표 달성 수 계산용
-            int completedExercises = 0;
-            int totalExercises = exercises.size();
+            if (exercises != null) {
+                for (Exercise exercise : exercises) {
+                    if (exercise == null) continue;
 
-            for (Exercise exercise : exercises) {
-                if (exercise != null) {
-                    // 운동에 대한 목표값 설정 (실제로는 운동 종류별로 다르게 설정)
-                    int exerciseGoalValue = getExerciseGoalValue(exercise.getExerciseName());
-
-                    // 칼로리 및 시간 누적
+                    // 칼로리와 시간 누적
                     totalCalories += exercise.getExerciseCalories();
                     totalTime += (exercise.getExerciseTime() != null) ? exercise.getExerciseTime() : 0;
 
-                    // 목표 달성 여부 확인
-                    if (exercise.getExerciseCount() >= exerciseGoalValue) {
-                        completedExercises++;
-                    }
+                    // 운동명에 해당하는 목표 찾기
+                    ExerciseGoal matchedGoal = goalMap.get(exercise.getExerciseName().toLowerCase());
+                    int goalValue = 0;
 
-                    // 산책 경로 이미지 조회 부분
-                    String routeImg = "";
-                    if ("산책".equals(exercise.getExerciseName())) {
-                        // 실제 DB에서 조회하도록 수정
-                        routeImg = exerciseMapper.findRouteImageByExerciseId(exercise.getExerciseId());
-                        // null 안전처리
-                        if (routeImg == null) {
-                            routeImg = "";
+                    if (matchedGoal != null) {
+                        // 목표가 있으면 목표값 사용
+                        goalValue = (int)matchedGoal.getExerciseGoalValue();
+                        totalMatches++;
+
+                        // 목표 달성 여부 확인
+                        if (exercise.getExerciseCount() >= goalValue) {
+                            completedGoals++;
                         }
                     }
 
+                    // 산책 경로 이미지 조회
+                    String routeImg = "";
+                    if ("산책".equals(exercise.getExerciseName())) {
+                        routeImg = exerciseMapper.findRouteImageByExerciseId(exercise.getExerciseId());
+                        if (routeImg == null) routeImg = "";
+                    }
 
                     // 운동 정보 생성
-                    FamilyDailyExerciseResponse.ExerciseInfo exerciseInfo = FamilyDailyExerciseResponse.ExerciseInfo.builder()
+                    exerciseInfoList.add(FamilyDailyExerciseResponse.ExerciseInfo.builder()
                             .exerciseId(exercise.getExerciseId())
                             .exerciseName(exercise.getExerciseName())
                             .exerciseRouteImg(routeImg)
-                            .exerciseCount((float) exercise.getExerciseCount())
-                            .exerciseGoalValue(exerciseGoalValue)
+                            .exerciseCount(exercise.getExerciseCount())
+                            .exerciseGoalValue(goalValue)
                             .exerciseCalories(exercise.getExerciseCalories())
-                            .exerciseTime((exercise.getExerciseTime() != null) ? exercise.getExerciseTime() : 0)
-                            .build();
-
-                    exerciseInfoList.add(exerciseInfo);
+                            .exerciseTime(exercise.getExerciseTime() != null ? exercise.getExerciseTime() : 0)
+                            .build());
                 }
             }
 
             // 목표 진행률 계산
-            int exerciseGoalProgress = (totalExercises > 0) ?
-                    (int)Math.round((double)completedExercises / totalExercises * 100) : 0;
+            int progressRate = totalMatches > 0 ?
+                    (int)Math.round(((double)completedGoals / totalMatches) * 100) : 0;
 
-            // 멤버별 일일 운동 정보 생성
-            FamilyDailyExerciseResponse.MemberDailyExercise memberDaily = FamilyDailyExerciseResponse.MemberDailyExercise.builder()
-                    .userId(member.getUserId())
-                    .userNickname(member.getUserNickname())
-                    .userFamilySequence(member.getUserFamilySequence())
-                    .exerciseGoalProgress(exerciseGoalProgress)
-                    .totalCalories(totalCalories)
-                    .totalTime(totalTime)
-                    .exercises(exerciseInfoList)
-                    .build();
+            // 구성원별 정보 생성
+            FamilyDailyExerciseResponse.MemberDailyExercise memberDaily =
+                    FamilyDailyExerciseResponse.MemberDailyExercise.builder()
+                            .userId(member.getUserId())
+                            .userNickname(member.getUserNickname())
+                            .userZodiacName(member.getUserZodiacName())  // userZodiacName 추가
+                            .userFamilySequence(member.getUserFamilySequence())
+                            .exerciseGoalProgress(progressRate)
+                            .totalCalories(totalCalories)
+                            .totalTime(totalTime)
+                            .exercises(exerciseInfoList)
+                            .build();
 
             memberList.add(memberDaily);
         }
 
-        // 응답 객체 생성
         return FamilyDailyExerciseResponse.builder()
                 .members(memberList)
                 .build();
-    }
-
-    // 운동 종류별 목표값 반환 (실제로는 DB에서 가져오는 것이 좋음)
-    private int getExerciseGoalValue(String exerciseName) {
-        if (exerciseName == null) return 100;
-
-        switch (exerciseName.toLowerCase()) {
-            case "스쿼트":
-                return 100;
-            case "팔굽혀펴기":
-                return 50;
-            case "윗몸일으키기":
-                return 50;
-            case "산책":
-                return 3;
-            default:
-                return 100;
-        }
-    }
-
-    // 운동 경로 이미지 조회 (실제로는 DB 조회 필요)
-    private String getExerciseRouteImage(int exerciseId) {
-        // 임시 구현 - 실제로는 DB에서 가져와야 함
-        return exerciseId % 2 == 0 ? "asdfasdfasdfasdf" : "";
     }
 
 

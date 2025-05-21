@@ -1,7 +1,7 @@
 package com.d208.fitmily.global.jwt;
 
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
-import com.d208.fitmily.domain.user.dto.LoginRequestDTO;
+import com.d208.fitmily.domain.user.dto.request.LoginRequest;
 import com.d208.fitmily.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -35,7 +35,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             ObjectMapper objectMapper = new ObjectMapper();
 
             // 여기 DTO 이름 수정!!
-            LoginRequestDTO loginRequestDTO = objectMapper.readValue(request.getInputStream(), LoginRequestDTO.class);
+            LoginRequest loginRequestDTO = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 
             String loginId = loginRequestDTO.getLoginId();
             String password = loginRequestDTO.getPassword();

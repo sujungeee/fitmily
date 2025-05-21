@@ -44,18 +44,6 @@ public class WalkController {
     private final GpsRedisService gpsRedisService;
     private final SseService sseService;
 
-//    @MessageMapping("/walk/gps")
-//    public void handleGps(@Payload GpsDto gpsDto, Principal principal) {
-//        System.out.println("🔍 Principal = " + principal);
-//
-//        if (principal != null) {
-//            String userIdStr = principal.getName(); // StompPrincipal의 name 필드
-//            Integer userId = Integer.parseInt(userIdStr);
-//            walkService.processGps(userId, gpsDto);
-//        } else {
-//            System.out.println("❌ [Controller] 인증 실패: Principal 없음");
-//        }
-//    }
 
     @Operation(summary = "산책중 gps 데이터 조회 ", description = "산책중인 사용자의 이전 gps 데이터를 전부 조회합니다. ")
     @GetMapping("/walks/gps/{userId}")
@@ -98,10 +86,10 @@ public class WalkController {
     }
 
     @Operation(summary = "산책중인 가족 리스트 조회 ", description = "산책중인 가족들의 리스트를 조회합니다. ")
-    @GetMapping("/api/family/{familyId}/walking-members")
-    public ResponseEntity<List<UserDto>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
+    @GetMapping("family/walking-members")
+    public ResponseEntity<Map<String, Object>> getWalkingFamilyMembers(@RequestParam Integer familyId) {
         List<UserDto> walkingUsers = walkService.getWalkingFamilyMembers(familyId);
-        return ResponseEntity.ok(walkingUsers);
+        return ResponseEntity.ok(Map.of("member", walkingUsers));
     }
 }
 
