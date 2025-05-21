@@ -61,8 +61,7 @@ fun FamilyStatsItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-//                    painter = painterResource(id = ProfileUtil().typeToProfile(stats.userZodiacName) ?: R.drawable.my_unselected_icon),
-                    painter = painterResource(id = R.drawable.my_unselected_icon),
+                    painter = painterResource(id = ProfileUtil().typeToProfile(stats.userZodiacName) ?: R.drawable.my_unselected_icon),
                     contentDescription = "프로필 이미지",
                     modifier = Modifier.background(ProfileUtil().seqToColor(stats.userFamilySequence), shape = CircleShape),
                 )

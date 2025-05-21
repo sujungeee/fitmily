@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.family.exercise.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +38,11 @@ fun FamilyExerciseItem(
     modifier: Modifier
 ) {
 
-    val isWalk = familyDailyExercise.exerciseId != null
+    Log.d("test1234", "FamilyExerciseItem : familyDailyExercise : $familyDailyExercise")
+
+    val isWalk = familyDailyExercise.exerciseName == "산책"
     val localImageRes = ExerciseUtil().mapExerciseNameToImage(familyDailyExercise.exerciseName) ?: R.drawable.sample_walk
+
 
     val unit = if(isWalk) {
         "km"
@@ -175,7 +179,7 @@ fun FamilyExerciseItem(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "${familyDailyExercise.exerciseTime}",
+                            text = "${familyDailyExercise.exerciseTime} 분",
                             color = mainBlack,
                             style = Typography.bodySmall
                         )

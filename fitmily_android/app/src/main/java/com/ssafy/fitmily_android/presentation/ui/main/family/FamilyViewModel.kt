@@ -47,6 +47,7 @@ class FamilyViewModel @Inject constructor(
 
                     val members = result.data?.members
                     Log.d("test1234", "getFamilyCalendarInfo members : $members")
+                    Log.d("test1234", "getFamilyCalendarInfo calendar : ${result.data?.calendar}")
                 }
 
                 is Result.Error -> {
