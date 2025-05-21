@@ -2,16 +2,22 @@ package com.ssafy.fitmily_android.util
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class DateUtil {
     fun getTime(dateTime: String): String {
-        val localDateTime = LocalDateTime.parse(dateTime)
-        val time = localDateTime.toLocalTime()
-        if (time.hour >= 12) {
-            return "오후 ${time.hour - 12}:${time.minute}"
+        val odt = OffsetDateTime.parse(dateTime)
+        val zonedDateTime = odt.atZoneSameInstant(ZoneId.systemDefault())
+
+        val hour = zonedDateTime.hour
+        val minute = zonedDateTime.minute.toString().padStart(2, '0')
+
+        if (hour >= 12) {
+            return "오후 ${hour - 12}:${minute}"
         }
-        return "오전 ${time.hour}:${time.minute}"
+        return "오전 ${hour}:${minute}"
     }
 
     fun getFullDate(dateTime: String): String {
