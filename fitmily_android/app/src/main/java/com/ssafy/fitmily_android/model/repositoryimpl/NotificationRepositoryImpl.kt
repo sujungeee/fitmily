@@ -4,7 +4,7 @@ import com.ssafy.fitmily_android.domain.repository.NotificationRepository
 import com.ssafy.fitmily_android.model.common.ApiResultHandler
 import com.ssafy.fitmily_android.model.common.Result
 import com.ssafy.fitmily_android.model.dto.request.notification.FcmRequest
-import com.ssafy.fitmily_android.model.dto.response.notification.Notification
+import com.ssafy.fitmily_android.model.dto.response.notification.GetNotificationResponse
 import com.ssafy.fitmily_android.model.dto.response.notification.UnReadNotificationResponse
 import com.ssafy.fitmily_android.model.service.NotificationService
 import jakarta.inject.Inject
@@ -18,7 +18,7 @@ class NotificationRepositoryImpl  @Inject constructor(
         }
     }
 
-    override suspend fun getNotifications(): Result<List<Notification>> {
+    override suspend fun getNotifications(): Result<GetNotificationResponse> {
         return ApiResultHandler.handleApi {
             notificationService.getNotifications()
         }
