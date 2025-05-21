@@ -61,7 +61,7 @@ fun FamilyDetailScreen(
     LaunchedEffect(selectedDate) {
         familyId = authDataStore.getFamilyId()
         familyDetailViewModel.getFamilyDailyInfo(
-            familyId = 1, /* TODO familyId로 바꾸기 */
+            familyId = familyId,
             date = dateText
         )
     }
