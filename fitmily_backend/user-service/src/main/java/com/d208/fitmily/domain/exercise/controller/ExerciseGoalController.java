@@ -1,9 +1,6 @@
 package com.d208.fitmily.domain.exercise.controller;
 
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalRequest;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalResponse;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalUpdateRequest;
+import com.d208.fitmily.domain.exercise.dto.*;
 import com.d208.fitmily.domain.exercise.service.ExerciseGoalService;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -121,10 +118,23 @@ public class ExerciseGoalController {
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping("/api/goal-progress")
-//    public ResponseEntity<Void> goalProgress(@AuthenticationPrincipal CustomUserDetails principal){
-//        Integer userId = principal.getId();
-//        List<goalprogress> achievementList = exerciseService.getWeeklyAchievement(userId);
-//    }
 
+    //
+    /**
+     * 7일간의 운동 목표 진행률 조회 API
+     *
+     * @param userId 조회할 사용자 ID
+     * @return 날짜별 목표 달성률 데이터
+     */
+    @GetMapping("/weekly-progress/{userId}")
+    public ResponseEntity<WeeklyGoalProgressResponse> getWeeklyGoalProgress(
+            @PathVariable int userId) {
+
+        // 사용자 본인 확인 로직이 필요하면 여기에 추가할 수 있음
+        // checkUserPermission(userId);
+
+        WeeklyGoalProgressResponse response = exerciseGoalService.getWeeklyGoalProgress(userId);
+        return ResponseEntity.ok(response);
+    }
+    
 }
