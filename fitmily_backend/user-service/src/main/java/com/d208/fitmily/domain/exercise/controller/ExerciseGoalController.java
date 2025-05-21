@@ -1,11 +1,9 @@
 package com.d208.fitmily.domain.exercise.controller;
 
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalRequest;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalResponse;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalUpdateRequest;
+import com.d208.fitmily.domain.exercise.dto.*;
 import com.d208.fitmily.domain.exercise.service.ExerciseGoalService;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
+import com.d208.fitmily.global.config.SecurityConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -121,10 +119,18 @@ public class ExerciseGoalController {
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping("/api/goal-progress")
-//    public ResponseEntity<Void> goalProgress(@AuthenticationPrincipal CustomUserDetails principal){
-//        Integer userId = principal.getId();
-//        List<goalprogress> achievementList = exerciseService.getWeeklyAchievement(userId);
-//    }
 
+<<<<<<< HEAD
+=======
+
+    //
+     //
+    @GetMapping("/weekly-progress")
+    public ResponseEntity<WeeklyGoalProgressResponse> getWeeklyGoalProgress() {
+        int userId = SecurityConfig.getCurrentUserId();
+        WeeklyGoalProgressResponse response = exerciseGoalService.getWeeklyGoalProgress(userId);
+        return ResponseEntity.ok(response);
+    }
+
+>>>>>>> cicd
 }
