@@ -12,8 +12,8 @@ import androidx.paging.cachedIn
 import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.domain.usecase.chat.ChatListUseCase
 import com.ssafy.fitmily_android.domain.usecase.home.GetFamilyUseCase
+import com.ssafy.fitmily_android.domain.usecase.s3.GetPresignedUrlUseCase
 import com.ssafy.fitmily_android.domain.usecase.s3.S3UseCase
-import com.ssafy.fitmily_android.domain.usecase.walk.GetPresignedUrlUseCase
 import com.ssafy.fitmily_android.model.dto.request.chat.ChatSendRequest
 import com.ssafy.fitmily_android.network.ChatManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -155,7 +155,7 @@ class ChatViewModel @Inject constructor(
                     // upload
                     val file = FileUtil().getFileFromUri(context, image, fileName, fileExtension!!)
                     val requestBody = file.asRequestBody(contentType.toMediaType())
-                    val uploadResult = s3UseCase(data!!, requestBody)
+                    val uploadResult = s3UseCase(data!!.url, requestBody)
                     ViewModelResultHandler.handle(
                         result = uploadResult
                         , onSuccess = {
