@@ -123,19 +123,19 @@ fun WalkScreen(
 
     val countdown = remember { mutableStateOf(-1) }
 
-//    val lifecycleOwner = LocalLifecycleOwner.current
-//
-//    DisposableEffect(Unit) {
-//        val observer = Observer<Boolean> { shouldUpdate ->
-//            if (shouldUpdate == true) {
-//                WalkLiveData.shouldUpdateOtherGps.value = false
-//            }
-//        }
-//        WalkLiveData.shouldUpdateOtherGps.observe(lifecycleOwner, observer)
-//        onDispose {
-//            WalkLiveData.shouldUpdateOtherGps.removeObserver(observer)
-//        }
-//    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(Unit) {
+        val observer = Observer<Boolean> { shouldUpdate ->
+            if (shouldUpdate == true) {
+                WalkLiveData.shouldUpdateOtherGps.value = false
+            }
+        }
+        WalkLiveData.shouldUpdateOtherGps.observe(lifecycleOwner, observer)
+        onDispose {
+            WalkLiveData.shouldUpdateOtherGps.removeObserver(observer)
+        }
+    }
 
     LaunchedEffect(WalkLiveData.isServiceRunning) {
         isWalking.value = WalkLiveData.isServiceRunning.value

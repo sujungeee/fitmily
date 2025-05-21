@@ -8,6 +8,7 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.graphics.Color
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -15,6 +16,7 @@ import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.presentation.ui.MainActivity
 import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
 
+private const val TAG = "MyFirebaseMessagingServ"
 class MyFirebaseMessagingService: FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -31,9 +33,9 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         val channelId = type // CHAT
         val channelName = getChannelName(type) // 채팅 알림
 
-//        if (type == "WALK") {
-//            WalkLiveData.shouldUpdateOtherGps.postValue(true)
-//        }
+        if (type == "WALK_START") {
+            WalkLiveData.shouldUpdateOtherGps.postValue(true)
+        }
 
         // notification channel
         val importance = NotificationManager.IMPORTANCE_HIGH

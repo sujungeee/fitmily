@@ -29,7 +29,7 @@ object WalkLiveData {
     var lastUpdatedTime: Long = 0
     var startedTime = System.currentTimeMillis()
 
-//    val shouldUpdateOtherGps = MutableLiveData<Boolean>(false)
+    val shouldUpdateOtherGps = MutableLiveData<Boolean>(false)
 
     fun updateGpsList(newGps: GpsDto) {
         _gpsList.value = _gpsList.value + newGps
