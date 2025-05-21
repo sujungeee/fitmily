@@ -127,6 +127,11 @@ public interface FamilyMapper {
     @Select("SELECT user_id FROM user WHERE family_id = #{familyId}")
     List<String> selectFamilyMemberIds(@Param("familyId") String familyId);
 
+
+    @Select("SELECT family_id FROM user WHERE user_id = #{userId}")
+    Integer selectFamilyIdByUserId(@Param("userId") Integer userId);
+
+
 }
 
 ///**
