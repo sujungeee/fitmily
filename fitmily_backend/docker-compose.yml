@@ -111,7 +111,7 @@ services:
       - app-network
 
   jenkins:
-    image: custom-jenkins:latest
+    image: jenkins/jenkins:lts
     container_name: jenkins
     user: root
     restart: always
