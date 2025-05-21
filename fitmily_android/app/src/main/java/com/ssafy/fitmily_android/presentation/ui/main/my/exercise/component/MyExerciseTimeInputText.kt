@@ -20,11 +20,10 @@ import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 
 @Composable
 fun MyExerciseTimeInputText(
-    modifier: Modifier
+    modifier: Modifier,
+    onValueChange: (String) -> Unit,
+    value: String
 ) {
-
-    /* TODO 추후 UI STATE로 추출 */
-    var inputValue by remember { mutableStateOf("") }
 
     Box(
         modifier = modifier
@@ -43,12 +42,14 @@ fun MyExerciseTimeInputText(
             }
     ) {
         BasicTextField(
-            value = inputValue,
-            onValueChange = { inputValue = it },
+            value = value,
+            onValueChange = { newValue ->
+                onValueChange(newValue)
+            },
             singleLine = true,
             textStyle = Typography.bodyLarge.copy(color = mainBlack),
             decorationBox = { innerTextField ->
-                if (inputValue.isEmpty()) {
+                if (value.isEmpty()) {
                     Text(
                         text = "운동한 시간",
                         color = mainDarkGray,

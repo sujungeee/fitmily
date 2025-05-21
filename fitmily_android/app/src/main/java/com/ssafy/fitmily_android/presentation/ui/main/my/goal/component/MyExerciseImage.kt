@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.util.ExerciseUtil
 
 @Composable
 fun MyExerciseImage(
@@ -20,20 +21,7 @@ fun MyExerciseImage(
     modifier: Modifier
 ) {
 
-    val exerciseMap = mapOf(
-        "런지" to R.drawable.sample_walk,
-        "벤치프레스" to R.drawable.sample_walk,
-        "푸시업" to R.drawable.sample_walk,
-        "스쿼트" to R.drawable.sample_walk,
-        "버피테스트" to R.drawable.sample_walk,
-        "데드리프트" to R.drawable.sample_walk,
-        "풀업" to R.drawable.sample_walk,
-        "딥스" to R.drawable.sample_walk,
-        "사이드 레터럴 라이즈" to R.drawable.sample_walk,
-        "산책" to R.drawable.sample_walk
-    )
-
-    val imageResId = exerciseMap[exerciseName] ?: R.drawable.sample_walk
+    val imageResId = ExerciseUtil().mapExerciseNameToImage(exerciseName) ?: R.drawable.sample_walk
 
     Box(
         modifier = modifier

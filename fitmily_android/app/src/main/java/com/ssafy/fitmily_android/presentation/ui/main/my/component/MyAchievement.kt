@@ -20,14 +20,17 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ssafy.fitmily_android.model.dto.response.my.MyWeaklyGoalDto
 import com.ssafy.fitmily_android.presentation.ui.main.my.AchievementDay
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MyAchievement(
-    data: List<AchievementDay>,
+    data: List<MyWeaklyGoalDto>,
     modifier: Modifier = Modifier
 ) {
 
@@ -58,7 +61,7 @@ fun MyAchievement(
                 val points = data.mapIndexed { idx, day ->
                     Offset(
                         x = idx * space,
-                        y = minY + (1f - day.percent) * (maxY - minY)
+                        y = minY + (1f - (day.exerciseGoalProgress / 100)) * (maxY - minY)
                     )
                 }
 
@@ -84,7 +87,7 @@ fun MyAchievement(
                         center = offset
                     )
                     // 값
-                    val percentText = "${(data[idx].percent * 100).toInt()}%"
+                    val percentText = "${(data[idx].exerciseGoalProgress)}%"
                     drawContext.canvas.nativeCanvas.apply {
                         drawText(
                             percentText,
@@ -110,11 +113,16 @@ fun MyAchievement(
         ) {
             data.forEach { day ->
                 Text(
-                    text = day.day,
+                    text = formatToMonthDay(day.date),
                     color = mainBlack,
                     style = Typography.bodyMedium
                 )
             }
         }
     }
+}
+
+fun formatToMonthDay(dateStr: String): String {
+    val parsed = LocalDate.parse(dateStr, DateTimeFormatter.ISO_DATE)
+    return "${parsed.monthValue}/${parsed.dayOfMonth}"
 }

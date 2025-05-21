@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ssafy.fitmily_android.model.dto.response.my.MyExerciseDto
 import com.ssafy.fitmily_android.presentation.ui.main.my.ExerciseHistory
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
@@ -21,7 +22,7 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 @Composable
 fun MyTodayExerciseHistory(
     totalExerciseCalorie: Int,
-    histories: List<ExerciseHistory>,
+    histories: List<MyExerciseDto>,
     modifier: Modifier
 ) {
     Column(

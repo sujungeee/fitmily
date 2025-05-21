@@ -53,7 +53,7 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendPoke(userId: Int): Result<Any> {
+    override suspend fun sendPoke(userId: Int): Result<Unit> {
         return ApiResultHandler.handleApi {
             homeService.sendPoke(userId)
         }

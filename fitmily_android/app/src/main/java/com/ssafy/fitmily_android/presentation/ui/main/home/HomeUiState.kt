@@ -13,7 +13,7 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val tstMessage : String = "",
     val weather: WeatherResponse? = null,
-    val familyId : Int = 0,
+    val familyId : Int = 100,
     val family :FamilyResponse  = FamilyResponse(),
     val dashBoardListData : FamilyTodayResponse = FamilyTodayResponse(),
     val challengeData: ChallengeResponse = ChallengeResponse(),

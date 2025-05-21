@@ -29,14 +29,18 @@ import com.ssafy.fitmily_android.ui.theme.mainWhite
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyExerciseSelectBottomSheet(
+    mode: Int,
     selectedExercise: String?,
     onItemSelected: (String) -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState
 ) {
 
-    val exerciseList = listOf(
-        "런지", "벤치프레스", "푸시업", "스쿼트", "버피테스트", "데드리프트", "풀업", "딥스", "사이드 레터럴 라이즈", "산책"
+    val exerciseList = if(mode == 0) listOf(
+        "런지", "벤치프레스", "푸쉬업", "스쿼트", "버피테스트", "데드리프트", "풀업", "딥스", "사이드레터럴레이즈", "산책"
+    )
+    else listOf(
+        "런지", "벤치프레스", "푸쉬업", "스쿼트", "버피테스트", "데드리프트", "풀업", "딥스", "사이드레터럴레이즈"
     )
 
     ModalBottomSheet(

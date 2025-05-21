@@ -37,7 +37,10 @@ import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
-fun AloneHome() {
+fun AloneHome(
+    onClickJoin: (String) -> Unit,
+    onClickCreate: (String) -> Unit,
+) {
     val dialogState = remember { mutableStateOf(DialogState.NONE) }
 
     Column(
@@ -140,7 +143,13 @@ fun AloneHome() {
         FamilyDialog(
             onDismissRequest = { dialogState.value = DialogState.NONE },
             onConfirmation = {
+                if(dialogState.value == DialogState.JOIN) {
+                    onClickJoin(it)
+                } else {
+                    onClickCreate(it)
+                }
                 dialogState.value = DialogState.NONE
+
             },
             dialogState = dialogState.value
 

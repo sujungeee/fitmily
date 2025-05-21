@@ -8,7 +8,7 @@ import jakarta.inject.Inject
 class ChatListUseCase @Inject constructor(
     private val chatRepository: ChatRepository
 ){
-    suspend operator fun invoke(familyId: String): Result<ChatListResponse> {
-        return chatRepository.getChatList(familyId)
+    suspend operator fun invoke(familyId: String, page: Int): Result<ChatListResponse> {
+        return chatRepository.getChatList(familyId, page)
     }
 }

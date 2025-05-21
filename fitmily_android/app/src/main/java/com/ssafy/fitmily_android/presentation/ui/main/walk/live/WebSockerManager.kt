@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.datastore.dataStore
 import com.google.gson.Gson
+import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 import io.reactivex.schedulers.Schedulers
 import ua.naiksoftware.stomp.Stomp
@@ -13,45 +15,24 @@ import ua.naiksoftware.stomp.dto.LifecycleEvent
 import ua.naiksoftware.stomp.dto.StompHeader
 
 private const val TAG = "WebSockerManager"
+
 object WebSocketManager {
     lateinit var stompClient: StompClient
-
-    var subscribeList = mutableListOf<String>()
+    private val subscribeMap = mutableMapOf<String, io.reactivex.disposables.Disposable>()
     var isConnected = false
 
-    val url = "ws://192.168.100.130:8081/api/ws-connect"
-    val TOKEN="eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ3MjgzNjg3LCJleHAiOjE3NDcyODcyODd9.VEDTuuHFWil2ipdMN_ZvgXeQ079sVP-lvsiBLU1LyK0"
-    var headerList: MutableList<StompHeader> = mutableListOf(
-        StompHeader("Authorization", "Bearer ${TOKEN}")
-    )
-
-    var recentMessage = GpsDto(0.0, 0.0, "2023-10-01T12:00:00Z")
-
-    private fun retryConnect() {
-        if (!isConnected) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                connectStomp()
-            }, 3000)
-        }
-    }
-
+//    val url = "ws://192.168.137.1:8081/api/ws-connect"
+    val url = "wss://k12d208.p.ssafy.io/api/ws-connect"
+    var TOKEN = ""
+    var USERID  = 0
 
     @SuppressLint("CheckResult")
-    fun connectStomp() {
+    fun connectStomp(other :Boolean = false) {
+        Log.d(TAG, "connectStomp: ${TOKEN}")
+        var headerList: MutableList<StompHeader> = mutableListOf(
+            StompHeader("Authorization", "Bearer ${TOKEN}")
+        )
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
-
-
-        val heartBeatHandler = Handler(Looper.getMainLooper())
-        val heartBeatRunnable = object : Runnable {
-            override fun run() {
-                if (isConnected) {
-//                    viewModel.sendStompHeartBeat(stompClient, roomId)
-                    heartBeatHandler.postDelayed(this, 1000)
-                }
-            }
-        }
-//        왜있지
-//        stompClient.disconnect()
 
 
         stompClient.lifecycle().subscribe { lifecycleEvent ->
@@ -59,10 +40,9 @@ object WebSocketManager {
                 LifecycleEvent.Type.OPENED -> {
                     isConnected = true
                     Log.d(TAG, "connectStomp: OPENED")
-//                    subscribeAll()
-//                    heartBeatHandler.post(heartBeatRunnable)
-                    if (WebSocketManager.stompClient.isConnected) {
-                        WebSocketManager.subscribeStomp()
+
+                    if (!other) {
+                        subscribeStomp()
                     }
                 }
 
@@ -85,62 +65,73 @@ object WebSocketManager {
 
     }
 
-    @SuppressLint("CheckResult")
-    fun subscribeStomp() {
-            stompClient.topic("/topic/walk/gps/1", headerList).subscribe { topicMessage ->
-                Log.d(TAG, "subscribeStomp: 응답 ")
-                topicMessage.payload?.let { payload ->
-                    val message = Gson().fromJson(
-                        topicMessage.getPayload(),
-                        GpsDto::class.java
-                    )
 
-                    WalkLiveData.gpsList.value= WalkLiveData.gpsList.value?.plus(message) ?: listOf(message)
-                    Log.d("WebSocketManager", "Received message: $message" )
-                }
+
+        @SuppressLint("CheckResult")
+        fun subscribeStomp(topic: String = "/topic/walk/gps/$USERID") {
+            if (subscribeMap.containsKey(topic)) {
+                Log.d(TAG, "subscribeStomp: 이미 구독 중인 토픽입니다 -> $topic")
+                return
             }
-    }
 
-    @SuppressLint("CheckResult")
-    fun subscribeStomp(topic: String){
-        try {
-            stompClient.topic(topic).subscribe { topicMessage ->
-                Log.d(TAG, "subscribeStomp: 응답 ")
-                topicMessage.payload?.let { payload ->
-                    val message = Gson().fromJson(
-                        topicMessage.getPayload(),
-                        GpsDto::class.java
-                    )
+            val headers = listOf(StompHeader("Authorization", "Bearer $TOKEN"))
+            val disposable = stompClient.topic(topic, headers)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe({ topicMessage ->
+                    Log.d(TAG, "subscribeStomp: 메시지 도착 -> $topic")
+                    if (topic== "/topic/walk/gps/$USERID") {
+                        topicMessage.payload?.let { payload ->
+                            val message = Gson().fromJson(payload, GpsDto::class.java)
+                            WalkLiveData.gpsList.postValue(
+                                WalkLiveData.gpsList.value?.plus(message) ?: listOf(message)
+                            )
+                        }
+                    }else {
+                        topicMessage.payload?.let { payload ->
+                            val message = Gson().fromJson(payload, GpsDto::class.java)
+                            WalkLiveData.otherData.postValue(
+                                message
+                            )
+                        }
+                    }
+                }, { error ->
+                    Log.e(TAG, "subscribeStomp: 에러 발생 -> $topic", error)
+                })
 
-                    recentMessage = message
-                    Log.d("WebSocketManager", "Received message: $message" )
-                }
+            subscribeMap[topic] = disposable
+            Log.d(TAG, "subscribeStomp: 구독 완료 -> $topic")
+        }
+
+        fun unsubscribeStomp(topic: String) {
+            subscribeMap[topic]?.dispose()
+            val removed = subscribeMap.remove(topic)
+
+            if (removed != null) {
+                Log.d(TAG, "unsubscribeStomp: 해제 완료 -> $topic")
+            } else {
+                Log.d(TAG, "unsubscribeStomp: 해당 토픽은 구독 중이 아닙니다 -> $topic")
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error subscribing to topic: $topic", e)
-        }
-    }
 
-    @SuppressLint("CheckResult")
-    fun unsubscribeStomp(topic: String) {
-        try {
-            stompClient.topic(topic).unsubscribeOn(Schedulers.io())
-            subscribeList.remove(topic)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error unsubscribing from topic: $topic", e)
+            if (subscribeMap.isEmpty()) {
+                Log.d(TAG, "unsubscribeStomp: 모든 구독 해제됨 → disconnect")
+                disconnectStomp()
+            }
         }
 
-        if (subscribeList.isEmpty()) {
-            disconnectStomp()
+        fun disconnectStomp() {
+            if (stompClient.isConnected) {
+                stompClient.disconnect()
+                isConnected = false
+                subscribeMap.values.forEach { it.dispose() }
+                subscribeMap.clear()
+            }
         }
-    }
 
-    fun disconnectStomp() {
-        if (stompClient.isConnected) {
-            stompClient.disconnect()
-            isConnected = false
+        fun getCurrentSubscribedTopics(): List<String> {
+            return subscribeMap.keys.toList()
         }
-    }
+
 
     fun reconnectStomp() {
         if (!isConnected) {

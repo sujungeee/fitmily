@@ -16,15 +16,18 @@ object WalkLiveData {
     val gpsList = MutableLiveData<List<GpsDto>>(
         listOf(
             // 초기 위치 데이터
-            GpsDto(37.5665, 126.978, "2023-10-01T12:00:00Z"),
-            GpsDto(37.5651, 126.989, "2023-10-01T12:01:00Z"),
+//            GpsDto(37.5665, 126.978, "2023-10-01T12:00:00Z"),
+//            GpsDto(37.5651, 126.989, "2023-10-01T12:01:00Z"),
         )
     )
+    val otherData = MutableLiveData<GpsDto>(null)
     // 위치 데이터를 위한 변수들
+    var userId = 0
     var lat = 0.0
     var lon = 0.0
     var speed = 0.0
     var lastUpdatedTime: Long = 0
+    var startedTime = System.currentTimeMillis()
 
     // GpsService를 시작하는 메서드
     fun startWalkLiveService(context: Context) {
@@ -43,7 +46,7 @@ object WalkLiveData {
     fun stopWalkLiveService(context: Context) {
         val intent = Intent(context, WalkLiveService::class.java)
         context.stopService(intent)
-        WebSocketManager.unsubscribeStomp("/topic/walk/gps/1")
+        WebSocketManager.unsubscribeStomp("/topic/walk/gps/${WebSocketManager.USERID}")
     }
 
     // 서비스의 실행 상태를 반환하는 메서드
