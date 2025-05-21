@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.my
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -28,6 +32,9 @@ import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyRecordButto
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTobBar
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTodayExerciseHistory
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
+import com.ssafy.fitmily_android.ui.theme.mainBlue
+import com.ssafy.fitmily_android.ui.theme.mainWhite
+import com.ssafy.fitmily_android.util.ProfileUtil
 
 @Composable
 fun MyScreen(
@@ -38,6 +45,19 @@ fun MyScreen(
     val context = LocalContext.current
     val uiState by myViewMdodel.myUiState.collectAsStateWithLifecycle()
     val authDataStore = MainApplication.getInstance().getDataStore()
+    var userNickname by remember { mutableStateOf("") }
+    var userZodiacName by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(Unit) {
+        userNickname = authDataStore.getUserNickname()
+        userZodiacName = authDataStore.getUserZodiacName()
+
+        Log.d("test1234", "userNickname : $userNickname")
+        Log.d("test1234", "userZodiacName : $userZodiacName")
+        myViewMdodel.getMyGoalInfo()
+        myViewMdodel.getMyExerciseInfo()
+    }
 
     LaunchedEffect(uiState.mySideEffect) {
         for(sideEffect in uiState.mySideEffect ?: return@LaunchedEffect) {
@@ -54,15 +74,13 @@ fun MyScreen(
                     }
                     Toast.makeText(context, "로그아웃이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                 }
+
+                is MySideEffect.NavigateToWalk -> {
+                    /* TODO 산책 Detail로 가기 */
+                }
             }
         }
     }
-
-    val goals = listOf(
-        GoalItem("스쿼트", 69f, 100f, "회"),
-        GoalItem("루마니안 데드리프트", 28f, 100f, "회"),
-        GoalItem("산책", 0.65f, 1f, "km"),
-    )
 
     val weekData = listOf(
         AchievementDay("5/10", 0.7f),
@@ -91,8 +109,9 @@ fun MyScreen(
         // TopBar 영역
         item {
             MyTobBar(
-                profileImage = painterResource(id = R.drawable.my_unselected_icon),
-                nickname = "예지렐라",
+                userZodiacName = userZodiacName,
+                color = ProfileUtil().seqToColor(0) ?: mainWhite,
+                nickname = userNickname,
                 onNotificationClick = {
                     navController.navigate("my/notification")
                 }
@@ -104,7 +123,7 @@ fun MyScreen(
         item {
             Spacer(Modifier.height(32.dp))
             MyExerciseStatusGraph(
-                progress = 80f,
+                progress = uiState.myGoalInfo?.exerciseGoalProgress ?: 0,
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
         }
@@ -113,7 +132,7 @@ fun MyScreen(
         item {
             Spacer(Modifier.height(12.dp))
             MyExerciseGoal(
-                goals = goals,
+                goals = uiState.myGoalInfo?.goal ?: emptyList(),
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
         }
@@ -148,8 +167,8 @@ fun MyScreen(
         item {
             Spacer(Modifier.height(32.dp))
             MyTodayExerciseHistory(
-                totalExerciseCalorie = 6300,
-                histories = histories,
+                totalExerciseCalorie = uiState.myExerciseTotalCalorie,
+                histories = uiState.myExerciseInfo?.exercise ?: emptyList(),
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
         }
@@ -162,14 +181,6 @@ fun MyScreen(
         }
     }
 }
-
-
-data class GoalItem(
-    val name: String,
-    val current: Float,
-    val total: Float,
-    val unit: String
-)
 
 data class AchievementDay(
     val day: String,

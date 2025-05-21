@@ -11,14 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
+import com.ssafy.fitmily_android.model.dto.response.home.GoalDto
+import com.ssafy.fitmily_android.model.dto.response.my.MyGoalDto
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun MyExerciseGoal(
-    goals: List<GoalItem>,
+    goals: List<MyGoalDto>,
     modifier: Modifier = Modifier
 ) {
     Column(

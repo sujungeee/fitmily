@@ -7,16 +7,11 @@ import com.ssafy.fitmily_android.domain.usecase.myhealth.MyHealthGetInfoUseCase
 import com.ssafy.fitmily_android.domain.usecase.myhealth.MyHealthInsertInfoUseCase
 import com.ssafy.fitmily_android.domain.usecase.myhealth.MyHealthUpdateInfoUseCase
 import com.ssafy.fitmily_android.model.common.Result
-import com.ssafy.fitmily_android.presentation.ui.state.Mode
-import com.ssafy.fitmily_android.presentation.ui.state.MyHealthSideEffect
-import com.ssafy.fitmily_android.presentation.ui.state.MyHealthUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import retrofit2.http.Tag
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,8 +31,6 @@ class MyHealthViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-
-            Log.d("test1234", "url : ")
 
             when(val result = myHealthGetInfoUseCase()) {
 
@@ -59,8 +52,8 @@ class MyHealthViewModel @Inject constructor(
                                 mode = Mode.MODIFIER,
                                 height = data.height.toString(),
                                 weight = data.weight.toString(),
-                                selectedMajorDiseases = data.fiveMajorDiseases,
-                                otherDiseases = data.otherDiseases,
+                                selectedMajorDiseases = data.fiveMajorDiseasesList,
+                                otherDiseases = data.otherDiseasesList,
                                 isLoading = false
                             )
                         }

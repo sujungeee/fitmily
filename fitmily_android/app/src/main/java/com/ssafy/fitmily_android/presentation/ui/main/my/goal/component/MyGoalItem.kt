@@ -14,17 +14,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Surface
-import com.ssafy.fitmily_android.presentation.ui.main.my.GoalItem
+import com.ssafy.fitmily_android.model.dto.response.my.MyGoalDto
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
 @Composable
 fun MyGoalItem(
-    goal: GoalItem,
+    goal: MyGoalDto,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
+
+    val unit = when(goal.exerciseGoalName) {
+
+        "산책" -> {
+            "km"
+        }
+
+        else -> {
+            "회"
+        }
+    }
+
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = mainWhite,
@@ -40,17 +52,17 @@ fun MyGoalItem(
         ) {
             Column {
                 Text(
-                    text = goal.name,
+                    text = goal.exerciseGoalName,
                     style = Typography.bodyLarge,
                     color = mainBlack
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text =
-                        if(goal.unit == "km")
-                            "${goal.total} ${goal.unit}"
+                        if(unit == "km")
+                            "${goal.exerciseGoalValue} $unit"
                         else
-                            "${goal.total.toInt()} ${goal.unit}",
+                            "${goal.exerciseGoalValue.toInt()} $unit",
                     style = Typography.bodyMedium,
                     color = mainBlack
                 )

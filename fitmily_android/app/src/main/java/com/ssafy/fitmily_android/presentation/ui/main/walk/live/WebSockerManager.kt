@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.datastore.dataStore
 import com.google.gson.Gson
+import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 import io.reactivex.schedulers.Schedulers
 import ua.naiksoftware.stomp.Stomp
@@ -13,17 +15,17 @@ import ua.naiksoftware.stomp.dto.LifecycleEvent
 import ua.naiksoftware.stomp.dto.StompHeader
 
 private const val TAG = "WebSockerManager"
+
 object WebSocketManager {
     lateinit var stompClient: StompClient
 
     var subscribeList = mutableListOf<String>()
     var isConnected = false
 
-    val url = "ws://192.168.100.130:8081/api/ws-connect"
-    val TOKEN="eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ3MjgzNjg3LCJleHAiOjE3NDcyODcyODd9.VEDTuuHFWil2ipdMN_ZvgXeQ079sVP-lvsiBLU1LyK0"
-    var headerList: MutableList<StompHeader> = mutableListOf(
-        StompHeader("Authorization", "Bearer ${TOKEN}")
-    )
+    val url = "wss://k12d208.p.ssafy.io/api/ws-connect"
+
+    var TOKEN = ""
+
 
     var recentMessage = GpsDto(0.0, 0.0, "2023-10-01T12:00:00Z")
 
@@ -38,6 +40,10 @@ object WebSocketManager {
 
     @SuppressLint("CheckResult")
     fun connectStomp() {
+        Log.d(TAG, "connectStomp: ${TOKEN}")
+        var headerList: MutableList<StompHeader> = mutableListOf(
+            StompHeader("Authorization", "Bearer ${TOKEN}")
+        )
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
 
 
@@ -61,9 +67,9 @@ object WebSocketManager {
                     Log.d(TAG, "connectStomp: OPENED")
 //                    subscribeAll()
 //                    heartBeatHandler.post(heartBeatRunnable)
-                    if (WebSocketManager.stompClient.isConnected) {
-                        WebSocketManager.subscribeStomp()
-                    }
+
+                    subscribeStomp()
+
                 }
 
                 LifecycleEvent.Type.ERROR -> {
@@ -87,22 +93,34 @@ object WebSocketManager {
 
     @SuppressLint("CheckResult")
     fun subscribeStomp() {
-            stompClient.topic("/topic/walk/gps/1", headerList).subscribe { topicMessage ->
-                Log.d(TAG, "subscribeStomp: 응답 ")
-                topicMessage.payload?.let { payload ->
-                    val message = Gson().fromJson(
-                        topicMessage.getPayload(),
-                        GpsDto::class.java
-                    )
+        var headerList: MutableList<StompHeader> = mutableListOf(
+            StompHeader("Authorization", "Bearer ${TOKEN}")
+        )
+        stompClient.topic("/topic/walk/gps/13", headerList).subscribe { topicMessage ->
+            Log.d(TAG, "subscribeStomp: 응답 ")
+            var past = 0.0006
+            topicMessage.payload?.let { payload ->
+                val message = Gson().fromJson(
+                    topicMessage.getPayload(),
+                    GpsDto::class.java
+                )
 
-                    WalkLiveData.gpsList.value= WalkLiveData.gpsList.value?.plus(message) ?: listOf(message)
-                    Log.d("WebSocketManager", "Received message: $message" )
-                }
+
+                message.lat += past
+                past += 0.0002
+
+
+
+                WalkLiveData.gpsList.postValue(
+                    WalkLiveData.gpsList.value?.plus(message) ?: listOf(message)
+                )
+                Log.d("WebSocketManager", "Received message: ${WalkLiveData.gpsList}")
             }
+        }
     }
 
     @SuppressLint("CheckResult")
-    fun subscribeStomp(topic: String){
+    fun subscribeStomp(topic: String) {
         try {
             stompClient.topic(topic).subscribe { topicMessage ->
                 Log.d(TAG, "subscribeStomp: 응답 ")
@@ -113,7 +131,7 @@ object WebSocketManager {
                     )
 
                     recentMessage = message
-                    Log.d("WebSocketManager", "Received message: $message" )
+                    Log.d("WebSocketManager", "Received message: $message")
                 }
             }
         } catch (e: Exception) {

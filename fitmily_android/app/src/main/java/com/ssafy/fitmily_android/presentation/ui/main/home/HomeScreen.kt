@@ -29,13 +29,12 @@ private const val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    homeVieModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
     val context = LocalContext.current
-    val homeUiState by homeVieModel.uiState.collectAsState()
+    val homeUiState by homeViewModel.uiState.collectAsState()
 
-    var isInFamily = remember { mutableStateOf(true) }
 
     val requestPermissionLauncher = rememberLauncherForActivityResult1(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -50,27 +49,48 @@ fun HomeScreen(
                     context = context,
                     onLocationReceived = { lat, lon ->
                         Log.d("test1234", "lat : $lat lon : $lon")
-                        homeVieModel.getWeatherInfo(lat, lon)
+                        homeViewModel.getWeatherInfo(lat, lon)
                     },
                     onFailure = {
                         Toast.makeText(context, "위치 정보를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
                     }
                 )
             }
-            // 권한 거부
             else {
                 Toast.makeText(context, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
             }
         }
     )
 
-    if (isInFamily.value) {
+    if (homeUiState.familyId != 0) {
         FamilyHome(
             navController = navController,
-            weather = homeUiState.weather
+            homeUiState = homeUiState,
+            onClickPoke = {
+                homeViewModel.sendPoke(it)
+            },
+
         )
     } else {
-        AloneHome()
+        AloneHome(
+            onClickCreate = {
+                homeViewModel.createFamily(it)
+            },
+            onClickJoin = {
+                homeViewModel.joinFamily(it)
+            },
+        )
+    }
+
+    LaunchedEffect(Unit){
+        homeViewModel.getFamilyId()
+    }
+    LaunchedEffect(homeUiState.familyId) {
+        if(homeUiState.familyId!=0 && homeUiState.familyId!=100) {
+            homeViewModel.getFamily()
+            homeViewModel.getChallenge()
+            homeViewModel.getDashboard()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -84,7 +104,7 @@ fun HomeScreen(
                 context,
                 onLocationReceived = { lat, lon ->
                     Log.d("test1234", "lat : $lat lon : $lon")
-                    homeVieModel.getWeatherInfo(lat, lon)
+                    homeViewModel.getWeatherInfo(lat, lon)
                 },
                 onFailure = {
                     Toast.makeText(context, "위치 정보를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -92,12 +112,6 @@ fun HomeScreen(
             )
         }
     }
-
-//    if(WalkLiveData.isServiceRunning.value) {
-//        Log.d(TAG, "HomeScreen: ")
-//        navController.navigate("walk/main")
-//        Log.d(TAG, "HomeScreen: ${WalkLiveData.lat}, ${WalkLiveData.lon}, ${WalkLiveData.speed}, ${WalkLiveData.lastUpdatedTime}")
-//    }
 
 }
 

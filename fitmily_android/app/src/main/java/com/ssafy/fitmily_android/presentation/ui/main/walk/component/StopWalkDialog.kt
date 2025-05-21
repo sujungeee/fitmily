@@ -19,9 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
+import coil.decode.GifDecoder
+import coil.request.ImageRequest
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue
@@ -33,6 +37,7 @@ fun StopWalkDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
 ) {
+    val context = LocalContext.current
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             colors = CardDefaults.cardColors(containerColor = mainWhite),
@@ -53,13 +58,22 @@ fun StopWalkDialog(
                     style = typography.bodyLarge,
                     modifier = Modifier.padding(16.dp),
                 )
-                Image(
-                    painter = painterResource(R.drawable.ic_launcher_background),
-                    contentDescription = "imageDescription",
-                    contentScale = ContentScale.Fit,
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(R.drawable.walk_end)
+                        .decoderFactory(GifDecoder.Factory())
+                        .build(),
+                    contentDescription = null,
                     modifier = Modifier
                         .height(160.dp)
                 )
+//                Image(
+//                    painter = painterResource(R.drawable.walk_end),
+//                    contentDescription = "imageDescription",
+//                    contentScale = ContentScale.Fit,
+//                    modifier = Modifier
+//                        .height(160.dp)
+//                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),

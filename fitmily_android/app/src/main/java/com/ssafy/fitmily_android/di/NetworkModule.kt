@@ -2,9 +2,13 @@ package com.ssafy.fitmily_android.di
 
 import com.ssafy.fitmily_android.model.service.AuthService
 import com.ssafy.fitmily_android.model.service.ChatService
+import com.ssafy.fitmily_android.model.service.FileService
 import com.ssafy.fitmily_android.model.service.HomeService
+import com.ssafy.fitmily_android.model.service.MyExerciseService
+import com.ssafy.fitmily_android.model.service.MyGoalService
 import com.ssafy.fitmily_android.model.service.MyHealthService
 import com.ssafy.fitmily_android.model.service.NotificationService
+import com.ssafy.fitmily_android.model.service.S3Service
 import com.ssafy.fitmily_android.model.service.WalkService
 import com.ssafy.fitmily_android.model.service.WeatherService
 import com.ssafy.fitmily_android.network.AccessTokenInterceptor
@@ -84,6 +88,28 @@ object NetworkModule {
 
     @Singleton
     @Provides
+    @S3Retrofit
+    fun provideS3OkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .readTimeout(5000, TimeUnit.MILLISECONDS)
+            .connectTimeout(5000, TimeUnit.MILLISECONDS)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @S3Retrofit
+    fun provideS3Retrofit(@S3Retrofit provideS3OkHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://k12d208.p.ssafy.io/api/")
+            .client(provideS3OkHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Singleton
+    @Provides
     fun provideAuthService(@MainRetrofit retrofit: Retrofit): AuthService {
         return retrofit.create(AuthService::class.java)
     }
@@ -120,7 +146,30 @@ object NetworkModule {
 
     @Singleton
     @Provides
+    fun provideMyGoalService(@MainRetrofit retrofit: Retrofit): MyGoalService {
+        return retrofit.create(MyGoalService::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun provideNotificationService(@MainRetrofit retrofit: Retrofit): NotificationService {
         return retrofit.create(NotificationService::class.java)
+    }
+    @Singleton
+    @Provides
+    fun provideFileService(@MainRetrofit retrofit: Retrofit): FileService {
+        return retrofit.create(FileService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideMyExerciseService(@MainRetrofit retrofit: Retrofit): MyExerciseService {
+        return retrofit.create(MyExerciseService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideS3Service(@S3Retrofit retrofit: Retrofit): S3Service {
+        return retrofit.create(S3Service::class.java)
     }
 }

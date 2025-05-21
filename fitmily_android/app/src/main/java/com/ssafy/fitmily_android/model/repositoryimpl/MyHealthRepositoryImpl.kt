@@ -24,7 +24,7 @@ class MyHealthRepositoryImpl @Inject constructor(
         height: Float,
         otherDiseases: List<String>,
         weight: Float
-    ): Result<Any> {
+    ): Result<Unit> {
 
         return ApiResultHandler.handleApi {
             val myHealthRequest = MyHealthRequest(
@@ -42,7 +42,7 @@ class MyHealthRepositoryImpl @Inject constructor(
         height: Float?,
         otherDiseases: List<String>?,
         weight: Float?
-    ): Result<Any> {
+    ): Result<Unit> {
 
         return ApiResultHandler.handleApi {
             val myHealthRequest = MyHealthRequest(

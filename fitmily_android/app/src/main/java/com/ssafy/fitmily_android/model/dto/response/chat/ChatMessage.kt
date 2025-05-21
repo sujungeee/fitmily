@@ -7,7 +7,7 @@ data class ChatMessage(
     , @SerializedName("senderId") val senderId: Int
     , @SerializedName("senderInfo") val senderInfo: SenderInfo
     , @SerializedName("content") val contentInfo: ContentInfo
-    , @SerializedName("sendAt") val sendAt: String
+    , @SerializedName("sentAt") val sentAt: String
     , @SerializedName("readByUserIds") val readByUserIds: List<Int>
-    , @SerializedName("unReadCount") val unReadCount: Int
+    , @SerializedName("unreadCount") val unreadCount: Int
 )

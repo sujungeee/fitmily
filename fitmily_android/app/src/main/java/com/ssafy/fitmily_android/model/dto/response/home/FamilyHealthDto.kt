@@ -9,5 +9,7 @@ data class FamilyHealthDto(
     val userBirth: String,
     val userGender: Int,
     val userId: Int,
-    val userNickname: String
+    val userNickname: String,
+    val userFamilySequence: Int,
+    val userZodiacName: String
 )

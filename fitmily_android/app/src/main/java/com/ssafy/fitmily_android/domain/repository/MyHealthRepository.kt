@@ -13,12 +13,12 @@ interface MyHealthRepository {
         height: Float,
         otherDiseases: List<String>,
         weight: Float
-    ): Result<Any>
+    ): Result<Unit>
 
     suspend fun updateMyHealthInfo(
         fiveMajorDiseases: List<String>? = null,
         height: Float? = null,
         otherDiseases: List<String>? = null,
         weight: Float? = null
-    ): Result<Any>
+    ): Result<Unit>
 }
