@@ -36,10 +36,10 @@ pipeline {
         }
 
         stage('Docker Build & Deploy') {
-            // 기존 코드 유지
             steps {
                 dir('fitmily_backend') {
-                    sh '/usr/local/bin/docker-compose build || docker compose build'
+                    // 캐시 사용 방지
+                    sh '/usr/local/bin/docker-compose build --no-cache || docker compose build --no-cache'
                     sh '/usr/local/bin/docker-compose up -d || docker compose up -d'
                 }
             }
