@@ -3,6 +3,7 @@ package com.d208.fitmily.global.config;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
+
+@ConditionalOnProperty(name = "spring.cloud.aws.credentials.accessKey")
 @Component
 @Slf4j
 public class AwsS3Config {
