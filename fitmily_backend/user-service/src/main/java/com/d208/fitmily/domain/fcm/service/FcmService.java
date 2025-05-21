@@ -368,4 +368,205 @@ public class FcmService {
                 .setAndroidConfig(androidConfig)
                 .build();
     }
+    /**
+     * 산책 시작 알림 전송
+     */
+    public void sendWalkStartNotification(UserDto walker, int familyId) {
+        log.info("산책 시작 알림 전송: userId={}, familyId={}", walker.getUserId(), familyId);
+
+        // 가족 구성원의 FCM 토큰 조회 (본인 제외)
+        List<FcmTokenDTO> familyTokens = fcmMapper.findTokensByFamilyIdExceptUser(familyId, walker.getUserId());
+
+        if (familyTokens.isEmpty()) {
+            log.warn("알림을 받을 가족 구성원의 FCM 토큰이 없음: familyId={}", familyId);
+            return;
+        }
+
+        // 알림 메시지 생성
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+        String notificationContent = walkerName + "님이 산책을 시작했어요! 함께 산책해보세요.";
+        LocalDateTime now = LocalDateTime.now();
+
+        for (FcmTokenDTO tokenDto : familyTokens) {
+            try {
+                // notification 테이블에 알림 추가
+                // 이 부분에서 com.d208.fitmily.domain.notification.entity.Notification을 사용
+                com.d208.fitmily.domain.notification.entity.Notification dbNotification =
+                        new com.d208.fitmily.domain.notification.entity.Notification();
+                dbNotification.setUserId(tokenDto.getUserId());
+                dbNotification.setNotificationType("WALK"); // WALK_START 대신 WALK로 통일
+                dbNotification.setNotificationSenderId(walker.getUserId());
+                dbNotification.setNotificationReceiverId(tokenDto.getUserId());
+                dbNotification.setNotificationResourceId(walker.getUserId()); // 산책 시작자 ID를 resourceId로 저장
+                dbNotification.setNotificationContent(notificationContent);
+                dbNotification.setNotificationIsRead(0);
+                dbNotification.setNotificationCreatedAt(now);
+                dbNotification.setNotificationUpdatedAt(now);
+
+                notificationMapper.insertNotification(dbNotification);
+                log.info("산책 시작 알림 저장 완료: userId={}", tokenDto.getUserId());
+
+                // FCM 메시지 생성 (Message 객체 이름 변경)
+                Message fcmMessage = createWalkStartNotificationMessage(walker, tokenDto.getToken());
+
+                // 메시지 전송
+                String response = firebaseMessaging.send(fcmMessage);
+                log.info("산책 시작 알림 전송 성공: userId={}, response={}", tokenDto.getUserId(), response);
+            } catch (FirebaseMessagingException e) {
+                log.error("산책 시작 알림 전송 실패: userId={}, token={}, error={}",
+                        tokenDto.getUserId(), tokenDto.getToken(), e.getMessage());
+                if (isInvalidTokenError(e)) {
+                    Fcm fcm = fcmMapper.findByUserIdAndFcmToken(tokenDto.getUserId(), tokenDto.getToken());
+                    if (fcm != null) {
+                        fcmMapper.deleteFcmToken(fcm.getFcmId());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("산책 시작 알림 처리 중 오류: userId={}, error={}", tokenDto.getUserId(), e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 산책 종료 알림 전송
+     */
+    public void sendWalkEndNotification(UserDto walker, int familyId, float distance, int calories, long durationMinutes) {
+        log.info("산책 종료 알림 전송: userId={}, familyId={}, distance={}, calories={}",
+                walker.getUserId(), familyId, distance, calories);
+
+        // 가족 구성원의 FCM 토큰 조회 (본인 제외)
+        List<FcmTokenDTO> familyTokens = fcmMapper.findTokensByFamilyIdExceptUser(familyId, walker.getUserId());
+
+        if (familyTokens.isEmpty()) {
+            log.warn("알림을 받을 가족 구성원의 FCM 토큰이 없음: familyId={}", familyId);
+            return;
+        }
+
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+        String distanceStr = String.format("%.1f", distance);
+        String durationStr = formatDuration(durationMinutes);
+        String notificationContent = walkerName + "님이 " + distanceStr + "km 산책을 완료했어요! (" + durationStr + ", " + calories + "kcal)";
+        LocalDateTime now = LocalDateTime.now();
+
+        for (FcmTokenDTO tokenDto : familyTokens) {
+            try {
+                // notification 테이블에 알림 추가
+                com.d208.fitmily.domain.notification.entity.Notification dbNotification =
+                        new com.d208.fitmily.domain.notification.entity.Notification();
+                dbNotification.setUserId(tokenDto.getUserId());
+                dbNotification.setNotificationType("WALK");
+                dbNotification.setNotificationSenderId(walker.getUserId());
+                dbNotification.setNotificationReceiverId(tokenDto.getUserId());
+                dbNotification.setNotificationResourceId(walker.getUserId());
+                dbNotification.setNotificationContent(notificationContent);
+                dbNotification.setNotificationIsRead(0);
+                dbNotification.setNotificationCreatedAt(now);
+                dbNotification.setNotificationUpdatedAt(now);
+
+                notificationMapper.insertNotification(dbNotification);
+                log.info("산책 종료 알림 저장 완료: userId={}", tokenDto.getUserId());
+
+                // FCM 메시지 생성
+                Message fcmMessage = createWalkEndNotificationMessage(walker, distance, calories, durationMinutes, tokenDto.getToken());
+
+                // 메시지 전송
+                String response = firebaseMessaging.send(fcmMessage);
+                log.info("산책 종료 알림 전송 성공: userId={}, response={}", tokenDto.getUserId(), response);
+            } catch (FirebaseMessagingException e) {
+                log.error("산책 종료 알림 전송 실패: userId={}, token={}, error={}",
+                        tokenDto.getUserId(), tokenDto.getToken(), e.getMessage());
+                // 나머지 코드...
+            } catch (Exception e) {
+                log.error("산책 종료 알림 처리 중 오류: userId={}, error={}", tokenDto.getUserId(), e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 산책 시작 알림 메시지 생성
+     */
+    private Message createWalkStartNotificationMessage(UserDto walker, String token) {
+        // Data 페이로드
+        Map<String, String> data = new HashMap<>();
+        data.put("type", "WALK_START");
+        data.put("id", String.valueOf(walker.getUserId()));
+        data.put("senderId", String.valueOf(walker.getUserId()));
+        data.put("senderName", walker.getUserNickname() != null ? walker.getUserNickname() : "가족");
+        data.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+
+        // 알림 정보
+        Notification notification = Notification.builder()
+                .setTitle("산책 알림")
+                .setBody(walkerName + "님이 산책을 시작했어요! 함께 산책해보세요.")
+                .build();
+
+        // Android 설정
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                        .setChannelId("walk_channel")
+                        .build())
+                .build();
+
+        return Message.builder()
+                .setToken(token)
+                .putAllData(data)
+                .setNotification(notification)
+                .setAndroidConfig(androidConfig)
+                .build();
+    }
+
+    /**
+     * 산책 종료 알림 메시지 생성
+     */
+    private Message createWalkEndNotificationMessage(UserDto walker, float distance, int calories, long durationMinutes, String token) {
+        // Data 페이로드
+        Map<String, String> data = new HashMap<>();
+        data.put("type", "WALK_END");
+        data.put("id", String.valueOf(walker.getUserId()));
+        data.put("senderId", String.valueOf(walker.getUserId()));
+        data.put("senderName", walker.getUserNickname() != null ? walker.getUserNickname() : "가족");
+        data.put("distance", String.format("%.1f", distance));
+        data.put("calories", String.valueOf(calories));
+        data.put("duration", String.valueOf(durationMinutes));
+        data.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+        String distanceStr = String.format("%.1f", distance);
+        String durationStr = formatDuration(durationMinutes);
+
+        // 알림 정보
+        Notification notification = Notification.builder()
+                .setTitle("산책 완료")
+                .setBody(walkerName + "님이 " + distanceStr + "km 산책을 완료했어요! (" + durationStr + ", " + calories + "kcal)")
+                .build();
+
+        // Android 설정
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                        .setChannelId("walk_channel")
+                        .build())
+                .build();
+
+        return Message.builder()
+                .setToken(token)
+                .putAllData(data)
+                .setNotification(notification)
+                .setAndroidConfig(androidConfig)
+                .build();
+    }
+
+    /**
+     * 시간(분) 포맷팅
+     */
+    private String formatDuration(long minutes) {
+        if (minutes < 60) {
+            return minutes + "분";
+        } else {
+            long hours = minutes / 60;
+            long mins = minutes % 60;
+            return hours + "시간 " + (mins > 0 ? mins + "분" : "");
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.d208.fitmily.domain.notification.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -21,7 +23,10 @@ public class NotificationResponseDTO {
     private boolean isRead;
     private Integer senderId;
     private String senderNickname;
-    private Integer resourceId;
-    private Map<String, Object> data;
-}
 
+    @JsonIgnore
+    private Integer resourceId;
+
+    @Builder.Default  // 이 부분 추가
+    private Map<String, Object> data = new HashMap<>();
+}

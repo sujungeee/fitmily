@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Tag(name = "운동목표 API", description = "운동 목표 생성/조회/수정/삭제")
 @RestController
 @RequestMapping("/api/goals")
@@ -25,17 +28,32 @@ public class ExerciseGoalController {
     /**
      * 개인운동 목표 조회
      * @param principal 인증된 사용자 정보
+     * @param date 조회할 날짜 (기본값: 오늘)
      * @return 운동 목표 응답
      */
     @Operation(summary = "개인운동 목표 조회")
     @GetMapping
-    public ResponseEntity<ExerciseGoalResponse> getGoals(@AuthenticationPrincipal CustomUserDetails principal) {
+    public ResponseEntity<ExerciseGoalResponse> getGoals(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(required = false) String date) {
+
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Integer userId = principal.getId();
-        ExerciseGoalResponse response = exerciseGoalService.getGoals(userId);
+        ExerciseGoalResponse response;
+
+        // 날짜가 없으면 오늘 날짜를 기본값으로 사용
+        if (date == null || date.isEmpty()) {
+            // 오늘 날짜를 yyyy-MM-dd 형식으로 포맷팅
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String today = sdf.format(new Date());
+            response = exerciseGoalService.getGoalsByDate(userId, today);
+        } else {
+            response = exerciseGoalService.getGoalsByDate(userId, date);
+        }
+
         return ResponseEntity.ok(response);
     }
 
@@ -108,7 +126,5 @@ public class ExerciseGoalController {
 //        Integer userId = principal.getId();
 //        List<goalprogress> achievementList = exerciseService.getWeeklyAchievement(userId);
 //    }
-
-
 
 }

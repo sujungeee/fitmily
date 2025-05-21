@@ -69,4 +69,13 @@ public interface FcmMapper {
         WHERE u.family_id = #{familyId}
         """)
     List<FcmTokenDTO> findTokensByFamilyId(@Param("familyId") int familyId);
+
+    // 가족 구성원들의 FCM 토큰 목록 조회 (특정 사용자 제외 - 산책)
+    @Select("""
+        SELECT f.user_id as userId, f.fcm_token as token
+        FROM fcm f
+        JOIN user u ON f.user_id = u.user_id
+        WHERE u.family_id = #{familyId} AND u.user_id != #{excludeUserId}
+        """)
+    List<FcmTokenDTO> findTokensByFamilyIdExceptUser(@Param("familyId") int familyId, @Param("excludeUserId") int excludeUserId);
 }

@@ -2,6 +2,7 @@ package com.d208.fitmily.domain.exercise.service;
 
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalResponse;
+import com.d208.fitmily.domain.exercise.entity.ExerciseGoal;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseGoalMapper;
 import com.d208.fitmily.global.common.exception.BusinessException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
@@ -63,6 +64,59 @@ public class ExerciseGoalService {
                         goalProgress
                 );
             } catch (Exception e) {
+            }
+        }
+
+        // 응답 생성
+        ExerciseGoalResponse response = new ExerciseGoalResponse();
+        response.setExerciseGoalProgress(progress);
+        response.setGoal(goals);
+
+        return response;
+    }
+
+    /**
+     * 특정 날짜의 운동 목표 목록 조회 및 진행률 업데이트
+     * @param userId 사용자 ID
+     * @param dateStr 조회할 날짜 (yyyy-MM-dd 형식)
+     * @return 해당 날짜의 운동 목표 응답 객체
+     */
+    public ExerciseGoalResponse getGoalsByDate(Integer userId, String dateStr) {
+        // 전체 목표 목록 조회 (findUserGoalsByDate 메서드 사용)
+        List<ExerciseGoal> exerciseGoals = exerciseGoalMapper.findUserGoalsByDate(userId, dateStr);
+
+        // 해당 날짜의 운동 기록 조회를 위한 커스텀 쿼리 호출
+        List<Map<String, Object>> goalMaps = exerciseGoalMapper.selectGoalsByUserIdAndDate(userId, dateStr);
+
+        // 목표 진행률 계산
+        int progress = exerciseGoalMapper.calculateProgressByDate(userId, dateStr);
+
+        // DTO로 변환
+        List<ExerciseGoalDto> goals = new ArrayList<>();
+        for (Map<String, Object> map : goalMaps) {
+            ExerciseGoalDto dto = new ExerciseGoalDto();
+
+            dto.setGoalId(((Number) map.get("exercise_goal_id")).intValue());
+            dto.setExerciseGoalName((String) map.get("exercise_goal_name"));
+            dto.setExerciseGoalValue(((Number) map.get("exercise_goal_value")).floatValue());
+            dto.setExerciseRecordValue(((Number) map.get("exercise_record_value")).floatValue());
+
+            goals.add(dto);
+
+            // 개별 목표 진행률 업데이트
+            try {
+                int goalProgress = calculateIndividualProgress(
+                        dto.getExerciseRecordValue(),
+                        dto.getExerciseGoalValue()
+                );
+
+                exerciseGoalMapper.updateGoalProgress(
+                        userId,
+                        dto.getExerciseGoalName(),
+                        goalProgress
+                );
+            } catch (Exception e) {
+                // 예외 처리
             }
         }
 
