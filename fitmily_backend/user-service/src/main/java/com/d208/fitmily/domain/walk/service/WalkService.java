@@ -1,7 +1,9 @@
 package com.d208.fitmily.domain.walk.service;
 
 import com.d208.fitmily.domain.AwsS3.Service.AwsS3Service;
+import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import com.d208.fitmily.domain.fcm.service.FcmService;
+import com.d208.fitmily.domain.user.mapper.UserMapper;
 import com.d208.fitmily.domain.walkchallenge.service.WalkChallengeService;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 //import com.d208.fitmily.health.entity.Health;
@@ -38,6 +40,8 @@ public class WalkService {
     private final WalkChallengeService walkChallengeService;
     private final AwsS3Service awsS3Service;
     private final FcmService fcmService;
+    private final FamilyMapper familyMapper;
+    private final UserMapper userMapper;
 
 
     // 산책 중지
@@ -98,24 +102,34 @@ public class WalkService {
 
 
     // 산책 기록 조회
-    public List<WalkResponseDto> findWalks(Integer userId, LocalDateTime start, LocalDateTime end) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        params.put("start",   start);
-        params.put("end",     end);
+    public Map<Integer, List<WalkResponseDto>> findFamilyWalks(Integer userId) {
+        // 1. 나의 가족 ID 조회
+        Integer familyId = familyMapper.selectFamilyIdByUserId(userId);
+        System.out.println("가족ID" + familyId);
 
-        List<WalkResponseDto> walks = walkMapper.selectWalks(params);
+        // 2. 가족 구성원 userId 목록 조회
+        List<Integer> familyUserIds = userMapper.selectUserIdsByFamilyId(familyId);
+        System.out.println("id 목록 " + familyUserIds);
 
-        for(WalkResponseDto walk : walks){
-            String routeImg = walk.getRouteImg();
-            System.out.println("routeImg: " + routeImg);
-            if (routeImg != null && !routeImg.isBlank()){
-                String presignedUrl = awsS3Service.generatePresignedDownloadUrl(routeImg);
-                System.out.println("presignedUrl" + presignedUrl);
-                walk.setRouteImg(presignedUrl);
+        Map<Integer, List<WalkResponseDto>> walkMap = new HashMap<>();
+
+
+        // 3. 각 userId에 대해 산책기록 조회
+        for (Integer memberId : familyUserIds) {
+            List<WalkResponseDto> walks = walkMapper.selectWalks(memberId);
+            System.out.println("산책기록 "+walks);
+
+            // 4. routeImg presigned url 변환
+            for (WalkResponseDto walk : walks) {
+                String routeImg = walk.getRouteImg();
+                if (routeImg != null && !routeImg.isBlank()) {
+                    String presignedUrl = awsS3Service.generatePresignedDownloadUrl(routeImg);
+                    walk.setRouteImg(presignedUrl);
+                }
             }
+            walkMap.put(memberId, walks);
         }
-        return walks;
+        return walkMap;
     }
 
 
