@@ -7,6 +7,8 @@ import com.d208.fitmily.global.handler.DelegatingStompHandler;
 import com.d208.fitmily.global.handler.WalkStompHandler;
 import com.d208.fitmily.global.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -16,6 +18,8 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,13 +39,23 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JWTUtil jwtUtil;
     private final WalkStompHandler walkStompHandler;
 
-
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WebSocketConfig.class);
+
+    @Bean
+    public TaskScheduler websocketTaskScheduler() {  // 빈 이름 변경
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("websocket-heartbeat-");
+        scheduler.initialize();
+        return scheduler;
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 구독하기
-        registry.enableSimpleBroker("/topic");
+        registry.enableSimpleBroker("/topic")
+                .setHeartbeatValue(new long[]{30000, 30000})
+                .setTaskScheduler(websocketTaskScheduler());
         // 메세지보내기
         registry.setApplicationDestinationPrefixes("/app");
         // 사용자 지정 수신 (/user/{username}/queue/messages)
