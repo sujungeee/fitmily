@@ -101,22 +101,30 @@ public class WalkService {
 
     // 산책 기록 조회
     public List<WalkResponseDto> findFamilyWalks(Integer userId) {
+
+//        1. 현재 로그인한 사용자의 familyId를 조회
         Integer familyId = familyMapper.selectFamilyIdByUserId(userId);
         System.out.println("familyId" + familyId);
+
+        // familyId가 없으면 빈 리스트 반환 (가족에 속해있지 않음)
         if (familyId == null) {
             return Collections.emptyList(); // 또는 예외 던지기
 
         }
 
+        // 2. 해당 familyId에 속한 모든 사용자들의 userId 리스트 조회
         List<Integer> familyUserIds = userMapper.selectUserIdsByFamilyId(familyId);
-
         System.out.println("familyUserIds" + familyUserIds);
+
+        // 가족 구성원이 아무도 없으면 빈 리스트 반환
         if (familyUserIds == null || familyUserIds.isEmpty()) {
             return Collections.emptyList();
         }
 
+        // 3. 모든 산책 기록을 담을 리스트 생성
         List<WalkResponseDto> result = new ArrayList<>();
 
+        // 4. 가족 구성원 각각에 대해 산책 기록을 조회
         for (Integer memberId : familyUserIds) {
             List<WalkResponseDto> walks = Optional.ofNullable(walkMapper.selectWalks(memberId))
                     .orElse(Collections.emptyList());

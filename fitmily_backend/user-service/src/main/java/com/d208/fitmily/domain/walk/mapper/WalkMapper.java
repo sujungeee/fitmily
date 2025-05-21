@@ -22,10 +22,34 @@ public interface WalkMapper {
     @Options(useGeneratedKeys = true, keyProperty = "walkId")
     int insertStopWalk(StopWalkDto walk);
 
-    // 2. 산책 기록 조회
-    @Select("SELECT walk_id, user_id, walk_start_time, walk_end_time, walk_distance, walk_route_img " +
-            "FROM walk " +
-            "WHERE user_id = #{userId}")
+    @Select("""
+        SELECT
+            w.walk_id,
+            w.user_id,
+            w.walk_route_img,
+            w.walk_start_time,
+            w.walk_end_time,
+            w.walk_distance,
+            w.walk_calories,
+            u.nickname,
+            u.zodiac_name,
+            u.user_family_sequence
+        FROM walk w
+        JOIN user u ON w.user_id = u.user_id
+        WHERE w.user_id = #{userId}
+    """)
+    @Results({
+            @Result(property = "walkId", column = "walk_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "routeImg", column = "walk_route_img"),
+            @Result(property = "startTime", column = "walk_start_time"),
+            @Result(property = "endTime", column = "walk_end_time"),
+            @Result(property = "distance", column = "walk_distance"),
+            @Result(property = "calories", column = "walk_calories"),
+            @Result(property = "nickname", column = "nickname"),
+            @Result(property = "zodiacName", column = "zodiac_name"),
+            @Result(property = "userFamilySequence", column = "user_family_sequence")
+    })
     List<WalkResponseDto> selectWalks(@Param("userId") Integer userId);
 
     // 3. 산책 목표 존재 여부 확인
