@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +16,8 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,8 +30,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.presentation.ui.MainActivity
 import com.ssafy.fitmily_android.presentation.ui.components.EmptyContentText
 import com.ssafy.fitmily_android.presentation.ui.main.chat.components.ChatBottomBar
@@ -38,7 +39,9 @@ import com.ssafy.fitmily_android.presentation.ui.main.chat.components.ChatConten
 import com.ssafy.fitmily_android.presentation.ui.main.chat.components.ChatGalleryBar
 import com.ssafy.fitmily_android.presentation.ui.main.chat.components.ChatTopBar
 import gun0912.tedimagepicker.builder.TedImagePicker
+import gun0912.tedimagepicker.builder.type.MediaType
 
+private const val TAG = "ChatScreen_fitmily"
 @Composable
 fun ChatScreen(
     navController: NavHostController
@@ -49,19 +52,16 @@ fun ChatScreen(
     val activity = context as? Activity
     activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
+    val uiState by chatViewModel.chatUiState.collectAsState()
     val images = remember { mutableStateListOf<Uri>() }
-    // TODO: familyCount API로 받자
-    val familyCount = 4
-
-//    DisposableEffect(Unit) {
-//        chatViewModel.initStomp()
-//        onDispose {
-//            chatViewModel.cancelStomp()
-//        }
-//    }
 
     LaunchedEffect(Unit) {
-        // 패밀리 정보 조회
+        val authDataStore = MainApplication.getInstance().getDataStore()
+        val familyId = authDataStore.getFamilyId()
+        if (familyId != 0) {
+            chatViewModel.getFamilyInfo(familyId)
+            chatViewModel.initStomp()
+        }
     }
 
     BackHandler {
@@ -80,10 +80,10 @@ fun ChatScreen(
             .fillMaxSize()
         , containerColor = Color(0xFFD2E1FF)
         , topBar = {
-            ChatTopBar(navController, "우리가족족족족족", familyCount)
+            ChatTopBar(navController, uiState.familyName, uiState.familyCount)
         }
     ) { innerPadding ->
-        if (familyCount != -1) {
+        if (uiState.familyCount != -1) {
             Column (
                 modifier = Modifier
                     .fillMaxSize()
@@ -134,7 +134,7 @@ fun ChatScreen(
     }
 }
 
-// 갤러리
+// 갤러리 열기
 private fun galleryOpen(context: Context, onImagesSelected: (List<Uri>) -> Unit) {
     if (isPermissionGranted(Manifest.permission.CAMERA, context)) {
         selectImages(context, onImagesSelected)
@@ -150,8 +150,14 @@ private fun galleryOpen(context: Context, onImagesSelected: (List<Uri>) -> Unit)
 private fun selectImages(context: Context, onImagesSelected: (List<Uri>) -> Unit) {
     TedImagePicker.with(context)
         .max(9, "최대 9장까지 선택이 가능합니다.")
+        .mediaType(MediaType.IMAGE)
         .startMultiImage { uris ->
-            onImagesSelected(uris)
+            val filteredUris = uris.filter { uri ->
+                val mimeType = context.contentResolver.getType(uri)
+                mimeType == "image/jpeg" || mimeType == "image/png"
+            }
+            Toast.makeText(context, "jpeg, png 이외의 확장자는 제외됩니다.", Toast.LENGTH_SHORT).show()
+            onImagesSelected(filteredUris)
         }
 }
 

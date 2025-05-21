@@ -15,6 +15,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.gson.Gson
+import com.ssafy.fitmily_android.model.dto.request.walk.GpsRequest
 import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 
 private const val TAG = "WalkLiveWorker"
@@ -64,7 +65,6 @@ class WalkLiveWorker(private val context: Context) {
             Looper.getMainLooper()
         )
     }
-
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             if (locationResult.locations[0] != null) {
@@ -73,7 +73,8 @@ class WalkLiveWorker(private val context: Context) {
                     lon = locationResult.locations[0].longitude
                     lastUpdatedTime = System.currentTimeMillis()
                 }
-                val data =  GpsDto(
+                val data =  GpsRequest(
+                    WalkLiveData.userId,
                     WalkLiveData.lat,
                     WalkLiveData.lon,
                     System.currentTimeMillis().toString(),

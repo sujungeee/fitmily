@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.ssafy.fitmily_android.model.dto.response.family.FamilyCalendarMember
 import com.ssafy.fitmily_android.ui.theme.Typography
+import com.ssafy.fitmily_android.util.ProfileUtil
 
 @Composable
 fun FamilyNameDotFlowRow(
-    families: List<Pair<String, Color>>,
+    families: List<FamilyCalendarMember>,
     modifier: Modifier
 ) {
     FlowRow(
@@ -31,7 +33,7 @@ fun FamilyNameDotFlowRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        families.forEach { (name, color) ->
+        families.forEach { family ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(end = 8.dp)
@@ -39,11 +41,11 @@ fun FamilyNameDotFlowRow(
                 Box(
                     modifier = Modifier
                         .size(8.dp)
-                        .background(color = color, CircleShape)
+                        .background(color = ProfileUtil().seqToColor(family.userFamilysequence), CircleShape)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = name,
+                    text = family.userName,
                     style = Typography.bodyMedium
                 )
             }

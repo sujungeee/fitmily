@@ -27,12 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.model.dto.response.walk.HistoryDto
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ProfileItem
 import com.ssafy.fitmily_android.ui.theme.mainGray
+import com.ssafy.fitmily_android.util.DateUtil
 
 @Composable
 fun WalkHistoryDetailScreen(
-    navController:NavHostController
+    navController:NavHostController,
+    item: HistoryDto
 ) {
     Column(
         modifier = Modifier
@@ -68,7 +71,7 @@ fun WalkHistoryDetailScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp),){
-            ProfileItem()
+            ProfileItem(sequence = item.userFamilySequence, name = item.nickname, animal = item.zodiacName)
             Text(
                 modifier = Modifier.padding(start = 8.dp),
                 text = "님의 산책 결과",
@@ -84,7 +87,7 @@ fun WalkHistoryDetailScreen(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(horizontalAlignment = Alignment.Start) {
-                Text("1km", style = typography.titleMedium)
+                Text("${item.distance}km", style = typography.titleMedium)
                 Text("거리", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -94,7 +97,7 @@ fun WalkHistoryDetailScreen(
                     .background(mainGray)
             )
             Column(horizontalAlignment = Alignment.Start) {
-                Text("10:00:22", style = typography.titleMedium)
+                Text(DateUtil().getDurationTime(item.startTime, item.endTime), style = typography.titleMedium)
                 Text("시간", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -104,8 +107,8 @@ fun WalkHistoryDetailScreen(
                     .background(mainGray)
             )
             Column(horizontalAlignment = Alignment.Start) {
-                Text("90", style = typography.titleMedium)
-                Text("심박수", style = typography.bodyMedium, color = Color.Gray)
+                Text("${if(item.calories==0){"--"}else{item.calories}}kcal", style = typography.titleMedium)
+                Text("칼로리", style = typography.bodyMedium, color = Color.Gray)
             }
         }
 
@@ -116,7 +119,8 @@ fun WalkHistoryDetailScreen(
                     .padding(top = 32.dp)
                     .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.FillBounds,
-                painter = painterResource(R.drawable.ic_launcher_background),
+                painter =
+                    painterResource(R.drawable.ic_launcher_background),
                 contentDescription = "walking",
             )
 
@@ -128,5 +132,5 @@ fun WalkHistoryDetailScreen(
 @Composable
 @Preview(showSystemUi = true)
 fun WalkHistoryDetailScreenPreview() {
-    WalkHistoryDetailScreen(rememberNavController())
+    WalkHistoryDetailScreen(rememberNavController(),  HistoryDto())
 }

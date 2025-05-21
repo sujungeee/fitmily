@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 fun IllnessItem(ill:String, color: Color) {
     Box(
         modifier = Modifier
-            .border(1.dp, Color(0xFFFF6B6B), shape = RoundedCornerShape(50))
+            .border(1.dp, color, shape = RoundedCornerShape(50))
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(

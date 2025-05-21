@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +34,7 @@ fun ChatGallerySendButton (
     , imageCount: Int
     , chatViewModel: ChatViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
@@ -40,7 +42,8 @@ fun ChatGallerySendButton (
             .padding(horizontal = 10.dp, vertical = 6.dp)
             .clickable {
                 chatViewModel.sendMessage(
-                    type = "image"
+                    context
+                    , type = "image"
                     , images = images.toList()
                 )
                 onGalleryClose()

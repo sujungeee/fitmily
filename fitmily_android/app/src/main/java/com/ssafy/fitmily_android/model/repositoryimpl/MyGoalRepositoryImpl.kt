@@ -6,6 +6,7 @@ import com.ssafy.fitmily_android.model.dto.response.my.MyGoalResponse
 import com.ssafy.fitmily_android.model.service.MyGoalService
 import com.ssafy.fitmily_android.model.common.Result
 import com.ssafy.fitmily_android.model.dto.request.my.MyGoalRequest
+import com.ssafy.fitmily_android.model.dto.response.my.MyWeeklyProgressResponse
 import javax.inject.Inject
 
 class MyGoalRepositoryImpl @Inject constructor(
@@ -49,6 +50,14 @@ class MyGoalRepositoryImpl @Inject constructor(
     override suspend fun deleteMyGoalInfo(goalId: Int): Result<Unit> {
         return ApiResultHandler.handleApi {
             myGoalService.deleteMyGoalInfo(goalId = goalId)
+        }
+    }
+
+    override suspend fun getMyWeeklyProgressInfo(
+        userId: Int
+    ): Result<MyWeeklyProgressResponse> {
+        return ApiResultHandler.handleApi {
+            myGoalService.getMyWeeklyProgressInfo(userId)
         }
     }
 

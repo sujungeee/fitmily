@@ -21,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.ssafy.fitmily_android.R
+import com.ssafy.fitmily_android.model.dto.response.my.MyExerciseDto
 import com.ssafy.fitmily_android.presentation.ui.main.my.ExerciseHistory
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
@@ -29,27 +31,52 @@ import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainDarkGray
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
+import com.ssafy.fitmily_android.util.ExerciseUtil
 
 @Composable
 fun MyExerciseHistoryItem(
-    history: ExerciseHistory
+    history: MyExerciseDto
 ) {
+    val isWalk = history.walkId != null
+
+    val unit = if(isWalk) {
+        "km"
+    }
+    else {
+        "회"
+    }
+
+    val exerciseImageRes = ExerciseUtil().mapExerciseNameToImage(history.exerciseName) ?: R.drawable.sample_walk
+    val imageUrl = history.imgUrl
+
     Column(
     ) {
-        val valueText = if (history.unit != "km") {
-            history.exerciseValue.toInt()
+        val valueText = if (isWalk) {
+            history.exerciseRecord
         } else {
-            history.exerciseValue
+            history.exerciseRecord.toInt()
         }
 
         // 이미지
-        Image(
-            painter = painterResource(id = history.iconRes),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-        )
+        if (isWalk && !imageUrl.isNullOrEmpty()) {
+            // URL 이미지
+            Image(
+                painter = rememberAsyncImagePainter(imageUrl),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            )
+        } else {
+            // 리소스 이미지
+            Image(
+                painter = painterResource(id = exerciseImageRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            )
+        }
         Spacer(modifier = Modifier.height(12.dp))
 
         // 운동명
@@ -78,8 +105,8 @@ fun MyExerciseHistoryItem(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            MyExerciseInfoChip(text = "${history.exerciseCalorie}kcal")
-            MyExerciseInfoChip(text = "${valueText} ${history.unit}")
+            MyExerciseInfoChip(text = "${history.exerciseCalories}kcal")
+            MyExerciseInfoChip(text = "${valueText} ${unit}")
         }
     }
 }
