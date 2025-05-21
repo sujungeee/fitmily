@@ -16,7 +16,7 @@ public interface WalkMapper {
         INSERT INTO walk (
             user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_calories,walk_created_at,walk_updated_at
         ) VALUES (
-            #{userId}, #{routeImg}, #{startTime}, #{endTime}, #{distance}, #{calories},NOW(),NOW()
+             #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance}, #{calories}, NOW(), NOW()
         )
         """)
     @Options(useGeneratedKeys = true, keyProperty = "walkId")
@@ -26,7 +26,7 @@ public interface WalkMapper {
     @Select("""
         <script>
         SELECT
-            w.walk_id, w.user_id, u.user_nickname,
+            w.walk_id, w.user_id, u.user_nickname,u.user_zodiac_name, u.user_family_sequence, u.family_id,
             w.walk_route_img, w.walk_start_time, w.walk_end_time,
             w.walk_distance, w.walk_calories
         FROM walk w
@@ -45,6 +45,18 @@ public interface WalkMapper {
         ORDER BY w.walk_start_time DESC
         </script>
         """)
+    @Results(id = "WalkResponseDtoMap", value = {
+            @Result(column = "walk_id", property = "walkId"),
+            @Result(column = "user_id", property = "userId"),
+            @Result(column = "walk_route_img", property = "routeImg"),
+            @Result(column = "walk_start_time", property = "startTime"),
+            @Result(column = "walk_end_time", property = "endTime"),
+            @Result(column = "walk_distance", property = "distance"),
+            @Result(column = "walk_calories", property = "calories"),
+            @Result(column = "user_zodiac_name", property = "zodiacName"),
+            @Result(column = "user_nickname", property = "nickname"),
+            @Result(column = "user_family_sequence", property = "userFamilySequence")
+    })
     List<WalkResponseDto> selectWalks(Map<String, Object> params);
 
     // 3. 산책 목표 존재 여부 확인

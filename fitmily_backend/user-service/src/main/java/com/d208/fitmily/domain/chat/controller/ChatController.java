@@ -1,87 +1,124 @@
+//package com.d208.fitmily.domain.chat.controller;
+//
+//import com.d208.fitmily.domain.chat.dto.ChatMessagesResponseDTO;
+//import com.d208.fitmily.domain.chat.service.ChatMessageService;
+//import com.d208.fitmily.domain.chat.service.ChatService;
+//import com.d208.fitmily.domain.user.dto.CustomUserDetails;
+//import io.swagger.v3.oas.annotations.Operation;
+//import io.swagger.v3.oas.annotations.tags.Tag;
+//import lombok.RequiredArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.annotation.AuthenticationPrincipal;
+//import org.springframework.web.bind.annotation.*;
+//
+//import java.util.Collections;
+//
+//@Slf4j
+//@Tag(name = "채팅 API", description = "채팅 메시지 조회")
+//@RestController
+//@RequestMapping("/api/chat")
+//@RequiredArgsConstructor
+//public class ChatController {
+//
+//    private final ChatService chatService;
+//    private final ChatMessageService chatMessageService;
+//
+//    @Operation(summary = "메시지 목록 조회", description = "가족 채팅방의 메시지 목록을 페이지 단위로 조회합니다.")
+//    @GetMapping("/family/{familyId}/{page}/messages")
+//    public ResponseEntity<ChatMessagesResponseDTO> getMessagesByPage(
+//            @PathVariable String familyId,
+//            @PathVariable int page,
+//            @RequestParam(defaultValue = "20") int limit,
+//            @AuthenticationPrincipal CustomUserDetails principal) {
+//
+//        try {
+//            if (principal == null) {
+//                log.warn("인증된 사용자 정보가 없습니다.");
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//            }
+//
+//            Integer userId = principal.getId();
+//            if (userId == null) {
+//                log.warn("사용자 ID가 null입니다.");
+//                return ResponseEntity.badRequest().build();
+//            }
+//
+//            log.debug("페이지 기반 메시지 조회 - familyId: {}, userId: {}, page: {}, limit: {}",
+//                    familyId, userId, page, limit);
+//
+//            // 권한 확인
+//            if (!chatMessageService.validateUserFamilyAccess(userId.toString(), familyId)) {
+//                log.warn("사용자 {}가 가족 {}의 채팅방에 접근할 권한이 없습니다.", userId, familyId);
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            }
+//
+//            ChatMessagesResponseDTO response = chatService.getMessagesByPage(familyId, userId.toString(), page, limit);
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            log.error("메시지 조회 API 오류", e);
+//            return ResponseEntity.ok(new ChatMessagesResponseDTO(Collections.emptyList(), false));
+//        }
+//    }
+//}
+
 package com.d208.fitmily.domain.chat.controller;
 
 import com.d208.fitmily.domain.chat.dto.ChatMessagesResponseDTO;
+import com.d208.fitmily.domain.chat.service.ChatMessageService;
 import com.d208.fitmily.domain.chat.service.ChatService;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 @Slf4j
-@Tag(name = "채팅 API", description = "채팅 메시지 조회 및 관리")
+@Tag(name = "채팅 API", description = "채팅 메시지 조회")
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
 public class ChatController {
 
     private final ChatService chatService;
+    private final ChatMessageService chatMessageService;
 
-    @Operation(summary = "메시지 목록 조회", description = "가족 채팅방의 메시지 목록을 조회합니다.")
-    @GetMapping("/family/{familyId}/messages")
-    public ResponseEntity<ChatMessagesResponseDTO> getMessages(
+    @Operation(summary = "메시지 목록 조회", description = "가족 채팅방의 메시지 목록을 페이지 단위로 조회합니다.")
+    @GetMapping("/family/{familyId}/{page}/messages")
+    public ResponseEntity<ChatMessagesResponseDTO> getMessagesByPage(
             @PathVariable String familyId,
-            @RequestParam(required = false) String before,
+            @PathVariable int page,
             @RequestParam(defaultValue = "20") int limit,
-            Authentication authentication) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        // 인증 객체에서 사용자 ID 추출
-        String userId = extractUserId(authentication);
-        log.debug("메시지 조회 요청 - familyId: {}, userId: {}, before: {}, limit: {}",
-                familyId, userId, before, limit);
-
-        ChatMessagesResponseDTO response = chatService.getMessages(familyId, userId, before, limit);
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "안 읽은 메시지 수 조회", description = "특정 가족 채팅방의 안 읽은 메시지 수를 조회합니다.")
-    @GetMapping("/family/{familyId}/unread")
-    public ResponseEntity<Integer> getUnreadCount(
-            @PathVariable String familyId,
-            Authentication authentication) {
-
-        String userId = extractUserId(authentication);
-        log.debug("안 읽은 메시지 수 조회 요청 - familyId: {}, userId: {}", familyId, userId);
-
-        int unreadCount = chatService.getUnreadCount(familyId, userId);
-        return ResponseEntity.ok(unreadCount);
-    }
-
-    // 사용자 ID 추출 메서드
-    private String extractUserId(Authentication authentication) {
-        if (authentication != null) {
-            Object principal = authentication.getPrincipal();
-            log.debug("Principal 타입: {}", principal.getClass().getName());
-
-            // CustomUserDetails 타입인 경우
-            if (principal instanceof CustomUserDetails) {
-                return String.valueOf(((CustomUserDetails) principal).getId());
+        try {
+            if (principal == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
-            // 문자열 타입인 경우
-            if (principal instanceof String) {
-                return (String) principal;
+            Integer userId = principal.getId();
+            if (userId == null) {
+                return ResponseEntity.badRequest().build();
             }
 
-            // 다른 타입인 경우 toString() 결과에서 ID만 추출 시도
-            String principalStr = principal.toString();
-            if (principalStr.contains("CustomUserDetails")) {
-                try {
-                    // CustomUserDetails에서 ID 추출 시도
-                    if (principal instanceof CustomUserDetails) {
-                        return String.valueOf(((CustomUserDetails) principal).getId());
-                    }
-                } catch (Exception e) {
-                    log.warn("CustomUserDetails에서 ID 추출 실패", e);
-                }
+            // 권한 확인
+            if (!chatMessageService.validateUserFamilyAccess(userId.toString(), familyId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
-            return principalStr;
+            ChatMessagesResponseDTO response = chatService.getMessagesByPage(familyId, userId.toString(), page, limit);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ChatMessagesResponseDTO(Collections.emptyList(), false));
         }
-
-        return null;
     }
 }

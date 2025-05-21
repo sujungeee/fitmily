@@ -1,7 +1,10 @@
 package com.d208.fitmily.domain.exercise.service;
 
+import com.d208.fitmily.domain.exercise.dto.DailyGoalProgressDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalResponse;
+import com.d208.fitmily.domain.exercise.entity.ExerciseGoal;
+import com.d208.fitmily.domain.exercise.dto.WeeklyGoalProgressResponse;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseGoalMapper;
 import com.d208.fitmily.global.common.exception.BusinessException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
@@ -12,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +67,59 @@ public class ExerciseGoalService {
                         goalProgress
                 );
             } catch (Exception e) {
+            }
+        }
+
+        // 응답 생성
+        ExerciseGoalResponse response = new ExerciseGoalResponse();
+        response.setExerciseGoalProgress(progress);
+        response.setGoal(goals);
+
+        return response;
+    }
+
+    /**
+     * 특정 날짜의 운동 목표 목록 조회 및 진행률 업데이트
+     * @param userId 사용자 ID
+     * @param dateStr 조회할 날짜 (yyyy-MM-dd 형식)
+     * @return 해당 날짜의 운동 목표 응답 객체
+     */
+    public ExerciseGoalResponse getGoalsByDate(Integer userId, String dateStr) {
+        // 전체 목표 목록 조회 (findUserGoalsByDate 메서드 사용)
+        List<ExerciseGoal> exerciseGoals = exerciseGoalMapper.findUserGoalsByDate(userId, dateStr);
+
+        // 해당 날짜의 운동 기록 조회를 위한 커스텀 쿼리 호출
+        List<Map<String, Object>> goalMaps = exerciseGoalMapper.selectGoalsByUserIdAndDate(userId, dateStr);
+
+        // 목표 진행률 계산
+        int progress = exerciseGoalMapper.calculateProgressByDate(userId, dateStr);
+
+        // DTO로 변환
+        List<ExerciseGoalDto> goals = new ArrayList<>();
+        for (Map<String, Object> map : goalMaps) {
+            ExerciseGoalDto dto = new ExerciseGoalDto();
+
+            dto.setGoalId(((Number) map.get("exercise_goal_id")).intValue());
+            dto.setExerciseGoalName((String) map.get("exercise_goal_name"));
+            dto.setExerciseGoalValue(((Number) map.get("exercise_goal_value")).floatValue());
+            dto.setExerciseRecordValue(((Number) map.get("exercise_record_value")).floatValue());
+
+            goals.add(dto);
+
+            // 개별 목표 진행률 업데이트
+            try {
+                int goalProgress = calculateIndividualProgress(
+                        dto.getExerciseRecordValue(),
+                        dto.getExerciseGoalValue()
+                );
+
+                exerciseGoalMapper.updateGoalProgress(
+                        userId,
+                        dto.getExerciseGoalName(),
+                        goalProgress
+                );
+            } catch (Exception e) {
+                // 예외 처리
             }
         }
 
@@ -154,4 +211,42 @@ public class ExerciseGoalService {
             throw new BusinessException(ErrorCode.EXERCISE_GOAL_DELETE_FAILED);
         }
     }
+
+
+    //
+     //
+    public WeeklyGoalProgressResponse getWeeklyGoalProgress(int userId) {
+        // 오늘 날짜
+        LocalDate today = LocalDate.now();
+
+        // 7일 전 날짜
+        LocalDate sevenDaysAgo = today.minusDays(6);
+
+        // log.info("조회 기간: {} ~ {}", sevenDaysAgo, today);
+
+        List<DailyGoalProgressDto> dailyProgressList = new ArrayList<>();
+
+        // 7일간의 데이터 조회
+        for (LocalDate date = sevenDaysAgo; !date.isAfter(today); date = date.plusDays(1)) {
+            String dateStr = date.toString();
+
+            // 해당 날짜의 목표 달성률 계산
+            int totalGoals = exerciseGoalMapper.countGoalsByDateAndUser(userId, dateStr);
+            int completedGoals = exerciseGoalMapper.countCompletedGoalsByDateAndUser(userId, dateStr);
+
+            // 목표 달성률 계산 (목표가 없으면 0%)
+            int progressRate = totalGoals > 0 ? (int)Math.round((double)completedGoals / totalGoals * 100) : 0;
+
+            // 결과 목록에 추가
+            dailyProgressList.add(DailyGoalProgressDto.builder()
+                    .date(dateStr)
+                    .exerciseGoalProgress(progressRate)
+                    .build());
+        }
+
+        return WeeklyGoalProgressResponse.builder()
+                .goal(dailyProgressList)
+                .build();
+    }
+
 }

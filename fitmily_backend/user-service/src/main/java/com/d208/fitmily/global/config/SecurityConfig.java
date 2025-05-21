@@ -109,19 +109,28 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/reissue").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
                         .requestMatchers("/api/users/check-id").permitAll()
+//                        .requestMatchers("/api/family/**").hasRole("USER")
+                        .requestMatchers("/api/family/**").permitAll()
 
                         // swagger 설정
                         .requestMatchers( "/swagger-ui/**").permitAll()
                         .requestMatchers( "/v3/api-docs/**").permitAll()
                         .requestMatchers( "/api-docs/**").permitAll()
                         .requestMatchers( "/swagger-ui.html").permitAll()
-//
+
+                        // s3
+                        .requestMatchers("/api/s3/upload-url").permitAll()
+
+
                         //chat-test.html 허용 코드 3가지
                         .requestMatchers("/api/ws-connect/**").permitAll()
                         .requestMatchers("/chat-test.html").permitAll()
                         .requestMatchers("/.well-known/**").permitAll()
 
                         .requestMatchers("/api/ws-connect/**").permitAll()
+
+
+
 
                         .requestMatchers( "/*").permitAll()
 

@@ -49,6 +49,7 @@ public class ChatMessage {
     public static class SenderInfo {
         private String nickname;
         private String familySequence;
+        private String userZodiacName;
     }
 
     @Data

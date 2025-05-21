@@ -13,9 +13,9 @@ import java.sql.Timestamp;
 public class StopWalkDto {
     private Integer walkId;
     private Integer userId;
-    private String routeImg;
-    private Timestamp startTime;
-    private Timestamp endTime;
-    private Float distance;
+    private String walkRouteImg;
+    private Timestamp walkStartTime;
+    private Timestamp walkEndTime;
+    private Float walkDistance;
     private Integer calories;
 }

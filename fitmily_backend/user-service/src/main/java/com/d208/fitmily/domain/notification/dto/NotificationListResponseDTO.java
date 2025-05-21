@@ -1,4 +1,4 @@
-package com.d208.fitmily.domain.fcm.dto;
+package com.d208.fitmily.domain.notification.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FCMTokenDTO {
-    private String userId;
-    private String token;
+public class NotificationListResponseDTO {
+    private Object content;
 }
+

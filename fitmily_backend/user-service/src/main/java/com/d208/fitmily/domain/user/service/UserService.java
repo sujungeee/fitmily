@@ -3,13 +3,13 @@ package com.d208.fitmily.domain.user.service;
 
 
 import com.d208.fitmily.global.jwt.JWTUtil;
-import com.d208.fitmily.domain.user.dto.ReissueResponseDto;
+import com.d208.fitmily.domain.user.dto.response.ReissueResponse;
 import com.d208.fitmily.domain.user.mapper.UserMapper;
 import com.d208.fitmily.domain.walk.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.d208.fitmily.domain.user.dto.JoinRequestDTO;
+import com.d208.fitmily.domain.user.dto.request.JoinRequest;
 import com.d208.fitmily.domain.user.entity.User;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +29,7 @@ public class UserService {
 
 
     /* 회원가입 */ //
-    public void joinprocess(JoinRequestDTO dto){
+    public void joinprocess(JoinRequest dto){
 
 //        if (userMapper.existsByLoginId(dto.getLoginId())) {
 //            throw new BusinessException(ErrorCode.USERNAME_DUPLICATED);
@@ -73,7 +73,7 @@ public class UserService {
 
 
     /* reissue 하기 */
-    public ReissueResponseDto  reissueAccessToken(String refreshToken) {
+    public ReissueResponse reissueAccessToken(String refreshToken) {
 
         //  refreshToken 토큰 유효성 검사
 //        if (!jwtUtil.validateToken(refreshToken)) {
@@ -93,7 +93,7 @@ public class UserService {
         userMapper.updateRefreshToken(userId, newRefreshToken);
 
         // 액세스+리프레시 토큰을 묶어서 반환
-        return new ReissueResponseDto(newAccessToken, newRefreshToken);
+        return new ReissueResponse(newAccessToken, newRefreshToken);
     }
 
     /* 유저 정보 조회 */

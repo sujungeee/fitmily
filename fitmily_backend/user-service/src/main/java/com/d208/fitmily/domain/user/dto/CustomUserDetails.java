@@ -18,8 +18,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(userEntity.getRole()));
+        // null이나 빈 문자열 체크 추가
+        String role = userEntity.getRole();
+        if (role == null || role.trim().isEmpty()) {
+            role = "ROLE_USER"; // 기본 역할 설정
+        }
+        return List.of(new SimpleGrantedAuthority(role));
     }
+
 
     public Integer getId() {
         return userEntity.getUserId();

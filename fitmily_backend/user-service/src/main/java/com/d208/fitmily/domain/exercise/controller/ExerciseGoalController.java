@@ -1,9 +1,6 @@
 package com.d208.fitmily.domain.exercise.controller;
 
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalRequest;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalResponse;
-import com.d208.fitmily.domain.exercise.dto.ExerciseGoalUpdateRequest;
+import com.d208.fitmily.domain.exercise.dto.*;
 import com.d208.fitmily.domain.exercise.service.ExerciseGoalService;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Tag(name = "운동목표 API", description = "운동 목표 생성/조회/수정/삭제")
 @RestController
@@ -25,17 +25,32 @@ public class ExerciseGoalController {
     /**
      * 개인운동 목표 조회
      * @param principal 인증된 사용자 정보
+     * @param date 조회할 날짜 (기본값: 오늘)
      * @return 운동 목표 응답
      */
     @Operation(summary = "개인운동 목표 조회")
     @GetMapping
-    public ResponseEntity<ExerciseGoalResponse> getGoals(@AuthenticationPrincipal CustomUserDetails principal) {
+    public ResponseEntity<ExerciseGoalResponse> getGoals(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(required = false) String date) {
+
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Integer userId = principal.getId();
-        ExerciseGoalResponse response = exerciseGoalService.getGoals(userId);
+        ExerciseGoalResponse response;
+
+        // 날짜가 없으면 오늘 날짜를 기본값으로 사용
+        if (date == null || date.isEmpty()) {
+            // 오늘 날짜를 yyyy-MM-dd 형식으로 포맷팅
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String today = sdf.format(new Date());
+            response = exerciseGoalService.getGoalsByDate(userId, today);
+        } else {
+            response = exerciseGoalService.getGoalsByDate(userId, date);
+        }
+
         return ResponseEntity.ok(response);
     }
 
@@ -103,12 +118,23 @@ public class ExerciseGoalController {
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping("/api/goal-progress")
-//    public ResponseEntity<Void> goalProgress(@AuthenticationPrincipal CustomUserDetails principal){
-//        Integer userId = principal.getId();
-//        List<goalprogress> achievementList = exerciseService.getWeeklyAchievement(userId);
-//    }
 
+    //
+    /**
+     * 7일간의 운동 목표 진행률 조회 API
+     *
+     * @param userId 조회할 사용자 ID
+     * @return 날짜별 목표 달성률 데이터
+     */
+    @GetMapping("/weekly-progress/{userId}")
+    public ResponseEntity<WeeklyGoalProgressResponse> getWeeklyGoalProgress(
+            @PathVariable int userId) {
 
+        // 사용자 본인 확인 로직이 필요하면 여기에 추가할 수 있음
+        // checkUserPermission(userId);
 
+        WeeklyGoalProgressResponse response = exerciseGoalService.getWeeklyGoalProgress(userId);
+        return ResponseEntity.ok(response);
+    }
+    
 }
