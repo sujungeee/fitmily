@@ -31,8 +31,8 @@ public interface WalkMapper {
             w.walk_end_time,
             w.walk_distance,
             w.walk_calories,
-            u.nickname,
-            u.zodiac_name,
+            u.user_nickname,
+            u.user_zodiac_name,
             u.user_family_sequence
         FROM walk w
         JOIN user u ON w.user_id = u.user_id
