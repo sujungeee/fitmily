@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.family.detail.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,18 +24,29 @@ import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.R
-import com.ssafy.fitmily_android.presentation.ui.main.family.detail.FamilyMemberStats
+import com.ssafy.fitmily_android.model.dto.response.family.FamilyDailyMember
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
+import com.ssafy.fitmily_android.util.ProfileUtil
 
 @Composable
 fun FamilyStatsItem(
-    stats: FamilyMemberStats,
+    stats: FamilyDailyMember,
     onClick: () -> Unit
 ) {
+
+    Log.d("test1234", "FamilyStatsItem : userZodiacName : ${stats.userZodiacName}")
+    Log.d("test1234", "FamilyStatsItem : userId : ${stats.userId}")
+    Log.d("test1234", "FamilyStatsItem : userNickname : ${stats.userNickname}")
+    Log.d("test1234", "FamilyStatsItem : totalCalories : ${stats.totalCalories}")
+    Log.d("test1234", "FamilyStatsItem : exerciseGaolProgress : ${stats.exerciseGoalProgress}")
+    Log.d("test1234", "FamilyStatsItem : userFamilySequence : ${stats.userFamilySequence}")
+    Log.d("test1234", "FamilyStatsItem : totalTime : ${stats.totalTime}")
+    Log.d("test1234", "FamilyStatsItem : exercises : ${stats.exercises}")
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,13 +61,15 @@ fun FamilyStatsItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.my_unselected_icon),
+                    painter = painterResource(id = ProfileUtil().typeToProfile(stats.userZodiacName) ?: R.drawable.my_unselected_icon),
                     contentDescription = "프로필 이미지",
-                    modifier = Modifier.background(stats.color, shape = CircleShape),
+                    modifier = Modifier
+                        .background(ProfileUtil().seqToColor(stats.userFamilySequence), shape = CircleShape)
+                        .size(40.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = stats.name,
+                    text = stats.userNickname,
                     style = Typography.titleMedium,
                     color = mainBlack
                 )
@@ -76,14 +90,14 @@ fun FamilyStatsItem(
                 ) {
                     val size = 64.dp
                     CircularProgressIndicator(
-                        progress = stats.progress / 100f,
+                        progress = stats.exerciseGoalProgress / 100f,
                         strokeWidth = 8.dp,
                         color = mainBlue,
                         trackColor = mainGray,
                         modifier = Modifier.size(size)
                     )
                     Text(
-                        text = "${stats.progress}%",
+                        text = "${stats.exerciseGoalProgress}%",
                         style = Typography.bodyLarge,
                         color = mainBlack
                     )
@@ -95,7 +109,7 @@ fun FamilyStatsItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "${stats.kcal}kcal",
+                        text = "${stats.totalCalories}kcal",
                         style = Typography.bodyLarge,
                         color = mainBlack
                     )
@@ -107,7 +121,7 @@ fun FamilyStatsItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = stats.duration,
+                        text = "${stats.totalTime} 분",
                         style = Typography.bodyLarge,
                         color = mainBlack
                     )

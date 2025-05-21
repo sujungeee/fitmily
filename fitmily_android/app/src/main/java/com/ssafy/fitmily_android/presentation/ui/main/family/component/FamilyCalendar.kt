@@ -60,6 +60,7 @@ import java.time.YearMonth
 fun FamilyCalendar(
     adjacentMonths: Long = 500,
     modifier: Modifier,
+    indicatorMap: Map<CalendarDay, List<Color>>,
     onDayClick: ( (CalendarDay) -> Unit)? = null
 ) {
     val currentMonth = remember { YearMonth.now() }
@@ -82,10 +83,6 @@ fun FamilyCalendar(
         )
         val coroutineScope = rememberCoroutineScope()
         val visibleMonth = state.firstVisibleMonth
-        val indicatorMap: Map<CalendarDay, List<Color>> = mapOf(
-            CalendarDay(LocalDate.of(2025, 5, 12), DayPosition.MonthDate) to
-                    listOf(familyFirst, familySecond, familyThird, familyFourth, familyFifth, familySixth)
-        )
 
         SimpleCalendarTitle(
             modifier = Modifier.background(mainWhite),
@@ -108,7 +105,12 @@ fun FamilyCalendar(
             state = state,
             dayContent = { day ->
                 val indicators = indicatorMap[day] ?: emptyList()
-                Day(day, isSelected = selections.contains(day), onClick = { onDayClick?.invoke(day) }, indicators = indicators)
+                Day(
+                    day,
+                    isSelected = selections.contains(day),
+                    onClick = { onDayClick?.invoke(day) },
+                    indicators = indicators
+                )
             },
             monthHeader = {
                 MonthHeader(dayNames = dayNames)

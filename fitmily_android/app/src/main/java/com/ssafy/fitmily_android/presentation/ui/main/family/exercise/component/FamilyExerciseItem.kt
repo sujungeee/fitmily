@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.family.exercise.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,18 +23,34 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.ssafy.fitmily_android.R
-import com.ssafy.fitmily_android.presentation.ui.main.family.exercise.FamilyExercise
+import com.ssafy.fitmily_android.model.dto.response.family.FamilyDailyExercise
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
+import com.ssafy.fitmily_android.util.ExerciseUtil
 
 @Composable
 fun FamilyExerciseItem(
-    familyExercise: FamilyExercise,
+    familyDailyExercise: FamilyDailyExercise,
     modifier: Modifier
 ) {
+
+    Log.d("test1234", "FamilyExerciseItem : familyDailyExercise : $familyDailyExercise")
+
+    val isWalk = familyDailyExercise.exerciseName == "산책"
+    val localImageRes = ExerciseUtil().mapExerciseNameToImage(familyDailyExercise.exerciseName) ?: R.drawable.sample_walk
+
+
+    val unit = if(isWalk) {
+        "km"
+    }
+    else {
+        "회"
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -48,12 +65,25 @@ fun FamilyExerciseItem(
                     .size(80.dp)
                     .clip(RoundedCornerShape(16.dp)),
             ) {
-                Image(
-                    painter = painterResource(id = familyExercise.exerciseImg),
-                    contentDescription = "운동 이미지",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+                if (isWalk) {
+                    // exerciseRouteImg 사용 (URL 이미지)
+                    AsyncImage(
+                        model = familyDailyExercise.exerciseRouteImg,
+                        contentDescription = "운동 루트 이미지",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                        placeholder = painterResource(id = R.drawable.sample_walk),
+                        error = painterResource(id = R.drawable.sample_walk)
+                    )
+                } else {
+                    // 로컬 리소스 이미지 사용
+                    Image(
+                        painter = painterResource(id = localImageRes),
+                        contentDescription = "운동 이미지",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Spacer(Modifier.width(12.dp))
@@ -61,7 +91,7 @@ fun FamilyExerciseItem(
             Column {
                 // 운동 이름
                 Text(
-                    text = familyExercise.exerciseName,
+                    text = familyDailyExercise.exerciseName,
                     color = mainBlack,
                     style = Typography.titleMedium
                 )
@@ -80,10 +110,10 @@ fun FamilyExerciseItem(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = if (familyExercise.exerciseUnit == "개")
-                                "횟수"
+                            text = if (isWalk)
+                                "거리"
                             else
-                                "거리",
+                                "횟수",
                             color = mainBlack,
                             style = Typography.bodySmall
                         )
@@ -124,10 +154,10 @@ fun FamilyExerciseItem(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = if (familyExercise.exerciseUnit == "개")
-                                "${familyExercise.exerciseCurrent.toInt()} / ${familyExercise.exerciseTotal} ${familyExercise.exerciseUnit}"
+                            text = if (isWalk)
+                                "${familyDailyExercise.exerciseCount} / ${familyDailyExercise.exerciseGoalValue} $unit"
                             else
-                                "${familyExercise.exerciseCurrent} / ${familyExercise.exerciseTotal} ${familyExercise.exerciseUnit}",
+                                "${familyDailyExercise.exerciseCount.toInt()} / ${familyDailyExercise.exerciseGoalValue} $unit",
                             color = mainBlack,
                             style = Typography.bodySmall
                         )
@@ -138,7 +168,7 @@ fun FamilyExerciseItem(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "${familyExercise.exerciseKcal} kcal",
+                            text = "${familyDailyExercise.exerciseCalories} kcal",
                             color = mainBlack,
                             style = Typography.bodySmall
                         )
@@ -149,7 +179,7 @@ fun FamilyExerciseItem(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "${familyExercise.exerciseTime}",
+                            text = "${familyDailyExercise.exerciseTime} 분",
                             color = mainBlack,
                             style = Typography.bodySmall
                         )
