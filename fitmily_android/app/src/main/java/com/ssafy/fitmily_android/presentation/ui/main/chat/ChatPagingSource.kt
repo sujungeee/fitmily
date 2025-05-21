@@ -11,7 +11,7 @@ class ChatPagingSource(
     private val chatListUseCase: ChatListUseCase
 ) : PagingSource<Int, ChatMessage>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ChatMessage> {
-        val page = params.key ?: 1
+        val page = params.key ?: 0
 
         return try {
             val result = chatListUseCase(familyId, page)
@@ -22,9 +22,9 @@ class ChatPagingSource(
                 }
                 val isEnd = messages.size < PAGE_SIZE
                 LoadResult.Page(
-                    data = messages,
-                    prevKey = if (page == 1) null else page - 1,
-                    nextKey = if (isEnd) null else page + 1
+                    data = messages
+                    , prevKey = if (isEnd) null else page + 1
+                    , nextKey = if (page == 0) null else page - 1
                 )
             } else {
                 LoadResult.Error(Throwable(result.toString()))

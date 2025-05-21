@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.fitmily_android.domain.usecase.auth.AuthLogoutUseCase
 import com.ssafy.fitmily_android.domain.usecase.myexercise.MyExerciseGetInfoUseCase
 import com.ssafy.fitmily_android.domain.usecase.mygoal.MyGoalGetInfoUseCase
+import com.ssafy.fitmily_android.domain.usecase.mygoal.MyGoalWeeklyProgressInfoUseCase
 import com.ssafy.fitmily_android.domain.usecase.notification.GetUnReadNotificationInfoUseCase
 import com.ssafy.fitmily_android.model.common.Result
+import com.ssafy.fitmily_android.model.dto.response.my.MyWeeklyProgressResponse
 import com.ssafy.fitmily_android.util.ViewModelResultHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -22,7 +24,8 @@ class MyViewModel @Inject constructor(
     private val authLogoutUseCase: AuthLogoutUseCase,
     private val getUnReadNotificationInfoUseCase: GetUnReadNotificationInfoUseCase,
     private val myGoalGetInfoUseCase: MyGoalGetInfoUseCase,
-    private val myExerciseGetInfoUseCase: MyExerciseGetInfoUseCase
+    private val myExerciseGetInfoUseCase: MyExerciseGetInfoUseCase,
+    private val myGoalWeeklyProgressInfoUseCase: MyGoalWeeklyProgressInfoUseCase
 ): ViewModel(){
     private val _myUiState = MutableStateFlow(MyUiState())
     val myUiState: StateFlow<MyUiState> = _myUiState
@@ -141,6 +144,40 @@ class MyViewModel @Inject constructor(
 
                 is Result.NetworkError -> {
                     Log.d("test1234", "getMyExerciseInfo Network 에러 발생")
+                }
+            }
+        }
+    }
+
+    fun getMyGoalWeeklyProgressInfo(userId: Int) {
+        viewModelScope.launch {
+            when (val result = myGoalWeeklyProgressInfoUseCase(userId)) {
+
+                is Result.Success -> {
+                    val data = result.data
+
+                    Log.d("test1234", "getMyGoalWeeklyProgressInfo 호출 성공")
+
+                    _myUiState.update { state ->
+                        state.copy(
+                            myGoalWeeklyProgressInfo = data
+                        )
+                    }
+                }
+
+                is Result.Error -> {
+                    val error = result.error
+                    val exception = result.exception
+
+                    Log.d("test1234", "getMyGoalWeeklyProgressInfo Error 발생 : ${error?.code}")
+                    Log.d("test1234", "getMyGoalWeeklyProgressInfo Error 발생 : ${error?.message}")
+
+                    Log.d("test1234", "getMyGoalWeeklyProgressInfo Exception 발생 : ${exception?.message}")
+                    Log.d("test1234", "getMyGoalWeeklyProgressInfo Exception 발생 : ${exception?.stackTrace}")
+                }
+
+                is Result.NetworkError -> {
+                    Log.d("test1234", "getMyGoalWeeklyProgressInfo Network 에러 발생")
                 }
             }
         }

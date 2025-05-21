@@ -12,8 +12,8 @@ import androidx.paging.cachedIn
 import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.domain.usecase.chat.ChatListUseCase
 import com.ssafy.fitmily_android.domain.usecase.home.GetFamilyUseCase
+import com.ssafy.fitmily_android.domain.usecase.s3.GetPresignedUrlUseCase
 import com.ssafy.fitmily_android.domain.usecase.s3.S3UseCase
-import com.ssafy.fitmily_android.domain.usecase.walk.GetPresignedUrlUseCase
 import com.ssafy.fitmily_android.model.dto.request.chat.ChatSendRequest
 import com.ssafy.fitmily_android.network.ChatManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,7 +45,6 @@ class ChatViewModel @Inject constructor(
     , private val getPresignedUrlUseCase: GetPresignedUrlUseCase
     , private val s3UseCase: S3UseCase
 ) : ViewModel () {
-
     private val _chatUiState = MutableStateFlow(ChatUiState())
     val chatUiState: StateFlow<ChatUiState> = _chatUiState
 
@@ -60,32 +59,39 @@ class ChatViewModel @Inject constructor(
 
     fun initStomp() {
         viewModelScope.launch {
-            runCatching {
+            try {
                 familyId = authDataStore.getFamilyId().toString()
 
+                // 스톰프 연결
                 stompSession = chatClient.stompClient.connect(
                     url = chatClient.url
-                    , customStompConnectHeaders = mapOf("Authorization" to "Bearer ${authDataStore.getAccessToken()}")
+                    , customStompConnectHeaders = mapOf(
+                        "Authorization" to "Bearer ${authDataStore.getAccessToken()}"
+                    )
                 ).withMoshi(chatClient.moshi)
-                Log.d(TAG, "initStomp: stompSession: ${stompSession}")
+                Log.d(TAG, "initStomp: 스톰프 연결: ${stompSession}")
 
                 // 채팅방 구독
                 chatTopic = stompSession.subscribe(
                     StompSubscribeHeaders (
                         destination = "$SUBSCRIBE_URL$familyId"
-                        , customHeaders = mapOf("Authorization" to "Bearer ${authDataStore.getAccessToken()}")
+                        , customHeaders = mapOf(
+                            "Authorization" to "Bearer ${authDataStore.getAccessToken()}"
+                        )
                     )
                 )
-                Log.d(TAG, "initStomp: chatTopic: ${chatTopic}")
+                Log.d(TAG, "initStomp: 구독: ${chatTopic}")
 
                 // 채팅 수신
                 chatTopic.collect {
                     val newMessage = chatClient.moshi.adapter(WSChatResponse::class.java).fromJson(it.bodyAsText)
-                    Log.d(TAG, "initStomp: newMessage: ${newMessage}")
+                    Log.d(TAG, "initStomp: 수신: $newMessage")
                     _chatUiState.update { state ->
                         state.copy(newMessages = state.newMessages + newMessage!!)
                     }
                 }
+            } catch (e: Exception) {
+                initStomp()
             }
         }
     }
@@ -114,7 +120,9 @@ class ChatViewModel @Inject constructor(
                         stompSession.withMoshi(chatClient.moshi).convertAndSend(
                             StompSendHeaders(
                                 destination = "$SEND_URL$familyId",
-                                customHeaders = mapOf("Authorization" to "Bearer ${authDataStore.getAccessToken()}")
+                                customHeaders = mapOf(
+                                    "Authorization" to "Bearer ${authDataStore.getAccessToken()}"
+                                )
                             )
                             , ChatSendRequest(type, "", s3Image)
                         )
@@ -125,7 +133,9 @@ class ChatViewModel @Inject constructor(
                     stompSession.withMoshi(chatClient.moshi).convertAndSend(
                         StompSendHeaders(
                             destination = "$SEND_URL$familyId",
-                            customHeaders = mapOf("Authorization" to "Bearer ${authDataStore.getAccessToken()}")
+                            customHeaders = mapOf(
+                                "Authorization" to "Bearer ${authDataStore.getAccessToken()}"
+                            )
                         )
                         , ChatSendRequest(type, message, "")
                     )
@@ -155,7 +165,7 @@ class ChatViewModel @Inject constructor(
                     // upload
                     val file = FileUtil().getFileFromUri(context, image, fileName, fileExtension!!)
                     val requestBody = file.asRequestBody(contentType.toMediaType())
-                    val uploadResult = s3UseCase(data!!, requestBody)
+                    val uploadResult = s3UseCase(data!!.url, requestBody)
                     ViewModelResultHandler.handle(
                         result = uploadResult
                         , onSuccess = {

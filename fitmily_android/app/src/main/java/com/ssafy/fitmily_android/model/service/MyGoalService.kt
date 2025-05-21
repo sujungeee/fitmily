@@ -1,7 +1,9 @@
 package com.ssafy.fitmily_android.model.service
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param
 import com.ssafy.fitmily_android.model.dto.request.my.MyGoalRequest
 import com.ssafy.fitmily_android.model.dto.response.my.MyGoalResponse
+import com.ssafy.fitmily_android.model.dto.response.my.MyWeeklyProgressResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -29,4 +31,9 @@ interface MyGoalService {
     suspend fun deleteMyGoalInfo(
         @Path("goalId") goalId: Int
     ): Response<Unit>
+
+    @GET("goals/weekly-progress/{userId}")
+    suspend fun getMyWeeklyProgressInfo(
+        @Path("userId") userId: Int
+    ): Response<MyWeeklyProgressResponse>
 }

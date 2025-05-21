@@ -85,4 +85,8 @@ class MyGoalRegisterViewModel @Inject constructor(
             )
         }
     }
+
+    fun resetUiState() {
+        _myGoalRegisterUiState.value = MyGoalRegisterUiState()
+    }
 }

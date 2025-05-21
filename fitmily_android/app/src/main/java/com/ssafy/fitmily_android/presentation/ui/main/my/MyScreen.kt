@@ -58,6 +58,7 @@ fun MyScreen(
         Log.d("test1234", "userZodiacName : $userZodiacName")
         myViewMdodel.getMyGoalInfo()
         myViewMdodel.getMyExerciseInfo()
+        myViewMdodel.getMyGoalWeeklyProgressInfo(authDataStore.getUserId())
     }
 
     LaunchedEffect(uiState.mySideEffect) {
@@ -160,7 +161,7 @@ fun MyScreen(
         item {
             Spacer(Modifier.height(32.dp))
             MyAchievement(
-                data = weekData,
+                data = uiState.myGoalWeeklyProgressInfo?.goal ?: emptyList(),
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
         }

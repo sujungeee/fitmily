@@ -10,11 +10,10 @@ import java.util.concurrent.TimeUnit
 
 class ChatManager {
     val url = "wss://k12d208.p.ssafy.io/api/ws-connect"
-//    val url = "ws://192.168.100.82:8080/api/ws-connect"
 
     val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-        .callTimeout(10, TimeUnit.SECONDS)
+        .callTimeout(60, TimeUnit.MINUTES)
         .pingInterval(30, TimeUnit.SECONDS)
         .retryOnConnectionFailure(true)
         .build()

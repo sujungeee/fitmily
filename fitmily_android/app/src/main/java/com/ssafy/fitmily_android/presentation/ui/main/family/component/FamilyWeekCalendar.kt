@@ -47,21 +47,21 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FamilyWeekCalendar(
-    close: () -> Unit = {},
+    selectedDate: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
     onWeekRangeChange: (String) -> Unit = {}
 ) {
     val currentDate = remember { LocalDate.now() }
     val startDate = remember { currentDate.minusDays(500) }
     val endDate = remember { currentDate.plusDays(500) }
-    var selection by remember { mutableStateOf(currentDate) }
+    var selection = selectedDate
 
     val state = rememberWeekCalendarState(
         startDate = startDate,
         endDate = endDate,
-        firstVisibleWeekDate = currentDate,
+        firstVisibleWeekDate = selection,
     )
     val start = state.firstVisibleWeek.days.first().date
     val end = state.firstVisibleWeek.days.last().date
@@ -82,7 +82,7 @@ fun FamilyWeekCalendar(
             dayContent = { day ->
                 Day(day.date, isSelected = selection == day.date) { clicked ->
                     if (selection != clicked) {
-                        selection = clicked
+                        onDateChange(clicked)
                     }
                 }
             },
