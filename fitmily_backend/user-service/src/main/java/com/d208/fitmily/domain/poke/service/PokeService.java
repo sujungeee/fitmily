@@ -69,7 +69,7 @@ public class PokeService {
         log.info("콕 찌르기 알림 저장 완료: notificationId={}", notification.getNotificationId());
 
         // FCM 알림 전송 - 이제 notification ID를 resource ID로 사용
-        fcmService.sendPokeNotification(sender, target, notification.getNotificationId(), now);
+//        fcmService.sendPokeNotification(sender, target, notification.getNotificationId(), now);
 
         return now;
     }
