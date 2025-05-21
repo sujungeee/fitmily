@@ -237,6 +237,8 @@ public class FcmService {
         data.put("achievementRate", String.valueOf(achievementRate));
         data.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
+
+
         // 알림 메시지 제목과 내용 구성
         String title = "주간 산책 챌린지가 종료되었습니다";
         String body;
