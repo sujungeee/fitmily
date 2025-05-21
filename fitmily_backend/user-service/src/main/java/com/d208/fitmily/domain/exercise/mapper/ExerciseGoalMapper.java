@@ -168,7 +168,7 @@ public interface ExerciseGoalMapper {
     })
     List<ExerciseGoal> findUserGoalsByDate(@Param("userId") int userId, @Param("date") String date);
 
-<<<<<<< HEAD
+
     // 특정 날짜의 전체 운동 목표 진행률 계산
     @Select("""
     SELECT COALESCE(ROUND(AVG(
@@ -236,7 +236,8 @@ public interface ExerciseGoalMapper {
       AND DATE(eg.exercise_goal_created_at) = #{date}
     """)
     List<Map<String, Object>> selectGoalsByUserIdAndDate(@Param("userId") Integer userId, @Param("date") String date);
-=======
+
+
 
     //
     /**
@@ -257,6 +258,4 @@ public interface ExerciseGoalMapper {
             "AND eg.goal_date = #{date} " +
             "AND eg.exercise_goal_progress >= 100")
     int countCompletedGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
-
->>>>>>> cicd
 }
