@@ -168,4 +168,25 @@ public interface ExerciseGoalMapper {
     })
     List<ExerciseGoal> findUserGoalsByDate(@Param("userId") int userId, @Param("date") String date);
 
+
+    //
+    /**
+     * 특정 사용자, 특정 날짜의 총 목표 수 조회
+     */
+    @Select("SELECT COUNT(*) " +
+            "FROM exercise_goal eg " +  // 테이블 별칭 사용
+            "WHERE eg.user_id = #{userId} " +
+            "AND eg.goal_date = #{date}")
+    int countGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
+
+    /**
+     * 특정 사용자, 특정 날짜의 완료된 목표 수 조회 (진행률 100% 이상)
+     */
+    @Select("SELECT COUNT(*) " +
+            "FROM exercise_goal eg " +  // 테이블 별칭 사용
+            "WHERE eg.user_id = #{userId} " +
+            "AND eg.goal_date = #{date} " +
+            "AND eg.exercise_goal_progress >= 100")
+    int countCompletedGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
+
 }
