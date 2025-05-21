@@ -105,34 +105,41 @@ public class WalkService {
     public Map<Integer, List<WalkResponseDto>> findFamilyWalks(Integer userId) {
         // 1. 나의 가족 ID 조회
         Integer familyId = familyMapper.selectFamilyIdByUserId(userId);
-        System.out.println("가족ID" + familyId);
+        if (familyId == null) {
+            System.out.println("가족이 등록되지 않았습니다.");
+        }
 
-        // 2. 가족 구성원 userId 목록 조회
         List<Integer> familyUserIds = userMapper.selectUserIdsByFamilyId(familyId);
-        System.out.println("id 목록 " + familyUserIds);
+        if (familyUserIds == null || familyUserIds.isEmpty()) {
+            return Map.of(); // 빈 결과
+        }
 
         Map<Integer, List<WalkResponseDto>> walkMap = new HashMap<>();
 
-
-        // 3. 각 userId에 대해 산책기록 조회
         for (Integer memberId : familyUserIds) {
-            List<WalkResponseDto> walks = walkMapper.selectWalks(memberId);
-            System.out.println("산책기록 "+walks);
+            List<WalkResponseDto> walks = Optional.ofNullable(walkMapper.selectWalks(memberId))
+                    .orElse(Collections.emptyList());
 
-            // 4. routeImg presigned url 변환
+            List<WalkResponseDto> safeWalks = new ArrayList<>();
             for (WalkResponseDto walk : walks) {
+                if (walk == null) continue;
+
                 String routeImg = walk.getRouteImg();
                 if (routeImg != null && !routeImg.isBlank()) {
                     String presignedUrl = awsS3Service.generatePresignedDownloadUrl(routeImg);
-                    walk.setRouteImg(presignedUrl);
+                    if (presignedUrl != null) {
+                        walk.setRouteImg(presignedUrl);
+                    }
                 }
+
+                safeWalks.add(walk);
             }
-            walkMap.put(memberId, walks);
+
+            walkMap.put(memberId, safeWalks);
         }
+
         return walkMap;
     }
-
-
 
     // 산책 목표 여부 조회
     public Boolean walkGoalExists(Integer userId){
