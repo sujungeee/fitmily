@@ -63,7 +63,9 @@ fun FamilyStatsItem(
                 Image(
                     painter = painterResource(id = ProfileUtil().typeToProfile(stats.userZodiacName) ?: R.drawable.my_unselected_icon),
                     contentDescription = "프로필 이미지",
-                    modifier = Modifier.background(ProfileUtil().seqToColor(stats.userFamilySequence), shape = CircleShape),
+                    modifier = Modifier
+                        .background(ProfileUtil().seqToColor(stats.userFamilySequence), shape = CircleShape)
+                        .size(40.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
