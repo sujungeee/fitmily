@@ -63,12 +63,11 @@ public class WalkController {
 
     @Operation(summary = "산책 기록 조회", description = "산책 기록을 조회합니다.")
     @GetMapping("/walks")
-    public ResponseEntity<Map<String, Object>> getWalks(
-            @AuthenticationPrincipal CustomUserDetails principal
-    ) {
+    public ResponseEntity<Map<String, Object>> getWalks(@AuthenticationPrincipal CustomUserDetails principal) {
+        System.out.println("산책기록조회 컨트롤러 들어옴");
         Integer userId = principal.getId();
-        Map<Integer, List<WalkResponseDto>> result = walkService.findFamilyWalks(userId);
-        return ResponseEntity.ok(Map.of("walk", result));
+        List<WalkResponseDto> walks = walkService.findFamilyWalks(userId);
+        return ResponseEntity.ok(Map.of("walk", walks));
     }
 
     @Operation(summary = "산책 목표 조회", description = "- 목표 존재하면 = true  \n- 목표존재하지 않으면 = false")
