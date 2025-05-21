@@ -47,8 +47,8 @@ public class WalkService {
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
         float weight = Optional.ofNullable(health.getWeight()).orElse(66.0f);
-        Instant startTime = dto.getStartTime().toInstant();
-        Instant endTime = dto.getEndTime().toInstant();
+        Instant startTime = dto.getWalkStartTime().toInstant();
+        Instant endTime = dto.getWalkEndTime().toInstant();
 
         long walkingTime = Duration.between(startTime, endTime).toMinutes();
 
@@ -62,10 +62,10 @@ public class WalkService {
 
         StopWalkDto stopWalkDto = StopWalkDto.builder()
                 .userId(userId)
-                .routeImg(dto.getRouteImg())
-                .startTime(dto.getStartTime())
-                .endTime(dto.getEndTime())
-                .distance(dto.getDistance())
+                .walkRouteImg(dto.getWalkRouteImg())
+                .walkStartTime(dto.getWalkStartTime())
+                .walkEndTime(dto.getWalkEndTime())
+                .walkDistance(dto.getWalkDistance())
                 .calories(walkCalories)
                 .build();
 
@@ -80,7 +80,7 @@ public class WalkService {
                 fcmService.sendWalkEndNotification(
                         userDto,
                         userDto.getFamilyId(),
-                        dto.getDistance(),
+                        dto.getWalkDistance(),
                         walkCalories,
                         walkingTime
                 );
@@ -131,7 +131,7 @@ public class WalkService {
 
     // 산책 시작했을때
     public void processGps(Integer userId, GpsDto gpsDto){
-    System.out.println("서비스 들어옴");
+        System.out.println("서비스 들어옴");
         boolean isFirst = !redisTemplate.hasKey("walk:gps:" + userId); //키가 없으면, 산책 시작
         gpsRedisService.saveGps(userId, gpsDto); //gps redis에 저장
 
@@ -216,9 +216,5 @@ public class WalkService {
         }
 
         return result;
-            }
-        }
-
-
-
-
+    }
+}
