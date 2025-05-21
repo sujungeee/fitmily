@@ -38,8 +38,14 @@ class WalkViewModel @Inject constructor(
 
     fun updateOtherGpsList(otherGpsList: GpsDto?) {
         if (otherGpsList == null) return
-        _uiState.value.copy(
+        _uiState.value=_uiState.value.copy(
             otherGpsList= uiState.value.otherGpsList + otherGpsList
+        )
+    }
+
+    fun deleteWalkingMembers(){
+        _uiState.value = _uiState.value.copy(
+            walkingFamilyList = emptyList()
         )
     }
 
@@ -75,13 +81,14 @@ class WalkViewModel @Inject constructor(
         }
     }
 
-    fun getWalkingMembers(familyId : Int) {
+    fun getWalkingMembers(familyId : Int, userId: Int) {
         viewModelScope.launch {
             val result = getWalkingMemberUseCase(familyId)
             ViewModelResultHandler.handle(
                 result = result,
                 onSuccess = { data ->
-                    _uiState.value = _uiState.value.copy(walkingFamilyList = data!!.member)
+
+                    _uiState.value = _uiState.value.copy(walkingFamilyList =data?.member?.filter { it.userId != userId}?: emptyList())
                 },
                 onError = { msg ->
                     _uiState.value = _uiState.value.copy(tstMessage = msg)

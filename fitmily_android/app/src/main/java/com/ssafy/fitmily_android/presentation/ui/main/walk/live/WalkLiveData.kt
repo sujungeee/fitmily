@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 
 object WalkLiveData {
@@ -13,14 +15,12 @@ object WalkLiveData {
     // 서비스의 실행 성탸룰 나타내는 LiveData이다. 기본값은 false
     val isServiceRunning = MutableLiveData<Boolean>(false)
 
-    val gpsList = MutableLiveData<List<GpsDto>>(
-        listOf(
-            // 초기 위치 데이터
-//            GpsDto(37.5665, 126.978, "2023-10-01T12:00:00Z"),
-//            GpsDto(37.5651, 126.989, "2023-10-01T12:01:00Z"),
-        )
-    )
-    val otherData = MutableLiveData<GpsDto>(null)
+    private val _gpsList = MutableStateFlow<List<GpsDto>>(emptyList())
+    val gpsList: StateFlow<List<GpsDto>> = _gpsList
+
+    var otherData = MutableStateFlow(GpsDto(
+        0.0, 0.0, System.currentTimeMillis().toString()
+    ))
     // 위치 데이터를 위한 변수들
     var userId = 0
     var lat = 0.0
@@ -28,6 +28,10 @@ object WalkLiveData {
     var speed = 0.0
     var lastUpdatedTime: Long = 0
     var startedTime = System.currentTimeMillis()
+
+    fun updateGpsList(newGps: GpsDto) {
+        _gpsList.value = _gpsList.value + newGps
+    }
 
     // GpsService를 시작하는 메서드
     fun startWalkLiveService(context: Context) {
@@ -47,6 +51,7 @@ object WalkLiveData {
         val intent = Intent(context, WalkLiveService::class.java)
         context.stopService(intent)
         WebSocketManager.unsubscribeStomp("/topic/walk/gps/${WebSocketManager.USERID}")
+        _gpsList.value = emptyList()
     }
 
     // 서비스의 실행 상태를 반환하는 메서드

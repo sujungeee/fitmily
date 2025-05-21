@@ -41,8 +41,15 @@ object WebSocketManager {
                     isConnected = true
                     Log.d(TAG, "connectStomp: OPENED")
 
-                    if (!other) {
-                        subscribeStomp()
+
+                    // 이전에 구독했던 topic을 모두 재구독
+                    for (topic in subscribeMap.keys.toList()) {
+                        subscribeStomp(topic)
+                    }
+
+                    // 기본 구독
+                    if (!other && !subscribeMap.containsKey("/topic/walk/gps/$USERID")) {
+                        subscribeStomp("/topic/walk/gps/$USERID")
                     }
                 }
 
@@ -79,20 +86,16 @@ object WebSocketManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe({ topicMessage ->
-                    Log.d(TAG, "subscribeStomp: 메시지 도착 -> $topic")
                     if (topic== "/topic/walk/gps/$USERID") {
                         topicMessage.payload?.let { payload ->
                             val message = Gson().fromJson(payload, GpsDto::class.java)
-                            WalkLiveData.gpsList.postValue(
-                                WalkLiveData.gpsList.value?.plus(message) ?: listOf(message)
-                            )
+                            WalkLiveData.updateGpsList(message)
                         }
                     }else {
                         topicMessage.payload?.let { payload ->
                             val message = Gson().fromJson(payload, GpsDto::class.java)
-                            WalkLiveData.otherData.postValue(
-                                message
-                            )
+                            WalkLiveData.otherData.value= message
+                            Log.d(TAG, "waldd subscribeStomp: otherData -> ${message}")
                         }
                     }
                 }, { error ->

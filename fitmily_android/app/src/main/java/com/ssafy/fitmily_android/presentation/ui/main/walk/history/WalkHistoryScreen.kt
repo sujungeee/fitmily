@@ -46,7 +46,7 @@ fun WalkHistoryScreen(
 
     var isEmpty = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        walkHistoryViewModel.getWalkHistory()
+//        walkHistoryViewModel.getWalkHistory()
     }
 
     LaunchedEffect(walkHistoryUiState.walkHistoryResponse) {
