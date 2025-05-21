@@ -3,7 +3,6 @@ package com.d208.fitmily.global.config;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -13,23 +12,21 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
-
-@ConditionalOnProperty(name = "spring.cloud.aws.credentials.accessKey")
 @Component
 @Slf4j
 public class AwsS3Config {
 
     // 직접 값 주입 방식으로 변경
-    @Value("${spring.cloud.aws.credentials.accessKey}")
+    @Value("${spring.cloud.aws.credentials.accessKey:AKIAXZ2CK3QV4WQ7TVW5}")
     private String accessKey;
 
-    @Value("${spring.cloud.aws.credentials.secretKey}")
+    @Value("${spring.cloud.aws.credentials.secretKey:Rc5fGV+0LEmKIggmAQvNKQkLTOfv/wGX2mJ92H4X}")
     private String secretKey;
 
-    @Value("${spring.cloud.aws.region.static}")
+    @Value("${spring.cloud.aws.region.static:us-east-1}")
     private String region;
 
-    @Value("${spring.cloud.aws.s3.bucket}")
+    @Value("${spring.cloud.aws.s3.bucket:pop4u}")
     private String bucket;
 
     @PostConstruct
