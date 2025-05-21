@@ -99,16 +99,18 @@ public class WalkService {
     }
 
 
-
-
     // 산책 기록 조회
     public List<WalkResponseDto> findFamilyWalks(Integer userId) {
         Integer familyId = familyMapper.selectFamilyIdByUserId(userId);
+        System.out.println("familyId" + familyId);
         if (familyId == null) {
             return Collections.emptyList(); // 또는 예외 던지기
+
         }
 
         List<Integer> familyUserIds = userMapper.selectUserIdsByFamilyId(familyId);
+
+        System.out.println("familyUserIds" + familyUserIds);
         if (familyUserIds == null || familyUserIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -118,6 +120,7 @@ public class WalkService {
         for (Integer memberId : familyUserIds) {
             List<WalkResponseDto> walks = Optional.ofNullable(walkMapper.selectWalks(memberId))
                     .orElse(Collections.emptyList());
+            System.out.println("walks" + walks);
 
             for (WalkResponseDto walk : walks) {
                 if (walk == null) continue;
