@@ -23,6 +23,7 @@ public interface WalkMapper {
     int insertStopWalk(StopWalkDto walk);
 
     @Select("""
+        <script>
         SELECT
             w.walk_id,
             w.user_id,
@@ -32,11 +33,15 @@ public interface WalkMapper {
             w.walk_distance,
             w.walk_calories,
             u.user_nickname,
-            u.user_zodiac_name,
+            u.zodiac_name,
             u.user_family_sequence
         FROM walk w
         JOIN user u ON w.user_id = u.user_id
-        WHERE w.user_id = #{userId}
+        WHERE w.user_id IN
+        <foreach collection='userIds' item='id' open='(' separator=',' close=')'>
+            #{id}
+        </foreach>
+        </script>
     """)
     @Results({
             @Result(property = "walkId", column = "walk_id"),
@@ -46,11 +51,12 @@ public interface WalkMapper {
             @Result(property = "endTime", column = "walk_end_time"),
             @Result(property = "distance", column = "walk_distance"),
             @Result(property = "calories", column = "walk_calories"),
-            @Result(property = "nickname", column = "nickname"),
-            @Result(property = "zodiacName", column = "zodiac_name"),
+            @Result(property = "nickname", column = "user_nickname"),
+            @Result(property = "zodiacName", column = "user_zodiac_name"),
             @Result(property = "userFamilySequence", column = "user_family_sequence")
     })
-    List<WalkResponseDto> selectWalks(@Param("userId") Integer userId);
+    List<WalkResponseDto> selectWalksByUserIds(@Param("userIds") List<Integer> userIds);
+
 
     // 3. 산책 목표 존재 여부 확인
     @Select("""

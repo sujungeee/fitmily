@@ -125,10 +125,7 @@ public class WalkService {
         List<WalkResponseDto> result = new ArrayList<>();
 
         // 4. 가족 구성원 각각에 대해 산책 기록을 조회
-        for (Integer memberId : familyUserIds) {
-            List<WalkResponseDto> walks = Optional.ofNullable(walkMapper.selectWalks(memberId))
-                    .orElse(Collections.emptyList());
-            System.out.println("walks" + walks);
+        List<WalkResponseDto> walks = walkMapper.selectWalksByUserIds(familyUserIds);
 
             for (WalkResponseDto walk : walks) {
                 if (walk == null) continue;
@@ -136,16 +133,10 @@ public class WalkService {
                 String routeImg = walk.getRouteImg();
                 if (routeImg != null && !routeImg.isBlank()) {
                     String presignedUrl = awsS3Service.generatePresignedDownloadUrl(routeImg);
-                    if (presignedUrl != null) {
-                        walk.setRouteImg(presignedUrl);
-                    }
+                    walk.setRouteImg(presignedUrl);
                 }
-
-                result.add(walk); // ✅ 전체 리스트에 추가
             }
-        }
-
-        return result;
+        return walks;
     }
 
     // 산책 목표 여부 조회
