@@ -14,7 +14,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Component // ✅ 추가
-@ConfigurationProperties(prefix = "cloud.aws")
+@ConfigurationProperties(prefix = "spring.cloud.aws")
 @Getter
 @Setter
 @Slf4j
