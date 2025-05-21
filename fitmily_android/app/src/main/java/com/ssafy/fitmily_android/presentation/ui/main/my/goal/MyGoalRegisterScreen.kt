@@ -60,6 +60,7 @@ fun MyGoalRegisterScreen(
             is MyGoalSideEffect.NavigateToMy -> {
                 navController.popBackStack()
                 myGoalRegisterViewModel.consumeSideEffect()
+                myGoalRegisterViewModel.resetUiState()
             }
             null -> Unit
         }
