@@ -11,7 +11,43 @@ import java.util.Map;
 @Mapper
 public interface ExerciseGoalMapper {
 
-    // 1. 사용자의 전체 운동 목표 진행률 계산
+    /**
+     * 사용자의 특정 날짜 운동 목표 조회
+     */
+    @Select("SELECT * FROM exercise_goal WHERE user_id = #{userId} AND DATE(exercise_goal_created_at) = #{date}")
+    @Results(id = "exerciseGoalMap", value = {
+            @Result(property = "exerciseGoalId", column = "exercise_goal_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "exerciseGoalName", column = "exercise_goal_name"),
+            @Result(property = "exerciseGoalValue", column = "exercise_goal_value"),
+            @Result(property = "exerciseGoalProgress", column = "exercise_goal_progress"),
+            @Result(property = "exerciseGoalCreatedAt", column = "exercise_goal_created_at"),
+            @Result(property = "exerciseGoalUpdatedAt", column = "exercise_goal_updated_at")
+    })
+    List<ExerciseGoal> findUserGoalsByDate(@Param("userId") int userId, @Param("date") String date);
+
+    /**
+     * 특정 사용자, 특정 날짜의 총 목표 수 조회
+     */
+    @Select("SELECT COUNT(*) " +
+            "FROM exercise_goal eg " +
+            "WHERE eg.user_id = #{userId} " +
+            "AND DATE(eg.exercise_goal_created_at) = #{date}")
+    int countGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
+
+    /**
+     * 특정 사용자, 특정 날짜의 완료된 목표 수 조회 (진행률 100% 이상)
+     */
+    @Select("SELECT COUNT(*) " +
+            "FROM exercise_goal eg " +
+            "WHERE eg.user_id = #{userId} " +
+            "AND DATE(eg.exercise_goal_created_at) = #{date} " +
+            "AND eg.exercise_goal_progress >= 100")
+    int countCompletedGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
+
+    /**
+     * 사용자의 전체 운동 목표 진행률 계산
+     */
     @Select("""
         SELECT COALESCE(ROUND(AVG(
             CASE
@@ -45,131 +81,9 @@ public interface ExerciseGoalMapper {
         """)
     int calculateProgress(@Param("userId") Integer userId);
 
-    // 2. 사용자의 운동 목표 목록 조회
-    @Select("""
-    SELECT
-        eg.exercise_goal_id,
-        eg.exercise_goal_name,
-        eg.exercise_goal_value,  -- CAST 제거
-        CASE
-            WHEN eg.exercise_goal_name = '산책' THEN
-                COALESCE(
-                    (SELECT SUM(w.walk_distance)
-                     FROM walk w
-                     WHERE w.user_id = #{userId} AND DATE(w.walk_created_at) = CURDATE()),
-                    0
-                )
-            ELSE
-                COALESCE(
-                    (SELECT SUM(e.exercise_count)
-                     FROM exercise e
-                     WHERE e.user_id = #{userId}
-                       AND e.exercise_name = eg.exercise_goal_name
-                       AND DATE(e.exercise_created_at) = CURDATE()),
-                    0
-                )
-        END AS exercise_record_value  -- CAST 제거
-    FROM exercise_goal eg
-    WHERE eg.user_id = #{userId}
-    """)
-    List<Map<String, Object>> selectGoalsByUserId(@Param("userId") Integer userId);
-
-    // 3. 운동 목표 등록
-    @Insert("""
-        INSERT INTO exercise_goal (
-            user_id,
-            exercise_goal_name,
-            exercise_goal_value,
-            exercise_goal_progress,
-            exercise_goal_created_at,
-            exercise_goal_updated_at
-        ) VALUES (
-            #{userId},
-            #{goal.exerciseGoalName},
-            #{goal.exerciseGoalValue},
-            0,
-            #{now},
-            #{now}
-        )
-        """)
-    int insertGoal(
-            @Param("userId") Integer userId,
-            @Param("goal") ExerciseGoalDto goal,
-            @Param("now") Date now
-    );
-
-    // 4. 운동 목표 수정
-    @Update("""
-        UPDATE exercise_goal
-        SET exercise_goal_value = #{exerciseValue},
-            exercise_goal_updated_at = #{now}
-        WHERE exercise_goal_id = #{goalId}
-          AND user_id = #{userId}
-        """)
-    int updateGoal(
-            @Param("userId") Integer userId,
-            @Param("goalId") Integer goalId,
-            @Param("exerciseValue") float exerciseValue,
-            @Param("now") Date now
-    );
-
-    // 5. 운동 목표 삭제
-    @Delete("""
-        DELETE FROM exercise_goal
-        WHERE exercise_goal_id = #{goalId}
-          AND user_id = #{userId}
-        """)
-    int deleteGoal(
-            @Param("userId") Integer userId,
-            @Param("goalId") Integer goalId
-    );
-
-    // 6. 운동 목표 진행률 업데이트
-    @Update("""
-        UPDATE exercise_goal
-        SET exercise_goal_progress = #{progress},
-            exercise_goal_updated_at = NOW()
-        WHERE user_id = #{userId}
-          AND exercise_goal_name = #{exerciseName}
-        """)
-    int updateGoalProgress(
-            @Param("userId") Integer userId,
-            @Param("exerciseName") String exerciseName,
-            @Param("progress") Integer progress
-    );
-
-    // 7. 중복 운동 목표 확인
-    @Select("""
-        SELECT COUNT(*)
-        FROM exercise_goal
-        WHERE user_id = #{userId}
-          AND exercise_goal_name = #{exerciseName}
-        """)
-    int countGoalByNameAndUserId(
-            @Param("userId") Integer userId,
-            @Param("exerciseName") String exerciseName
-    );
-
-
-    //
     /**
-     *
+     * 특정 날짜의 전체 운동 목표 진행률 계산
      */
-    // 특정 날짜의 운동 목표 조회 메서드 추가
-    @Select("SELECT * FROM exercise_goal WHERE user_id = #{userId} AND DATE(exercise_goal_created_at) = #{date}")
-    @Results(id = "exerciseGoalMap", value = {
-            @Result(property = "exerciseGoalId", column = "exercise_goal_id"),
-            @Result(property = "userId", column = "user_id"),
-            @Result(property = "exerciseGoalName", column = "exercise_goal_name"),
-            @Result(property = "exerciseGoalValue", column = "exercise_goal_value"),
-            @Result(property = "exerciseGoalProgress", column = "exercise_goal_progress"),
-            @Result(property = "exerciseGoalCreatedAt", column = "exercise_goal_created_at"),
-            @Result(property = "exerciseGoalUpdatedAt", column = "exercise_goal_updated_at")
-    })
-    List<ExerciseGoal> findUserGoalsByDate(@Param("userId") int userId, @Param("date") String date);
-
-
-    // 특정 날짜의 전체 운동 목표 진행률 계산
     @Select("""
     SELECT COALESCE(ROUND(AVG(
         CASE
@@ -204,9 +118,39 @@ public interface ExerciseGoalMapper {
     """)
     int calculateProgressByDate(@Param("userId") Integer userId, @Param("date") String date);
 
-    // 특정 날짜의 사용자 운동 목표 목록 조회
     /**
-     * 특정 날짜에 생성된 운동 목표만 조회하도록 매퍼 수정
+     * 사용자의 운동 목표 목록 조회
+     */
+    @Select("""
+    SELECT
+        eg.exercise_goal_id,
+        eg.exercise_goal_name,
+        eg.exercise_goal_value,
+        CASE
+            WHEN eg.exercise_goal_name = '산책' THEN
+                COALESCE(
+                    (SELECT SUM(w.walk_distance)
+                     FROM walk w
+                     WHERE w.user_id = #{userId} AND DATE(w.walk_created_at) = CURDATE()),
+                    0
+                )
+            ELSE
+                COALESCE(
+                    (SELECT SUM(e.exercise_count)
+                     FROM exercise e
+                     WHERE e.user_id = #{userId}
+                       AND e.exercise_name = eg.exercise_goal_name
+                       AND DATE(e.exercise_created_at) = CURDATE()),
+                    0
+                )
+        END AS exercise_record_value
+    FROM exercise_goal eg
+    WHERE eg.user_id = #{userId}
+    """)
+    List<Map<String, Object>> selectGoalsByUserId(@Param("userId") Integer userId);
+
+    /**
+     * 특정 날짜의 사용자 운동 목표 목록 조회
      */
     @Select("""
     SELECT
@@ -237,25 +181,89 @@ public interface ExerciseGoalMapper {
     """)
     List<Map<String, Object>> selectGoalsByUserIdAndDate(@Param("userId") Integer userId, @Param("date") String date);
 
-
-
-    //
     /**
-     * 특정 사용자, 특정 날짜의 총 목표 수 조회
+     * 운동 목표 등록
      */
-    @Select("SELECT COUNT(*) " +
-            "FROM exercise_goal eg " +  // 테이블 별칭 사용
-            "WHERE eg.user_id = #{userId} " +
-            "AND eg.goal_date = #{date}")
-    int countGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
+    @Insert("""
+        INSERT INTO exercise_goal (
+            user_id,
+            exercise_goal_name,
+            exercise_goal_value,
+            exercise_goal_progress,
+            exercise_goal_created_at,
+            exercise_goal_updated_at
+        ) VALUES (
+            #{userId},
+            #{goal.exerciseGoalName},
+            #{goal.exerciseGoalValue},
+            0,
+            #{now},
+            #{now}
+        )
+        """)
+    int insertGoal(
+            @Param("userId") Integer userId,
+            @Param("goal") ExerciseGoalDto goal,
+            @Param("now") Date now
+    );
 
     /**
-     * 특정 사용자, 특정 날짜의 완료된 목표 수 조회 (진행률 100% 이상)
+     * 운동 목표 수정
      */
-    @Select("SELECT COUNT(*) " +
-            "FROM exercise_goal eg " +  // 테이블 별칭 사용
-            "WHERE eg.user_id = #{userId} " +
-            "AND eg.goal_date = #{date} " +
-            "AND eg.exercise_goal_progress >= 100")
-    int countCompletedGoalsByDateAndUser(@Param("userId") int userId, @Param("date") String date);
+    @Update("""
+        UPDATE exercise_goal
+        SET exercise_goal_value = #{exerciseValue},
+            exercise_goal_updated_at = #{now}
+        WHERE exercise_goal_id = #{goalId}
+          AND user_id = #{userId}
+        """)
+    int updateGoal(
+            @Param("userId") Integer userId,
+            @Param("goalId") Integer goalId,
+            @Param("exerciseValue") float exerciseValue,
+            @Param("now") Date now
+    );
+
+    /**
+     * 운동 목표 삭제
+     */
+    @Delete("""
+        DELETE FROM exercise_goal
+        WHERE exercise_goal_id = #{goalId}
+          AND user_id = #{userId}
+        """)
+    int deleteGoal(
+            @Param("userId") Integer userId,
+            @Param("goalId") Integer goalId
+    );
+
+    /**
+     * 운동 목표 진행률 업데이트
+     */
+    @Update("""
+        UPDATE exercise_goal
+        SET exercise_goal_progress = #{progress},
+            exercise_goal_updated_at = NOW()
+        WHERE user_id = #{userId}
+          AND exercise_goal_name = #{exerciseName}
+        """)
+    int updateGoalProgress(
+            @Param("userId") Integer userId,
+            @Param("exerciseName") String exerciseName,
+            @Param("progress") Integer progress
+    );
+
+    /**
+     * 중복 운동 목표 확인
+     */
+    @Select("""
+        SELECT COUNT(*)
+        FROM exercise_goal
+        WHERE user_id = #{userId}
+          AND exercise_goal_name = #{exerciseName}
+        """)
+    int countGoalByNameAndUserId(
+            @Param("userId") Integer userId,
+            @Param("exerciseName") String exerciseName
+    );
 }
