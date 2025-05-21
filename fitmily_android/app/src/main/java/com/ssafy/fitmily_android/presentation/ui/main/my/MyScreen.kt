@@ -65,8 +65,8 @@ fun MyScreen(
         for(sideEffect in uiState.mySideEffect ?: return@LaunchedEffect) {
             when (sideEffect) {
                 is MySideEffect.ClearAuthData -> {
-                    WalkLiveData.stopWalkLiveService(context)
                     authDataStore.clear()
+                    WalkLiveData.stopWalkLiveService(context)
                 }
 
                 is MySideEffect.NavigateToLogin -> {

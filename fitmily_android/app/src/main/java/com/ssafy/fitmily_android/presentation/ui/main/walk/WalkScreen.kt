@@ -30,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -119,6 +122,20 @@ fun WalkScreen(
     var familyId : Int
 
     val countdown = remember { mutableStateOf(-1) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(Unit) {
+        val observer = Observer<Boolean> { shouldUpdate ->
+            if (shouldUpdate == true) {
+                WalkLiveData.shouldUpdateOtherGps.value = false
+            }
+        }
+        WalkLiveData.shouldUpdateOtherGps.observe(lifecycleOwner, observer)
+        onDispose {
+            WalkLiveData.shouldUpdateOtherGps.removeObserver(observer)
+        }
+    }
 
     LaunchedEffect(WalkLiveData.isServiceRunning) {
         isWalking.value = WalkLiveData.isServiceRunning.value

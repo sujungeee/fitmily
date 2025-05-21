@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.model.dto.response.home.FamilyDashboardDto
+import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.util.ProfileUtil
 
@@ -99,8 +100,9 @@ fun DashBoardItem(item: FamilyDashboardDto, onClickPoke: (Int) -> Unit) {
                                 .aspectRatio(1f)
                                 .fillMaxSize(),
                             color = userColor,
+                            trackColor = mainGray,
                             strokeWidth = 8.dp,
-                            progress = 80 / 100f
+                            progress = item.totalProgressRate / 100f,
                         )
 
                         Text(

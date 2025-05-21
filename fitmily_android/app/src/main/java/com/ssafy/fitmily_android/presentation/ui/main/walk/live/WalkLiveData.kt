@@ -29,6 +29,8 @@ object WalkLiveData {
     var lastUpdatedTime: Long = 0
     var startedTime = System.currentTimeMillis()
 
+    val shouldUpdateOtherGps = MutableLiveData<Boolean>(false)
+
     fun updateGpsList(newGps: GpsDto) {
         _gpsList.value = _gpsList.value + newGps
     }
@@ -50,8 +52,11 @@ object WalkLiveData {
     fun stopWalkLiveService(context: Context) {
         val intent = Intent(context, WalkLiveService::class.java)
         context.stopService(intent)
-        WebSocketManager.unsubscribeStomp("/topic/walk/gps/${WebSocketManager.USERID}")
-        _gpsList.value = emptyList()
+        if(WebSocketManager.isConnected) {
+            WebSocketManager.unsubscribeStomp("/topic/walk/gps/${WebSocketManager.USERID}")
+        }
+            _gpsList.value = emptyList()
+
     }
 
     // 서비스의 실행 상태를 반환하는 메서드
