@@ -129,6 +129,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/ws-connect/**").permitAll()
 
+
+
+
                         .requestMatchers( "/*").permitAll()
 
 
