@@ -118,7 +118,7 @@ public class WalkChallengeService {
     @Transactional
     public void updateChallengeDistance(StopWalkDto walkDto) {
         Integer userId = walkDto.getUserId();
-        Float distance = walkDto.getDistance();
+        Float distance = walkDto.getWalkDistance();
 
         // 사용자의 가족 ID 조회
         Integer familyId = userService.getUserById(userId).getFamilyId();

@@ -16,7 +16,7 @@ public interface WalkMapper {
         INSERT INTO walk (
             user_id, walk_route_img, walk_start_time, walk_end_time, walk_distance, walk_calories,walk_created_at,walk_updated_at
         ) VALUES (
-            #{userId}, #{routeImg}, #{startTime}, #{endTime}, #{distance}, #{calories},NOW(),NOW()
+             #{userId}, #{walkRouteImg}, #{walkStartTime}, #{walkEndTime}, #{walkDistance}, #{calories}, NOW(), NOW()
         )
         """)
     @Options(useGeneratedKeys = true, keyProperty = "walkId")

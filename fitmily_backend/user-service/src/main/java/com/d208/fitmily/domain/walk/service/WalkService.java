@@ -1,6 +1,7 @@
 package com.d208.fitmily.domain.walk.service;
 
 import com.d208.fitmily.domain.AwsS3.Service.AwsS3Service;
+import com.d208.fitmily.domain.fcm.service.FcmService;
 import com.d208.fitmily.domain.walkchallenge.service.WalkChallengeService;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 //import com.d208.fitmily.health.entity.Health;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -23,6 +25,7 @@ import java.util.*;
 import static java.time.Duration.between;
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WalkService {
 
     //    private final SseService sseService;
@@ -34,17 +37,17 @@ public class WalkService {
     private final SimpMessagingTemplate messagingTemplate;
     private final WalkChallengeService walkChallengeService;
     private final AwsS3Service awsS3Service;
+    private final FcmService fcmService;
 
 
     // 산책 중지
-    @Transactional
     public void endWalk(Integer userId, EndWalkRequestDto dto){
-//        User user = userService.getUserById(userId);
+        UserDto userDto = userService.getUserDtoById(userId);
         HealthResponseDto health = healthService.getLatestHealth(userId);
 
         float weight = Optional.ofNullable(health.getWeight()).orElse(66.0f);
-        Instant startTime = dto.getStartTime().toInstant();
-        Instant endTime = dto.getEndTime().toInstant();
+        Instant startTime = dto.getWalkStartTime().toInstant();
+        Instant endTime = dto.getWalkEndTime().toInstant();
 
         long walkingTime = Duration.between(startTime, endTime).toMinutes();
 
@@ -58,24 +61,36 @@ public class WalkService {
 
         StopWalkDto stopWalkDto = StopWalkDto.builder()
                 .userId(userId)
-                .routeImg(dto.getRouteImg())
-                .startTime(dto.getStartTime())
-                .endTime(dto.getEndTime())
-                .distance(dto.getDistance())
+                .walkRouteImg(dto.getWalkRouteImg())
+                .walkStartTime(dto.getWalkStartTime())
+                .walkEndTime(dto.getWalkEndTime())
+                .walkDistance(dto.getWalkDistance())
                 .calories(walkCalories)
                 .build();
 
         walkMapper.insertStopWalk(stopWalkDto);
+        System.out.println("산책 저장까진 완료됨");
 
         // 산책 챌린지 거리 업데이트
         walkChallengeService.updateChallengeDistance(stopWalkDto);
+        System.out.println("산책 챌린지 거리까진 업데이트됨");
+
+//        // FCM 알림 전송 (산책 종료)
+//        if (userDto.getFamilyId() != null) {
+//                fcmService.sendWalkEndNotification(
+//                        userDto,
+//                        userDto.getFamilyId(),
+//                        dto.getWalkDistance(),
+//                        walkCalories,
+//                        walkingTime
+//                );
+//        }
 
         //gps 데이터 삭제
         gpsRedisService.removeWalkData(userId);
+        System.out.println("redis 데이터 삭제");
 
     }
-
-
 
 
     // 산책 기록 조회
@@ -111,9 +126,10 @@ public class WalkService {
 
     // 산책 시작했을때
     public void processGps(Integer userId, GpsDto gpsDto){
-    System.out.println("서비스 들어옴");
+        System.out.println("산책 서비스 들어옴");
         boolean isFirst = !redisTemplate.hasKey("walk:gps:" + userId); //키가 없으면, 산책 시작
         gpsRedisService.saveGps(userId, gpsDto); //gps redis에 저장
+        System.out.println("데이터 전송을 완료함");
 
 //        if (isFirst){
 //            UserDto user = userService.getUserDtoById(userId);
@@ -129,6 +145,23 @@ public class WalkService {
 //            //sse 전송
 ////            sseService.sendFamilyWalkingEvent(familyId, data);
 //        }
+
+        // 처음 GPS 데이터가 들어왔을 때 (산책 시작)
+        if (isFirst){
+            System.out.println("isFirst 들어옴");
+            UserDto user = userService.getUserDtoById(userId);
+
+            // FCM 알림 전송 (산책 시작)
+            if (user.getFamilyId() != null) {
+                try {
+                    fcmService.sendWalkStartNotification(user, user.getFamilyId());
+                    System.out.println("fcm 전송완료");
+                } catch (Exception e) {
+                    log.error("산책 시작 알림 전송 실패: {}", e.getMessage());
+                    // 알림 전송 실패해도 정상 처리
+                }
+            }
+        }
 
         // 데이터 전송
         String topic = "/topic/walk/gps/" + userId;
@@ -181,9 +214,5 @@ public class WalkService {
         }
 
         return result;
-            }
-        }
-
-
-
-
+    }
+}
