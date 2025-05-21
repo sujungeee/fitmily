@@ -3,7 +3,6 @@ package com.d208.fitmily.domain.exercise.controller;
 import com.d208.fitmily.domain.exercise.dto.*;
 import com.d208.fitmily.domain.exercise.service.ExerciseGoalService;
 import com.d208.fitmily.domain.user.dto.CustomUserDetails;
-import com.d208.fitmily.global.config.SecurityConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -121,8 +120,13 @@ public class ExerciseGoalController {
 
 
     //
-     //
-    @@GetMapping("/weekly-progress/{userId}")
+    /**
+     * 7일간의 운동 목표 진행률 조회 API
+     *
+     * @param userId 조회할 사용자 ID
+     * @return 날짜별 목표 달성률 데이터
+     */
+    @GetMapping("/weekly-progress/{userId}")
     public ResponseEntity<WeeklyGoalProgressResponse> getWeeklyGoalProgress(
             @PathVariable int userId) {
 
