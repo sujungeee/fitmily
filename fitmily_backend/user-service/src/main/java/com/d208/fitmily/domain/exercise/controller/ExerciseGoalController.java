@@ -120,9 +120,6 @@ public class ExerciseGoalController {
     }
 
 
-<<<<<<< HEAD
-=======
-
     //
      //
     @GetMapping("/weekly-progress")
@@ -131,6 +128,5 @@ public class ExerciseGoalController {
         WeeklyGoalProgressResponse response = exerciseGoalService.getWeeklyGoalProgress(userId);
         return ResponseEntity.ok(response);
     }
-
->>>>>>> cicd
+    
 }
