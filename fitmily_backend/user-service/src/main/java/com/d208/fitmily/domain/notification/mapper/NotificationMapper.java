@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface NotificationMapper {
@@ -42,33 +41,23 @@ public interface NotificationMapper {
         n.notification_id as notificationId,
         n.notification_type as type,
         n.notification_created_at as receivedAt,
-        n.notification_is_read as isRead,
+        CASE WHEN n.notification_is_read = 1 THEN true ELSE false END as isRead,
         n.notification_sender_id as senderId,
-        CASE WHEN n.notification_sender_id IS NOT NULL 
+        CASE WHEN n.notification_sender_id > 0
              THEN u.user_nickname 
              ELSE NULL 
         END as senderNickname,
-        n.notification_resource_id as resourceId,
-        n.notification_content as content
+        n.notification_resource_id as resourceId
     FROM notification n
     LEFT JOIN user u ON n.notification_sender_id = u.user_id
     WHERE n.notification_receiver_id = #{userId}
+    AND n.notification_type IN ('POKE', 'CHALLENGE', 'WALK')
     ORDER BY n.notification_created_at DESC
     LIMIT #{limit} OFFSET #{offset}
 """)
-    @Results({
-            @Result(property = "notificationId", column = "notificationId"),
-            @Result(property = "type", column = "type"),
-            @Result(property = "receivedAt", column = "receivedAt"),
-            @Result(property = "isRead", column = "isRead", javaType = Boolean.class),
-            @Result(property = "senderId", column = "senderId"),
-            @Result(property = "senderNickname", column = "senderNickname"),
-            @Result(property = "resourceId", column = "resourceId"),
-    })
     List<NotificationResponseDTO> findNotificationsByUserId(@Param("userId") int userId,
                                                             @Param("limit") int limit,
                                                             @Param("offset") int offset);
-
 
     @Update("""
         UPDATE notification
@@ -83,6 +72,7 @@ public interface NotificationMapper {
         FROM notification 
         WHERE notification_receiver_id = #{userId} 
         AND notification_is_read = 0
+        AND notification_type IN ('POKE', 'CHALLENGE', 'WALK')
         """)
     int countUnreadNotifications(@Param("userId") int userId);
 }
