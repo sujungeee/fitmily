@@ -2,6 +2,7 @@ package com.ssafy.fitmily_android.presentation.ui.main.my
 
 import com.ssafy.fitmily_android.model.dto.response.my.MyExerciseResponse
 import com.ssafy.fitmily_android.model.dto.response.my.MyGoalResponse
+import com.ssafy.fitmily_android.model.dto.response.my.MyWeeklyProgressResponse
 
 data class MyUiState (
     val logoutResult: Boolean = false,
@@ -9,7 +10,8 @@ data class MyUiState (
     val hasUnreadNotification: Boolean = false,
     val myGoalInfo: MyGoalResponse? = null,
     val myExerciseInfo: MyExerciseResponse? = null,
-    val myExerciseTotalCalorie: Int = 1
+    val myExerciseTotalCalorie: Int = 0,
+    val myGoalWeeklyProgressInfo: MyWeeklyProgressResponse? = null
 )
 
 sealed interface MySideEffect {

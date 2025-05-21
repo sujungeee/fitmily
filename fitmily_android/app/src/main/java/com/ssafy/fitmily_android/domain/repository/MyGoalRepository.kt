@@ -2,6 +2,7 @@ package com.ssafy.fitmily_android.domain.repository
 
 import com.ssafy.fitmily_android.model.dto.response.my.MyGoalResponse
 import com.ssafy.fitmily_android.model.common.Result
+import com.ssafy.fitmily_android.model.dto.response.my.MyWeeklyProgressResponse
 
 interface MyGoalRepository {
 
@@ -20,4 +21,8 @@ interface MyGoalRepository {
     suspend fun deleteMyGoalInfo(
         goalId: Int
     ): Result<Unit>
+
+    suspend fun getMyWeeklyProgressInfo(
+        userId: Int
+    ): Result<MyWeeklyProgressResponse>
 }
