@@ -213,6 +213,8 @@ public class ExerciseGoalService {
     }
 
 
+    //
+     //
     public WeeklyGoalProgressResponse getWeeklyGoalProgress(int userId) {
         // 오늘 날짜
         LocalDate today = LocalDate.now();
