@@ -49,6 +49,7 @@ class WalkLiveService: Service() {
         serviceScope.launch {
 
             WebSocketManager.TOKEN = application.getAccessToken()
+            WebSocketManager.USERID = application.getUserId()
             WalkLiveData.userId = application.getUserId()
 
             WalkLiveData.startedTime = System.currentTimeMillis()
@@ -58,14 +59,7 @@ class WalkLiveService: Service() {
             }
             walkLiveWorker = WalkLiveWorker(context)
             walkLiveWorker.startLocationUpdates()
-
         }
-
-        // Todo 웹소켓 시작
-
-        // WalkLiveWorker를 시작, stompClient 보내서 send 할 수 있게끔
-
-
 
         return START_STICKY
     }

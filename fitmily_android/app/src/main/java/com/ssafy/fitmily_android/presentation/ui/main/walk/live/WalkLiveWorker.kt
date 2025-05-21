@@ -65,7 +65,6 @@ class WalkLiveWorker(private val context: Context) {
             Looper.getMainLooper()
         )
     }
-    var pp = 0.001
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             if (locationResult.locations[0] != null) {
@@ -76,11 +75,10 @@ class WalkLiveWorker(private val context: Context) {
                 }
                 val data =  GpsRequest(
                     WalkLiveData.userId,
-                    WalkLiveData.lat+pp,
+                    WalkLiveData.lat,
                     WalkLiveData.lon,
                     System.currentTimeMillis().toString(),
                 )
-                pp+= 0.001
 
                 Log.d(TAG, "startLocationUpdates: ${WalkLiveData.gpsList.value}")
                 val jsonMessage = Gson().toJson(data)
