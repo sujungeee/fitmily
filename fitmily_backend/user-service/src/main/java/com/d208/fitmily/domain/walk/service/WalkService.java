@@ -41,6 +41,7 @@ public class WalkService {
 
 
     // 산책 중지
+    @Transactional
     public void endWalk(Integer userId, EndWalkRequestDto dto){
         UserDto userDto = userService.getUserDtoById(userId);
         HealthResponseDto health = healthService.getLatestHealth(userId);
@@ -69,28 +70,32 @@ public class WalkService {
                 .build();
 
         walkMapper.insertStopWalk(stopWalkDto);
-        System.out.println("산책 저장까진 완료됨");
 
         // 산책 챌린지 거리 업데이트
         walkChallengeService.updateChallengeDistance(stopWalkDto);
-        System.out.println("산책 챌린지 거리까진 업데이트됨");
 
-//        // FCM 알림 전송 (산책 종료)
-//        if (userDto.getFamilyId() != null) {
-//                fcmService.sendWalkEndNotification(
-//                        userDto,
-//                        userDto.getFamilyId(),
-//                        dto.getWalkDistance(),
-//                        walkCalories,
-//                        walkingTime
-//                );
-//        }
+        // FCM 알림 전송 (산책 종료)
+        if (userDto.getFamilyId() != null) {
+            try {
+                fcmService.sendWalkEndNotification(
+                        userDto,
+                        userDto.getFamilyId(),
+                        dto.getWalkDistance(),
+                        walkCalories,
+                        walkingTime
+                );
+            } catch (Exception e) {
+                log.error("산책 종료 알림 전송 실패: {}", e.getMessage());
+                // 알림 전송 실패해도 정상 처리
+            }
+        }
 
         //gps 데이터 삭제
         gpsRedisService.removeWalkData(userId);
-        System.out.println("redis 데이터 삭제");
 
     }
+
+
 
 
     // 산책 기록 조회
@@ -126,10 +131,9 @@ public class WalkService {
 
     // 산책 시작했을때
     public void processGps(Integer userId, GpsDto gpsDto){
-        System.out.println("산책 서비스 들어옴");
+        System.out.println("서비스 들어옴");
         boolean isFirst = !redisTemplate.hasKey("walk:gps:" + userId); //키가 없으면, 산책 시작
         gpsRedisService.saveGps(userId, gpsDto); //gps redis에 저장
-        System.out.println("데이터 전송을 완료함");
 
 //        if (isFirst){
 //            UserDto user = userService.getUserDtoById(userId);
@@ -148,14 +152,12 @@ public class WalkService {
 
         // 처음 GPS 데이터가 들어왔을 때 (산책 시작)
         if (isFirst){
-            System.out.println("isFirst 들어옴");
             UserDto user = userService.getUserDtoById(userId);
 
             // FCM 알림 전송 (산책 시작)
             if (user.getFamilyId() != null) {
                 try {
                     fcmService.sendWalkStartNotification(user, user.getFamilyId());
-                    System.out.println("fcm 전송완료");
                 } catch (Exception e) {
                     log.error("산책 시작 알림 전송 실패: {}", e.getMessage());
                     // 알림 전송 실패해도 정상 처리
