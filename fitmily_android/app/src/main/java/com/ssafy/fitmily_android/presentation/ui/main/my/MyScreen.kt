@@ -31,6 +31,7 @@ import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyLogout
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyRecordButtonRow
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTobBar
 import com.ssafy.fitmily_android.presentation.ui.main.my.component.MyTodayExerciseHistory
+import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
 import com.ssafy.fitmily_android.ui.theme.backGroundGray
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
@@ -64,6 +65,7 @@ fun MyScreen(
         for(sideEffect in uiState.mySideEffect ?: return@LaunchedEffect) {
             when (sideEffect) {
                 is MySideEffect.ClearAuthData -> {
+                    WalkLiveData.stopWalkLiveService(context)
                     authDataStore.clear()
                 }
 

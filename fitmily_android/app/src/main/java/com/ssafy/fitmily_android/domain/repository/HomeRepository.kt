@@ -17,7 +17,7 @@ interface HomeRepository {
 
     suspend fun getFamily(familyId: Int): Result<FamilyResponse>
 
-    suspend fun getDashboard(familyId: Int, today: String?): Result<FamilyTodayResponse>
+    suspend fun getDashboard(familyId: Int): Result<FamilyTodayResponse>
 
     suspend fun getFamilyHealth(familyId: Int): Result<FamilyHealthResponse>
 

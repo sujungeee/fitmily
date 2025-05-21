@@ -23,18 +23,23 @@ class WalkMapCaptureHelper(
 
     fun capture() {
         mapView = MapView(context)
+        mapView.visibility = ViewGroup.INVISIBLE
         mapView.onCreate(null)
         mapView.onResume()
 
         val rootView = (context as? Activity)?.window?.decorView as? ViewGroup
-        rootView?.addView(mapView, ViewGroup.LayoutParams(1000, 1000)) // 원하는 사이즈
+        rootView?.addView(mapView, ViewGroup.LayoutParams(300, 300)) // 원하는 사이즈
 
         mapView.getMapAsync(this)
     }
 
     override fun onMapReady(naverMap: NaverMap) {
         val pathOverlay = PathOverlay().apply {
-            coords = path
+            coords = if (path.size<2){
+                listOf(path[0], path[0])
+            } else {
+                path
+            }
             color = 0xFF3498DB.toInt()
             width = 10
         }
@@ -43,7 +48,7 @@ class WalkMapCaptureHelper(
 
         if (path.isNotEmpty()) {
             val center = path[path.size / 2]
-            naverMap.cameraPosition = CameraPosition(center, 15.0)
+            naverMap.cameraPosition = CameraPosition(center, 17.0)
         }
 
         mapView.postDelayed({
