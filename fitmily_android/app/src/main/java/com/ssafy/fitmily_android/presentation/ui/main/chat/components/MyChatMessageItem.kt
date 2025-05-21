@@ -1,6 +1,5 @@
 package com.ssafy.fitmily_android.presentation.ui.main.chat.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,13 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.ssafy.fitmily_android.R
+import coil3.compose.AsyncImage
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 
+private const val TAG = "MyChatMessageItem_fitmily"
 @Composable
 fun MyChatMessageItem(
     myMessage : ChatMessage
@@ -51,7 +50,7 @@ fun MyChatMessageItem(
                 modifier = Modifier.width(4.dp)
             )
 
-            if (myMessage.message != null) { // 채팅 메시지
+            if (myMessage.message != null && myMessage.message != "") { // 채팅 메시지
                 Box(
                     modifier = Modifier
                         .wrapContentWidth()
@@ -73,9 +72,8 @@ fun MyChatMessageItem(
                         .fillMaxWidth(0.5f)
                         .aspectRatio(1f)
                 ) {
-                    Image(
-                        // TODO: 채팅 이미지 삽입
-                        painter = painterResource(R.drawable.tmp_image2)
+                    AsyncImage(
+                        model = myMessage.imageUrl
                         , contentDescription = "갤러리 이미지"
                         , contentScale = ContentScale.Crop
                         , alignment = Alignment.Center
