@@ -393,8 +393,7 @@ public class FcmService {
             try {
                 // notification 테이블에 알림 추가
                 // 이 부분에서 com.d208.fitmily.domain.notification.entity.Notification을 사용
-                com.d208.fitmily.domain.notification.entity.Notification dbNotification =
-                        new com.d208.fitmily.domain.notification.entity.Notification();
+                com.d208.fitmily.domain.notification.entity.Notification dbNotification = new com.d208.fitmily.domain.notification.entity.Notification();
                 dbNotification.setUserId(tokenDto.getUserId());
                 dbNotification.setNotificationType("WALK"); // WALK_START 대신 WALK로 통일
                 dbNotification.setNotificationSenderId(walker.getUserId());

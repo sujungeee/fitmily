@@ -45,6 +45,7 @@ public class AwsS3Service {
 
             // Presigned URL 생성
             PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+            System.out.println("url 생성완료 ");
             return presignedRequest.url().toString();
 
         } catch (Exception e) {
@@ -58,10 +59,10 @@ public class AwsS3Service {
         if (fileName == null || fileName.isBlank()) {
             return null;
         }
-        if (!doesObjectExist(fileName)) {
-            log.warn("❌ Presigned URL 생성 실패 - 파일이 존재하지 않음: {}", fileName);
-            return null;
-        }
+//        if (!doesObjectExist(fileName)) {
+//            log.warn("❌ Presigned URL 생성 실패 - 파일이 존재하지 않음: {}", fileName);
+//            return null;
+//        }
 
         try {
             S3Presigner presigner = awsS3Config.s3Presigner();
