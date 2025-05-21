@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,7 +54,11 @@ fun ChatScreen(
     activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
     val uiState by chatViewModel.chatUiState.collectAsState()
+
     val images = remember { mutableStateListOf<Uri>() }
+    var chatSize by remember { mutableStateOf(0) }
+    var showGalleryBar by remember { mutableStateOf(false) }
+    val scrollState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         val authDataStore = MainApplication.getInstance().getDataStore()
@@ -61,6 +66,12 @@ fun ChatScreen(
         if (familyId != 0) {
             chatViewModel.getFamilyInfo(familyId)
             chatViewModel.initStomp()
+        }
+    }
+
+    LaunchedEffect(showGalleryBar) {
+        if (showGalleryBar && chatSize > 0) {
+            scrollState.scrollToItem(chatSize - 1)
         }
     }
 
@@ -73,7 +84,6 @@ fun ChatScreen(
         }
     }
 
-    var showGalleryBar by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier
@@ -95,6 +105,10 @@ fun ChatScreen(
                         .fillMaxWidth()
                         .weight(1f)
                         .imePadding()
+                    , scrollState = scrollState
+                    , onSizeChanged =  {
+                        chatSize = it
+                    }
                 )
 
                 if (showGalleryBar && images.isNotEmpty()) {
