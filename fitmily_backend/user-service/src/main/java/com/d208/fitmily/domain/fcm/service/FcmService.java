@@ -1,6 +1,5 @@
 package com.d208.fitmily.domain.fcm.service;
 
-import com.d208.fitmily.domain.chat.entity.ChatMessage;
 import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import com.d208.fitmily.domain.fcm.dto.FcmTokenDTO;
 import com.d208.fitmily.domain.fcm.entity.Fcm;
@@ -8,18 +7,16 @@ import com.d208.fitmily.domain.fcm.mapper.FcmMapper;
 import com.d208.fitmily.domain.notification.mapper.NotificationMapper;
 import com.d208.fitmily.domain.user.entity.User;
 import com.d208.fitmily.domain.user.mapper.UserMapper;
+import com.d208.fitmily.domain.walk.dto.UserDto;
 import com.google.firebase.messaging.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -82,7 +79,7 @@ public class FcmService {
     /**
      * 콕 찌르기 알림 전송
      */
-    public void sendPokeNotification(User sender, User target, int pokeId, LocalDateTime timestamp) {
+    public void sendPokeNotification(UserDto sender, UserDto target, int pokeId, LocalDateTime timestamp) {
         log.info("콕 찌르기 알림 전송: sender={}, target={}, pokeId={}",
                 sender.getUserId(), target.getUserId(), pokeId);
 
@@ -114,53 +111,38 @@ public class FcmService {
     }
 
     /**
-     * 챌린지 알림 전송
+     * 콕 찌르기 알림 메시지 생성
      */
-    public void sendChallengeNotification(int familyId, int challengeId, String startDate, String endDate, int targetDistance) {
-        log.info("챌린지 알림 전송: familyId={}, challengeId={}", familyId, challengeId);
+    private Message createPokeNotificationMessage(UserDto sender, int pokeId, LocalDateTime timestamp, String token) {
+        // Data 페이로드
+        Map<String, String> data = new HashMap<>();
+        data.put("type", "POKE");
+        data.put("id", String.valueOf(pokeId));
+        data.put("senderId", String.valueOf(sender.getUserId()));
 
-        // 가족 구성원 조회 (FamilyMapper 사용)
-        List<User> familyMembers = familyMapper.findFamilyMembers(familyId);
+        String senderName = sender.getUserNickname() != null ? sender.getUserNickname() : "사용자";
+        data.put("senderName", senderName);
 
-        if (familyMembers.isEmpty()) {
-            log.warn("가족 구성원이 없음: familyId={}", familyId);
-            return;
-        }
+        data.put("timestamp", timestamp.format(DateTimeFormatter.ISO_DATE_TIME));
 
-        LocalDateTime now = LocalDateTime.now();
+        // 알림 정보
+        com.google.firebase.messaging.Notification notification = com.google.firebase.messaging.Notification.builder()
+                .setTitle("콕 찌르기")
+                .setBody(senderName + "님이 당신에게 산책을 장려했어요!")
+                .build();
 
-        // 각 가족 구성원에게 알림 저장 및 전송
-        for (User member : familyMembers) {
-            // 애플리케이션 내부 알림 저장 (명확한 클래스 경로 사용)
-            com.d208.fitmily.domain.notification.entity.Notification notification =
-                    new com.d208.fitmily.domain.notification.entity.Notification();
-            notification.setUserId(member.getUserId());
-            notification.setNotificationType("CHALLENGE");
-            notification.setNotificationSenderId(0); // 시스템 알림 - 발신자 없음
-            notification.setNotificationReceiverId(member.getUserId());
-            notification.setNotificationResourceId(challengeId); // 챌린지 ID 저장
-            notification.setNotificationContent("새로운 주간 산책 챌린지가 시작되었습니다. 목표 거리 " + targetDistance + "km, 가족들과 함께 도전해보세요!");
-            notification.setNotificationIsRead(0);
-            notification.setNotificationCreatedAt(now);
-            notification.setNotificationUpdatedAt(now);
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                        .setChannelId("poke_channel")
+                        .build())
+                .build();
 
-            notificationMapper.insertNotification(notification);
-
-            // FCM 알림 전송
-            List<Fcm> tokens = fcmMapper.findByUserId(member.getUserId());
-
-            for (Fcm fcm : tokens) {
-                try {
-                    Message message = createChallengeNotificationMessage(
-                            challengeId, startDate, endDate, targetDistance, fcm.getFcmToken());
-
-                    String response = firebaseMessaging.send(message);
-                    log.info("챌린지 알림 전송 성공: userId={}, response={}", member.getUserId(), response);
-                } catch (FirebaseMessagingException e) {
-                    // 오류 처리 (기존 코드 유지)
-                }
-            }
-        }
+        return Message.builder()
+                .setToken(token)
+                .putAllData(data)
+                .setNotification(notification)
+                .setAndroidConfig(androidConfig)
+                .build();
     }
 
     /**
@@ -201,46 +183,6 @@ public class FcmService {
                 }
             }
         }
-    }
-
-    /**
-     * 콕 찌르기 알림 메시지 생성
-     */
-    private Message createPokeNotificationMessage(User sender, int pokeId, LocalDateTime timestamp, String token) {
-        // Data 페이로드
-        Map<String, String> data = new HashMap<>();
-        data.put("type", "POKE");
-        data.put("id", String.valueOf(pokeId));
-        data.put("senderId", String.valueOf(sender.getUserId()));
-
-        // null 체크 추가 - 닉네임이 null이면 기본값 사용
-        String senderName = sender.getUserNickname();
-        if (senderName == null) {
-            senderName = "사용자"; // 기본값 설정
-        }
-        data.put("senderName", senderName);
-
-        data.put("timestamp", timestamp.format(DateTimeFormatter.ISO_DATE_TIME));
-
-        // 알림 정보 (닉네임에 null 체크 추가)
-        com.google.firebase.messaging.Notification notification = com.google.firebase.messaging.Notification.builder()
-                .setTitle("콕 찌르기")
-                .setBody(senderName + "님이 당신에게 산책을 장려했어요!")
-                .build();
-
-        // Android 설정
-        AndroidConfig androidConfig = AndroidConfig.builder()
-                .setNotification(AndroidNotification.builder()
-                        .setChannelId("poke_channel")
-                        .build())
-                .build();
-
-        return Message.builder()
-                .setToken(token)
-                .putAllData(data)
-                .setNotification(notification)
-                .setAndroidConfig(androidConfig)
-                .build();
     }
 
     /**
@@ -425,5 +367,206 @@ public class FcmService {
                 .setNotification(notification)
                 .setAndroidConfig(androidConfig)
                 .build();
+    }
+    /**
+     * 산책 시작 알림 전송
+     */
+    public void sendWalkStartNotification(UserDto walker, int familyId) {
+        log.info("산책 시작 알림 전송: userId={}, familyId={}", walker.getUserId(), familyId);
+
+        // 가족 구성원의 FCM 토큰 조회 (본인 제외)
+        List<FcmTokenDTO> familyTokens = fcmMapper.findTokensByFamilyIdExceptUser(familyId, walker.getUserId());
+
+        if (familyTokens.isEmpty()) {
+            log.warn("알림을 받을 가족 구성원의 FCM 토큰이 없음: familyId={}", familyId);
+            return;
+        }
+
+        // 알림 메시지 생성
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+        String notificationContent = walkerName + "님이 산책을 시작했어요! 함께 산책해보세요.";
+        LocalDateTime now = LocalDateTime.now();
+
+        for (FcmTokenDTO tokenDto : familyTokens) {
+            try {
+                // notification 테이블에 알림 추가
+                // 이 부분에서 com.d208.fitmily.domain.notification.entity.Notification을 사용
+                com.d208.fitmily.domain.notification.entity.Notification dbNotification =
+                        new com.d208.fitmily.domain.notification.entity.Notification();
+                dbNotification.setUserId(tokenDto.getUserId());
+                dbNotification.setNotificationType("WALK"); // WALK_START 대신 WALK로 통일
+                dbNotification.setNotificationSenderId(walker.getUserId());
+                dbNotification.setNotificationReceiverId(tokenDto.getUserId());
+                dbNotification.setNotificationResourceId(walker.getUserId()); // 산책 시작자 ID를 resourceId로 저장
+                dbNotification.setNotificationContent(notificationContent);
+                dbNotification.setNotificationIsRead(0);
+                dbNotification.setNotificationCreatedAt(now);
+                dbNotification.setNotificationUpdatedAt(now);
+
+                notificationMapper.insertNotification(dbNotification);
+                log.info("산책 시작 알림 저장 완료: userId={}", tokenDto.getUserId());
+
+                // FCM 메시지 생성 (Message 객체 이름 변경)
+                Message fcmMessage = createWalkStartNotificationMessage(walker, tokenDto.getToken());
+
+                // 메시지 전송
+                String response = firebaseMessaging.send(fcmMessage);
+                log.info("산책 시작 알림 전송 성공: userId={}, response={}", tokenDto.getUserId(), response);
+            } catch (FirebaseMessagingException e) {
+                log.error("산책 시작 알림 전송 실패: userId={}, token={}, error={}",
+                        tokenDto.getUserId(), tokenDto.getToken(), e.getMessage());
+                if (isInvalidTokenError(e)) {
+                    Fcm fcm = fcmMapper.findByUserIdAndFcmToken(tokenDto.getUserId(), tokenDto.getToken());
+                    if (fcm != null) {
+                        fcmMapper.deleteFcmToken(fcm.getFcmId());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("산책 시작 알림 처리 중 오류: userId={}, error={}", tokenDto.getUserId(), e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 산책 종료 알림 전송
+     */
+    public void sendWalkEndNotification(UserDto walker, int familyId, float distance, int calories, long durationMinutes) {
+        log.info("산책 종료 알림 전송: userId={}, familyId={}, distance={}, calories={}",
+                walker.getUserId(), familyId, distance, calories);
+
+        // 가족 구성원의 FCM 토큰 조회 (본인 제외)
+        List<FcmTokenDTO> familyTokens = fcmMapper.findTokensByFamilyIdExceptUser(familyId, walker.getUserId());
+
+        if (familyTokens.isEmpty()) {
+            log.warn("알림을 받을 가족 구성원의 FCM 토큰이 없음: familyId={}", familyId);
+            return;
+        }
+
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+        String distanceStr = String.format("%.1f", distance);
+        String durationStr = formatDuration(durationMinutes);
+        String notificationContent = walkerName + "님이 " + distanceStr + "km 산책을 완료했어요! (" + durationStr + ", " + calories + "kcal)";
+        LocalDateTime now = LocalDateTime.now();
+
+        for (FcmTokenDTO tokenDto : familyTokens) {
+            try {
+                // notification 테이블에 알림 추가
+                com.d208.fitmily.domain.notification.entity.Notification dbNotification =
+                        new com.d208.fitmily.domain.notification.entity.Notification();
+                dbNotification.setUserId(tokenDto.getUserId());
+                dbNotification.setNotificationType("WALK");
+                dbNotification.setNotificationSenderId(walker.getUserId());
+                dbNotification.setNotificationReceiverId(tokenDto.getUserId());
+                dbNotification.setNotificationResourceId(walker.getUserId());
+                dbNotification.setNotificationContent(notificationContent);
+                dbNotification.setNotificationIsRead(0);
+                dbNotification.setNotificationCreatedAt(now);
+                dbNotification.setNotificationUpdatedAt(now);
+
+                notificationMapper.insertNotification(dbNotification);
+                log.info("산책 종료 알림 저장 완료: userId={}", tokenDto.getUserId());
+
+                // FCM 메시지 생성
+                Message fcmMessage = createWalkEndNotificationMessage(walker, distance, calories, durationMinutes, tokenDto.getToken());
+
+                // 메시지 전송
+                String response = firebaseMessaging.send(fcmMessage);
+                log.info("산책 종료 알림 전송 성공: userId={}, response={}", tokenDto.getUserId(), response);
+            } catch (FirebaseMessagingException e) {
+                log.error("산책 종료 알림 전송 실패: userId={}, token={}, error={}",
+                        tokenDto.getUserId(), tokenDto.getToken(), e.getMessage());
+                // 나머지 코드...
+            } catch (Exception e) {
+                log.error("산책 종료 알림 처리 중 오류: userId={}, error={}", tokenDto.getUserId(), e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 산책 시작 알림 메시지 생성
+     */
+    private Message createWalkStartNotificationMessage(UserDto walker, String token) {
+        // Data 페이로드
+        Map<String, String> data = new HashMap<>();
+        data.put("type", "WALK_START");
+        data.put("id", String.valueOf(walker.getUserId()));
+        data.put("senderId", String.valueOf(walker.getUserId()));
+        data.put("senderName", walker.getUserNickname() != null ? walker.getUserNickname() : "가족");
+        data.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+
+        // 알림 정보
+        Notification notification = Notification.builder()
+                .setTitle("산책 알림")
+                .setBody(walkerName + "님이 산책을 시작했어요! 함께 산책해보세요.")
+                .build();
+
+        // Android 설정
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                        .setChannelId("walk_channel")
+                        .build())
+                .build();
+
+        return Message.builder()
+                .setToken(token)
+                .putAllData(data)
+                .setNotification(notification)
+                .setAndroidConfig(androidConfig)
+                .build();
+    }
+
+    /**
+     * 산책 종료 알림 메시지 생성
+     */
+    private Message createWalkEndNotificationMessage(UserDto walker, float distance, int calories, long durationMinutes, String token) {
+        // Data 페이로드
+        Map<String, String> data = new HashMap<>();
+        data.put("type", "WALK_END");
+        data.put("id", String.valueOf(walker.getUserId()));
+        data.put("senderId", String.valueOf(walker.getUserId()));
+        data.put("senderName", walker.getUserNickname() != null ? walker.getUserNickname() : "가족");
+        data.put("distance", String.format("%.1f", distance));
+        data.put("calories", String.valueOf(calories));
+        data.put("duration", String.valueOf(durationMinutes));
+        data.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+        String walkerName = walker.getUserNickname() != null ? walker.getUserNickname() : "가족";
+        String distanceStr = String.format("%.1f", distance);
+        String durationStr = formatDuration(durationMinutes);
+
+        // 알림 정보
+        Notification notification = Notification.builder()
+                .setTitle("산책 완료")
+                .setBody(walkerName + "님이 " + distanceStr + "km 산책을 완료했어요! (" + durationStr + ", " + calories + "kcal)")
+                .build();
+
+        // Android 설정
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                        .setChannelId("walk_channel")
+                        .build())
+                .build();
+
+        return Message.builder()
+                .setToken(token)
+                .putAllData(data)
+                .setNotification(notification)
+                .setAndroidConfig(androidConfig)
+                .build();
+    }
+
+    /**
+     * 시간(분) 포맷팅
+     */
+    private String formatDuration(long minutes) {
+        if (minutes < 60) {
+            return minutes + "분";
+        } else {
+            long hours = minutes / 60;
+            long mins = minutes % 60;
+            return hours + "시간 " + (mins > 0 ? mins + "분" : "");
+        }
     }
 }

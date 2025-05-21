@@ -168,4 +168,71 @@ public interface ExerciseGoalMapper {
     })
     List<ExerciseGoal> findUserGoalsByDate(@Param("userId") int userId, @Param("date") String date);
 
+    // 특정 날짜의 전체 운동 목표 진행률 계산
+    @Select("""
+    SELECT COALESCE(ROUND(AVG(
+        CASE
+            WHEN eg.exercise_goal_name = '산책' THEN
+                CASE
+                    WHEN w_distance.total_distance IS NULL THEN 0
+                    WHEN w_distance.total_distance >= CAST(eg.exercise_goal_value AS DECIMAL(10,1)) THEN 100
+                    ELSE (w_distance.total_distance / CAST(eg.exercise_goal_value AS DECIMAL(10,1))) * 100
+                END
+            ELSE
+                CASE
+                    WHEN e_counts.count_sum IS NULL THEN 0
+                    WHEN e_counts.count_sum >= CAST(eg.exercise_goal_value AS DECIMAL(10,1)) THEN 100
+                    ELSE (e_counts.count_sum / CAST(eg.exercise_goal_value AS DECIMAL(10,1))) * 100
+                END
+        END
+    )), 0) as progress
+    FROM exercise_goal eg
+    LEFT JOIN (
+        SELECT e.exercise_name, SUM(e.exercise_count) AS count_sum
+        FROM exercise e
+        WHERE e.user_id = #{userId} AND DATE(e.exercise_created_at) = #{date}
+        GROUP BY e.exercise_name
+    ) e_counts ON eg.exercise_goal_name = e_counts.exercise_name
+    LEFT JOIN (
+        SELECT SUM(w.walk_distance) AS total_distance
+        FROM walk w
+        WHERE w.user_id = #{userId} AND DATE(w.walk_created_at) = #{date}
+    ) w_distance ON eg.exercise_goal_name = '산책'
+    WHERE eg.user_id = #{userId}
+      AND DATE(eg.exercise_goal_created_at) = #{date}
+    """)
+    int calculateProgressByDate(@Param("userId") Integer userId, @Param("date") String date);
+
+    // 특정 날짜의 사용자 운동 목표 목록 조회
+    /**
+     * 특정 날짜에 생성된 운동 목표만 조회하도록 매퍼 수정
+     */
+    @Select("""
+    SELECT
+        eg.exercise_goal_id,
+        eg.exercise_goal_name,
+        eg.exercise_goal_value,
+        CASE
+            WHEN eg.exercise_goal_name = '산책' THEN
+                COALESCE(
+                    (SELECT SUM(w.walk_distance)
+                     FROM walk w
+                     WHERE w.user_id = #{userId} AND DATE(w.walk_created_at) = #{date}),
+                    0
+                )
+            ELSE
+                COALESCE(
+                    (SELECT SUM(e.exercise_count)
+                     FROM exercise e
+                     WHERE e.user_id = #{userId}
+                       AND e.exercise_name = eg.exercise_goal_name
+                       AND DATE(e.exercise_created_at) = #{date}),
+                    0
+                )
+        END AS exercise_record_value
+    FROM exercise_goal eg
+    WHERE eg.user_id = #{userId}
+      AND DATE(eg.exercise_goal_created_at) = #{date}
+    """)
+    List<Map<String, Object>> selectGoalsByUserIdAndDate(@Param("userId") Integer userId, @Param("date") String date);
 }

@@ -13,6 +13,7 @@ import com.d208.fitmily.domain.family.mapper.FamilyMapper;
 import com.d208.fitmily.domain.health.dto.HealthResponseDto;
 import com.d208.fitmily.domain.health.mapper.HealthMapper;
 import com.d208.fitmily.domain.user.entity.User;
+import com.d208.fitmily.domain.walkchallenge.service.WalkChallengeService;
 import com.d208.fitmily.global.common.exception.CustomException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,6 +45,7 @@ public class FamilyService {
     private final HealthMapper healthMapper;
     private final ObjectMapper objectMapper;
     private final ChatMessageService chatMessageService;
+    private final WalkChallengeService walkChallengeService;
 
     private static final int MAX_FAMILY_MEMBERS = 6;
 
@@ -70,6 +72,9 @@ public class FamilyService {
 
         // 채팅방 초기화 - 시스템 메시지 전송
         initializeChat(String.valueOf(family.getFamilyId()), "system");
+
+        // 가족 생성 시 산책 챌린지 생성
+        walkChallengeService.handleUserJoinFamily(userId, family.getFamilyId());
 
         return family.getFamilyId();
     }
@@ -108,6 +113,9 @@ public class FamilyService {
 
             // 패밀리 인원 수 증가
             familyMapper.incrementFamilyPeople(familyId);
+
+            // 가족 가입 시 산책 챌린지 업데이트
+            walkChallengeService.handleUserJoinFamily(userId, familyId);
 
             return familyId;
         } catch (Exception e) {
