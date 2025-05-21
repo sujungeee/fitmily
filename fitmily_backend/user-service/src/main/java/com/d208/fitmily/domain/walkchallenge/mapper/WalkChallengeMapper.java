@@ -152,4 +152,40 @@ public interface WalkChallengeMapper {
         WHERE DATE_ADD(walk_challenge_start_date, INTERVAL 7 DAY) = #{endDate}
         """)
     List<WalkChallengeDto> findChallengesEndingOn(@Param("endDate") LocalDate endDate);
+    // 챌린지 목표 거리 업데이트
+    @Update("""
+    UPDATE walk_challenge
+    SET walk_challenge_target_distance = #{newTargetDistance}
+    WHERE challenge_id = #{challengeId}
+    """)
+    int updateChallengeTargetDistance(
+            @Param("challengeId") Integer challengeId,
+            @Param("newTargetDistance") Integer newTargetDistance
+    );
+
+    // 사용자가 챌린지에 이미 등록되어 있는지 확인
+    @Select("""
+    SELECT COUNT(*)
+    FROM user_walk_challenge
+    WHERE user_id = #{userId} AND challenge_id = #{challengeId}
+    """)
+    int countUserInChallenge(
+            @Param("userId") Integer userId,
+            @Param("challengeId") Integer challengeId
+    );
+
+    /**
+     * ID로 챌린지 조회 (관계 없이)
+     */
+    @Select("""
+    SELECT 
+        challenge_id as challengeId,
+        family_id as familyId,
+        walk_challenge_target_distance as targetDistance,
+        walk_challenge_start_date as startDate
+    FROM walk_challenge
+    WHERE challenge_id = #{challengeId}
+    """)
+    WalkChallengeDto findByIdWithoutRelations(@Param("challengeId") Integer challengeId);
+
 }

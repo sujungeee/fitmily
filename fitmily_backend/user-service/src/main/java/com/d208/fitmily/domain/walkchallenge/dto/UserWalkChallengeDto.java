@@ -1,12 +1,14 @@
 package com.d208.fitmily.domain.walkchallenge.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserWalkChallengeDto {
+    private Integer userWalkChallengeId; // 이 필드 추가
     private Integer userId;
     private Integer challengeId;
     private Float distance;
