@@ -5,4 +5,4 @@ data class FamilyCalendarCalendar(
     val userFamilySequence: Int,
     val userId: Int,
     val userNickname: String
-)
+)   
