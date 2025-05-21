@@ -71,25 +71,24 @@ public class WalkService {
 
         walkMapper.insertStopWalk(stopWalkDto);
 
-        // 산책 챌린지 거리 업데이트
-        walkChallengeService.updateChallengeDistance(stopWalkDto);
+//        // 산책 챌린지 거리 업데이트
+//        walkChallengeService.updateChallengeDistance(stopWalkDto);
 
-        // FCM 알림 전송 (산책 종료)
-        if (userDto.getFamilyId() != null) {
-            try {
-                fcmService.sendWalkEndNotification(
-                        userDto,
-                        userDto.getFamilyId(),
-                        dto.getWalkDistance(),
-                        walkCalories,
-                        walkingTime
-                );
-            } catch (Exception e) {
-                log.error("산책 종료 알림 전송 실패: {}", e.getMessage());
-                // 알림 전송 실패해도 정상 처리
-            }
-        }
-
+//        // FCM 알림 전송 (산책 종료)
+//        if (userDto.getFamilyId() != null) {
+//            try {
+//                fcmService.sendWalkEndNotification(
+//                        userDto,
+//                        userDto.getFamilyId(),
+//                        dto.getWalkDistance(),
+//                        walkCalories,
+//                        walkingTime
+//                );
+//            } catch (Exception e) {
+//                log.error("산책 종료 알림 전송 실패: {}", e.getMessage());
+//                // 알림 전송 실패해도 정상 처리
+//            }
+//        }
         //gps 데이터 삭제
         gpsRedisService.removeWalkData(userId);
 
