@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetDashboardUseCase @Inject constructor(
     private val homeRepository: HomeRepository
 ) {
-    suspend operator fun invoke(familyId: Int, today: String?): Result<FamilyTodayResponse> {
-        return homeRepository.getDashboard(familyId, today)
+    suspend operator fun invoke(familyId: Int): Result<FamilyTodayResponse> {
+        return homeRepository.getDashboard(familyId)
     }
 }

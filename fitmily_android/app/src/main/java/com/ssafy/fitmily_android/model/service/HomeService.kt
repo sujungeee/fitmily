@@ -33,7 +33,6 @@ interface HomeService {
     @GET("family/{familyId}/dashboard")
     suspend fun getDashboard(
         @Path("familyId") familyId: Int,
-        @Query("date") today: String?
     ): Response<FamilyTodayResponse>
 
     @GET("family/{familyId}/health-status")
