@@ -1,5 +1,6 @@
 package com.ssafy.fitmily_android.presentation.ui.main.family.detail
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,8 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.google.gson.Gson
 import com.kizitonwose.calendar.sample.compose.FamilyWeekCalendar
+import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.presentation.ui.main.family.detail.component.FamilyDateBottomSheet
 import com.ssafy.fitmily_android.presentation.ui.main.family.detail.component.FamilyStatsItem
 import com.ssafy.fitmily_android.presentation.ui.main.my.notification.component.FamilyDetailTopBar
@@ -33,24 +39,32 @@ import com.ssafy.fitmily_android.ui.theme.familySecond
 import com.ssafy.fitmily_android.ui.theme.familyThird
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun FamilyDetailScreen(
     navController: NavHostController,
-    dateText: String = "2025.04.25",
+    date: String,
+    familyDetailViewModel: FamilyDetailViewModel = hiltViewModel()
 ) {
 
+    val familyDetailUiState by familyDetailViewModel.familyDetailUiState.collectAsState()
+    val authDataStore = MainApplication.getInstance().getDataStore()
+    var familyId by remember { mutableStateOf(1) }
     var monthText by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var selectedDate by remember { mutableStateOf(LocalDate.parse(date)) }
 
-    val statsList = listOf(
-        FamilyMemberStats("예지렐라", familyFirst, 100, 1550, "6시간 23분"),
-        FamilyMemberStats("수미동산", familySecond, 80, 1550, "6시간 23분"),
-        FamilyMemberStats("수정아귀", familyThird, 38, 1550, "6시간 23분"),
-        FamilyMemberStats("동욱카이", familyThird, 77, 1550, "6시간 23분"),
-        FamilyMemberStats("용성예신", familyThird, 38, 1550, "6시간 23분"),
-    )
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val dateText = selectedDate.format(dateFormatter)
+
+    LaunchedEffect(selectedDate) {
+        familyId = authDataStore.getFamilyId()
+        familyDetailViewModel.getFamilyDailyInfo(
+            familyId = 1, /* TODO familyId로 바꾸기 */
+            date = dateText
+        )
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -69,6 +83,8 @@ fun FamilyDetailScreen(
         // 주간 캘린더 영역
         item {
             FamilyWeekCalendar(
+                selectedDate = selectedDate,
+                onDateChange = { selectedDate = it },
                 onWeekRangeChange = { month ->
                     monthText = month
                 }
@@ -91,14 +107,15 @@ fun FamilyDetailScreen(
         }
 
         // 해당 날짜별 가족 운동 대시보드
-        items(statsList) { stats ->
+        items(familyDetailUiState.familyDailyResponse?.members ?: emptyList()) { stats ->
             Box(
                 modifier = Modifier.padding(horizontal = 28.dp)
             ) {
                 FamilyStatsItem(
                     stats = stats,
                     onClick = {
-                        navController.navigate("family/exercise")
+                        val memberJson = Uri.encode(Gson().toJson(stats))
+                        navController.navigate("family/exercise/$dateText/$memberJson")
                     }
                 )
             }
@@ -112,19 +129,9 @@ fun FamilyDetailScreen(
         onDateChange = { selectedDate = it },
         onTodayClick = { selectedDate = LocalDate.now()},
         onConfirmClick = {
-            /* TODO 날짜 선택 확정 로직 */
             monthText = "${selectedDate.year}.${selectedDate.monthValue}"
             showBottomSheet = false
         },
         onDismissClick = { showBottomSheet = false }
     )
 }
-
-
-data class FamilyMemberStats(
-    val name: String,
-    val color: Color,
-    val progress: Int, // 0~100
-    val kcal: Int,
-    val duration: String // "6시간 23분"
-)

@@ -18,6 +18,7 @@ import com.kizitonwose.calendar.sample.compose.FamilyCalendar
 import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.presentation.ui.main.family.component.FamilyNameDotFlowRow
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -53,7 +54,8 @@ fun FamilyScreen(
             modifier = Modifier.weight(1f),
             indicatorMap = familyViewModel.buildIndicatorMap(calendarData),
             onDayClick = { day ->
-                navController.navigate("family/detail")
+                val dateText = day.date.format(DateTimeFormatter.ISO_DATE)
+                navController.navigate("family/detail/$dateText")
             }
         )
 
