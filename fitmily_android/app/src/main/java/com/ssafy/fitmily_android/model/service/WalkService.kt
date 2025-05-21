@@ -22,7 +22,7 @@ interface WalkService {
     suspend fun getWalkHistory(
     ): Response<WalkHistoryResponse>
 
-    @GET("gps/{userId}")
+    @GET("walks/gps/{userId}")
     suspend fun getWalkPath(
         @Path("userId") userId: Int
     ): Response<WalkPathResponse>

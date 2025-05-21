@@ -26,12 +26,16 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,6 +61,7 @@ import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.PathOverlay
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.compose.rememberFusedLocationSource
+import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.model.dto.request.walk.WalkEndRequest
 import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
@@ -64,11 +69,13 @@ import com.ssafy.fitmily_android.presentation.ui.main.home.component.ProfileItem
 import com.ssafy.fitmily_android.presentation.ui.main.walk.component.StopWalkDialog
 import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkLiveData
 import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WalkMapCaptureHelper
+import com.ssafy.fitmily_android.presentation.ui.main.walk.live.WebSocketManager
 import com.ssafy.fitmily_android.ui.theme.mainBlue
 import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.ui.theme.secondaryBlue
 import com.ssafy.fitmily_android.util.LocationUtil
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.time.Instant
@@ -89,32 +96,54 @@ fun WalkScreen(
 
     val context = LocalContext.current
 
-
+    val walkUiState by walkViewModel.uiState.collectAsState()
 
     var isWalking = remember { mutableStateOf(false) }
     var isDialogOpen = remember { mutableStateOf(false) }
-    var watching = remember { mutableStateOf(0) }
+    var watching = remember { mutableStateOf(-1) }
 
     var path = remember { mutableStateOf(listOf<LatLng>()) }
     var bitmapa = remember { mutableStateOf<Bitmap?>(null) }
     val elapsedTime = remember { mutableStateOf(0L) }
     val totalDistance = remember { mutableStateOf(0.0) }
-    LaunchedEffect(WalkLiveData.gpsList.value) {
-        Log.d(TAG, "WalkScreen: ${WalkLiveData.gpsList.value}")
-        WalkLiveData.gpsList.value?.let { list ->
-            path.value = list.map {
-                LatLng(it.lat, it.lon)
-            }
-            totalDistance.value = calculateTotalDistance(path.value)
-        }
-    }
+    val coroutineScope = rememberCoroutineScope()
+
+    var familyId : Int
+
+    val countdown = remember { mutableStateOf(-1) }
 
     LaunchedEffect(WalkLiveData.isServiceRunning) {
         isWalking.value = WalkLiveData.isServiceRunning.value
     }
 
+
+
+    LaunchedEffect(WalkLiveData.gpsList.value) {
+        Log.d(TAG, "WalkScreen: ${WalkLiveData.gpsList.value}")
+            WalkLiveData.gpsList.value?.let { list ->
+                path.value = list.map {
+                    LatLng(it.lat, it.lon)
+                }
+                totalDistance.value = calculateTotalDistance(path.value)
+        }
+    }
+    LaunchedEffect(WalkLiveData.otherData){
+        if (!isWalking.value) {
+        if (WalkLiveData.otherData.value != null) {
+            walkViewModel.updateOtherGpsList(WalkLiveData.otherData.value)
+            path.value = walkUiState.otherGpsList.map {
+                LatLng(it.lat, it.lon)
+            }
+        }
+        }
+    }
+
+
     LaunchedEffect(isWalking.value) {
         if (isWalking.value) {
+
+            elapsedTime.value = 0L
+
             while (true) {
                 val now = System.currentTimeMillis()
                 val started = WalkLiveData.startedTime // Long 값 (ms)
@@ -126,7 +155,17 @@ fun WalkScreen(
                 kotlinx.coroutines.delay(1000L)
             }
         } else {
+            familyId = MainApplication.getInstance().getDataStore().getFamilyId()
+
+            walkViewModel.getWalkingMembers(familyId)
             elapsedTime.value = 0L
+        }
+    }
+
+    LaunchedEffect(watching.value) {
+        if (watching.value != -1) {
+            val tmp = walkUiState.walkingFamilyList[watching.value]
+            walkViewModel.getWalkPath(tmp.userId)
         }
     }
 
@@ -152,6 +191,7 @@ fun WalkScreen(
         }
     )
 
+    Box(){
     Column(
         modifier = Modifier
             .padding(
@@ -243,17 +283,29 @@ fun WalkScreen(
                     .fillMaxWidth(0.5f),
                 horizontalAlignment = Alignment.End
             ) {
-                items(1) { index ->
+                items(walkUiState.walkingFamilyList.size) { index ->
+                    val tmp = walkUiState.walkingFamilyList[index]
                     FilterChip(
                         modifier = Modifier
                             .padding(4.dp)
                             .height(26.dp),
                         onClick = {
+                            if (!WebSocketManager.isConnected) {
+                                WebSocketManager.connectStomp(other = true)
+                            }
+                            if (watching.value != index) {
+                                WebSocketManager.subscribeStomp("/topic/walk/gps/${tmp.userId}")
+
+                                if(watching.value !=-1){
+                                WebSocketManager.unsubscribeStomp("/topic/walk/gps/${walkUiState.walkingFamilyList[watching.value].userId}")
+                                    Log.d(TAG, "WalkScreen: 구독해제 ${walkUiState.walkingFamilyList[watching.value].userId}")
+                                }
+                                }
                             watching.value = index
                         },
                         selected = if(index==watching.value) true else false,
                         label = {
-                            ProfileItem(typography.bodySmall, 1, "내 산책", "mouse",)
+                            ProfileItem(typography.bodySmall, tmp.userFamilySequence, tmp.userNickname, tmp.userZodiacName,)
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = mainWhite,
@@ -277,9 +329,20 @@ fun WalkScreen(
 
                             //foregroundService 종료
                         }else {
-                            isWalking.value = !isWalking.value
+
                             //foregroundService 시작
+                            coroutineScope.launch {
+                                for (i in 3 downTo -1) {
+                                    countdown.value = i
+                                    delay(1000L)
+                                }
+                            }
+
+                            isWalking.value = !isWalking.value
+
                             WalkLiveData.startWalkLiveService(context)
+
+
                         }},
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3498DB)),
@@ -307,7 +370,27 @@ fun WalkScreen(
         }
 
     }
+        if (countdown.value>0){
+        Column(modifier = Modifier.fillMaxSize().background(mainWhite),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            Text(
+                text = "산책을 시작합니다.",
+                style = typography.titleLarge,
+                color = mainBlue,
+            )
+            Text(
+                text = "${countdown.value}",
+                style = typography.displayLarge,
+                color = mainBlue,
+            )
 
+            }
+
+        }
+
+
+    }
 
 
     if (isDialogOpen.value) {
@@ -327,12 +410,11 @@ fun WalkScreen(
                         onCaptured = { bitmap ->
                             bitmap?.let {
                                 bitmapa.value = it
-                                Log.d(TAG, "WalkScreen: ${it}")
-                                Log.d(TAG, "WalkScreensss: ${bitmapToByteArray(it)}")
+                                val dis=totalDistance.value
                                 (context as? LifecycleOwner)?.lifecycleScope?.launch {
                                     walkViewModel.postWalk(
                                         WalkEndRequest(
-                                            walkDistance = totalDistance.value,
+                                            walkDistance = dis,
                                             walkStartTime = Instant.ofEpochMilli(WalkLiveData.startedTime)
                                                 .atZone(ZoneId.systemDefault())
                                                 .toLocalDateTime().toString(),

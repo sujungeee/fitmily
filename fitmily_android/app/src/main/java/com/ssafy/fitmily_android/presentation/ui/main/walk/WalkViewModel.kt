@@ -1,17 +1,15 @@
 package com.ssafy.fitmily_android.presentation.ui.main.walk
 
-import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.fitmily_android.domain.usecase.s3.S3UseCase
-import com.ssafy.fitmily_android.domain.usecase.walk.GetPresignedUrlUseCase
+import com.ssafy.fitmily_android.domain.usecase.s3.GetPresignedUrlUseCase
 import com.ssafy.fitmily_android.domain.usecase.walk.GetWalkGoalExistUseCase
-import com.ssafy.fitmily_android.domain.usecase.walk.GetWalkHistoryUseCase
 import com.ssafy.fitmily_android.domain.usecase.walk.GetWalkPathUseCase
 import com.ssafy.fitmily_android.domain.usecase.walk.GetWalkingMemberUseCase
 import com.ssafy.fitmily_android.domain.usecase.walk.PostWalkUseCase
 import com.ssafy.fitmily_android.model.dto.request.walk.WalkEndRequest
+import com.ssafy.fitmily_android.model.dto.response.walk.GpsDto
 import com.ssafy.fitmily_android.util.ViewModelResultHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import kotlin.coroutines.resume
@@ -37,6 +34,14 @@ class WalkViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(WalkUiState())
     val uiState: StateFlow<WalkUiState> = _uiState.asStateFlow()
+
+
+    fun updateOtherGpsList(otherGpsList: GpsDto?) {
+        if (otherGpsList == null) return
+        _uiState.value.copy(
+            otherGpsList= uiState.value.otherGpsList + otherGpsList
+        )
+    }
 
     fun getWalkGoalExist() {
         viewModelScope.launch {
@@ -116,7 +121,7 @@ class WalkViewModel @Inject constructor(
                 ViewModelResultHandler.handle(
                     result = result,
                     onSuccess = { data ->
-                        continuation.resume(data!!)
+                        continuation.resume(data!!.url)
                     },
                     onError = { msg ->
                         continuation.resumeWithException(Exception("발급 실패"))

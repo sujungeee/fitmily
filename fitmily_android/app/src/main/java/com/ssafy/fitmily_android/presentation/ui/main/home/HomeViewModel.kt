@@ -43,6 +43,27 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    fun loadAllHomeData() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            val familyId = uiState.value.familyId
+
+            if (familyId != 0 && familyId != 100) {
+                val getFamilyDeferred = launch { getFamily() }
+                val getChallengeDeferred = launch { getChallenge() }
+                val getDashboardDeferred = launch { getDashboard() }
+
+                getFamilyDeferred.join()
+                getChallengeDeferred.join()
+                getDashboardDeferred.join()
+            }
+
+            _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+
     fun getFamilyId(){
         viewModelScope.launch {
             val familyId = MainApplication.getInstance().getDataStore().getFamilyId()
