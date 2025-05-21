@@ -133,6 +133,7 @@ public class WalkService {
                 String routeImg = walk.getRouteImg();
                 if (routeImg != null && !routeImg.isBlank()) {
                     String presignedUrl = awsS3Service.generatePresignedDownloadUrl(routeImg);
+                    System.out.println("presignedUrl : " +presignedUrl);
                     walk.setRouteImg(presignedUrl);
                 }
             }
@@ -222,7 +223,6 @@ public class WalkService {
 
         List<UserDto> result = new ArrayList<>();
         for (User user : walkingUsers) {
-            System.out.println("산책중인 사람들" + user.getUserId()+ user.getFamilySequence()+ user.getNickname()+user.getFamilyId());
             if (user == null) continue;
             result.add(UserDto.builder()
                     .userId(user.getUserId())
