@@ -13,7 +13,7 @@ public class SecretLogger {
     @Value("${spring.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${spring.cloud.aws.region}")
+    @Value("${spring.cloud.aws.region.static}")
     private String region;
 
     @PostConstruct
