@@ -1,7 +1,9 @@
 package com.d208.fitmily.domain.exercise.service;
 
+import com.d208.fitmily.domain.exercise.dto.DailyGoalProgressDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalDto;
 import com.d208.fitmily.domain.exercise.dto.ExerciseGoalResponse;
+import com.d208.fitmily.domain.exercise.dto.WeeklyGoalProgressResponse;
 import com.d208.fitmily.domain.exercise.mapper.ExerciseGoalMapper;
 import com.d208.fitmily.global.common.exception.BusinessException;
 import com.d208.fitmily.global.common.exception.ErrorCode;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -154,4 +157,40 @@ public class ExerciseGoalService {
             throw new BusinessException(ErrorCode.EXERCISE_GOAL_DELETE_FAILED);
         }
     }
+
+
+    public WeeklyGoalProgressResponse getWeeklyGoalProgress(int userId) {
+        // 오늘 날짜
+        LocalDate today = LocalDate.now();
+
+        // 7일 전 날짜
+        LocalDate sevenDaysAgo = today.minusDays(6);
+
+        // log.info("조회 기간: {} ~ {}", sevenDaysAgo, today);
+
+        List<DailyGoalProgressDto> dailyProgressList = new ArrayList<>();
+
+        // 7일간의 데이터 조회
+        for (LocalDate date = sevenDaysAgo; !date.isAfter(today); date = date.plusDays(1)) {
+            String dateStr = date.toString();
+
+            // 해당 날짜의 목표 달성률 계산
+            int totalGoals = exerciseGoalMapper.countGoalsByDateAndUser(userId, dateStr);
+            int completedGoals = exerciseGoalMapper.countCompletedGoalsByDateAndUser(userId, dateStr);
+
+            // 목표 달성률 계산 (목표가 없으면 0%)
+            int progressRate = totalGoals > 0 ? (int)Math.round((double)completedGoals / totalGoals * 100) : 0;
+
+            // 결과 목록에 추가
+            dailyProgressList.add(DailyGoalProgressDto.builder()
+                    .date(dateStr)
+                    .exerciseGoalProgress(progressRate)
+                    .build());
+        }
+
+        return WeeklyGoalProgressResponse.builder()
+                .goal(dailyProgressList)
+                .build();
+    }
+
 }
