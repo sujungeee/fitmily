@@ -103,7 +103,7 @@ class WalkViewModel @Inject constructor(
             var response = false
             var preSignedUrl = ""
 
-            preSignedUrl = getPresignedUrl(System.currentTimeMillis().toString())
+            preSignedUrl = getPresignedUrl(walkEndRequest.walkRouteImg)
             response = uploadToS3(preSignedUrl, byteArray)
 
             if (response){
