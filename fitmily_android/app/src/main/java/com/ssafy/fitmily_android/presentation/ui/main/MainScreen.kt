@@ -32,7 +32,7 @@ fun MainScreen(parentNavController: NavHostController, fcmType: String?, fcmId: 
             "POKE" -> "home/main"
             "CHALLENGE" -> "home/main"
             "CHAT" -> "chat/main"
-            "WALK" -> "walk/main"
+            "WALK_START" -> "walk/main"
             else -> "home/main"
         }
         navController.navigate(destination) {

@@ -80,11 +80,10 @@ class WalkLiveWorker(private val context: Context) {
                     System.currentTimeMillis().toString(),
                 )
 
-                Log.d(TAG, "startLocationUpdates: ${WalkLiveData.gpsList.value}")
                 val jsonMessage = Gson().toJson(data)
                 try {
                     WebSocketManager.stompClient.send("/app/walk/gps", jsonMessage).subscribe()
-                    Log.d(TAG, "startLocationUpdates: 스톰프 send")
+
                 } catch (e: Exception) {
                     Log.d(TAG, "startLocationUpdates: ${e.message }")
                 }

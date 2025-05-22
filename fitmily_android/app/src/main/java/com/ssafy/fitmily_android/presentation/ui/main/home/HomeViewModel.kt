@@ -175,7 +175,7 @@ class HomeViewModel @Inject constructor(
 
     fun getDashboard() {
         viewModelScope.launch {
-            val result = getDashboardUseCase(familyId = uiState.value.familyId, today = "2025-05-20")
+            val result = getDashboardUseCase(familyId = uiState.value.familyId)
             ViewModelResultHandler.handle(
                 result = result,
                 onSuccess = { data ->

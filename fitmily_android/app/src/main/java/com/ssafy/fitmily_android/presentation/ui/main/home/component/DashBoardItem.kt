@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ssafy.fitmily_android.model.dto.response.home.FamilyDashboardDto
+import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.util.ProfileUtil
 
@@ -66,7 +67,7 @@ fun DashBoardItem(item: FamilyDashboardDto, onClickPoke: (Int) -> Unit) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomStart
         ) {
-            if (item.goalDtos == null) {
+            if (item.goals.isEmpty()) {
                 Text(
                     modifier = Modifier.fillMaxHeight(0.4f).fillMaxWidth(),
                     text = "설정된 목표가 없습니다.",
@@ -79,13 +80,13 @@ fun DashBoardItem(item: FamilyDashboardDto, onClickPoke: (Int) -> Unit) {
                         .fillMaxWidth()
                         .fillMaxHeight(0.6f),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment = Alignment.Top
                 ) {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(0.55f)
                     ) {
-                        items(item.goalDtos.size) { index ->
-                            GoalItem(item.goalDtos[index], userColor)
+                        items(item.goals.size) { index ->
+                            GoalItem(item.goals[index], userColor)
                         }
                     }
                     Spacer(Modifier.size(20.dp))
@@ -99,8 +100,9 @@ fun DashBoardItem(item: FamilyDashboardDto, onClickPoke: (Int) -> Unit) {
                                 .aspectRatio(1f)
                                 .fillMaxSize(),
                             color = userColor,
+                            trackColor = mainGray,
                             strokeWidth = 8.dp,
-                            progress = 80 / 100f
+                            progress = item.totalProgressRate / 100f,
                         )
 
                         Text(

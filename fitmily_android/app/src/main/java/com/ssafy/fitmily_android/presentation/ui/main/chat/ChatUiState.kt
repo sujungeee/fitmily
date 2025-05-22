@@ -10,5 +10,5 @@ data class ChatUiState(
     val chatPagingData: Flow<PagingData<ChatMessage>> = flowOf(PagingData.empty()) // 기존 채팅
     , val newMessages: List<WSChatResponse> = emptyList() // 웹소켓 채팅
     , val familyName: String = ""
-    , val familyCount: Int = -1
+    , val familyCount: Int = 0
 )

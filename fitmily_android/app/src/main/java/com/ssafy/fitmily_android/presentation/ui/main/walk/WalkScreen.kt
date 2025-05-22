@@ -30,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -54,13 +57,17 @@ import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.compose.CameraPositionState
 import com.naver.maps.map.compose.ExperimentalNaverMapApi
+import com.naver.maps.map.compose.LocationOverlay
 import com.naver.maps.map.compose.LocationTrackingMode
 import com.naver.maps.map.compose.MapProperties
 import com.naver.maps.map.compose.MapUiSettings
+import com.naver.maps.map.compose.Marker
+import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.PathOverlay
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.compose.rememberFusedLocationSource
+import com.naver.maps.map.overlay.OverlayImage
 import com.ssafy.fitmily_android.MainApplication
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.model.dto.request.walk.WalkEndRequest
@@ -75,6 +82,7 @@ import com.ssafy.fitmily_android.ui.theme.mainGray
 import com.ssafy.fitmily_android.ui.theme.mainWhite
 import com.ssafy.fitmily_android.ui.theme.secondaryBlue
 import com.ssafy.fitmily_android.util.LocationUtil
+import com.ssafy.fitmily_android.util.ProfileUtil
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -94,6 +102,9 @@ fun WalkScreen(
     walkViewModel: WalkViewModel = hiltViewModel(),
 )  {
 
+
+    val otherData by WalkLiveData.otherData.collectAsState()
+    val gpsList by WalkLiveData.gpsList.collectAsState()
     val context = LocalContext.current
 
     val walkUiState by walkViewModel.uiState.collectAsState()
@@ -108,9 +119,31 @@ fun WalkScreen(
     val totalDistance = remember { mutableStateOf(0.0) }
     val coroutineScope = rememberCoroutineScope()
 
+    var walkDistanceSnapshot :Double = 1.0
+
     var familyId : Int
 
     val countdown = remember { mutableStateOf(-1) }
+
+    var userId:Int
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(Unit) {
+        val observer = Observer<Boolean> { shouldUpdate ->
+            if (shouldUpdate == true) {
+                coroutineScope.launch {
+                    familyId = MainApplication.getInstance().getDataStore().getFamilyId()
+                    userId = MainApplication.getInstance().getDataStore().getUserId()
+                    walkViewModel.getWalkingMembers(familyId, userId )
+                    WalkLiveData.shouldUpdateOtherGps.value = false
+                }
+            }
+        }
+        WalkLiveData.shouldUpdateOtherGps.observe(lifecycleOwner, observer)
+        onDispose {
+            WalkLiveData.shouldUpdateOtherGps.removeObserver(observer)
+        }
+    }
 
     LaunchedEffect(WalkLiveData.isServiceRunning) {
         isWalking.value = WalkLiveData.isServiceRunning.value
@@ -118,52 +151,46 @@ fun WalkScreen(
 
 
 
-    LaunchedEffect(WalkLiveData.gpsList.value) {
-        Log.d(TAG, "WalkScreen: ${WalkLiveData.gpsList.value}")
-            WalkLiveData.gpsList.value?.let { list ->
-                path.value = list.map {
-                    LatLng(it.lat, it.lon)
-                }
-                totalDistance.value = calculateTotalDistance(path.value)
-        }
-    }
-    LaunchedEffect(WalkLiveData.otherData){
-        if (!isWalking.value) {
-        if (WalkLiveData.otherData.value != null) {
-            walkViewModel.updateOtherGpsList(WalkLiveData.otherData.value)
-            path.value = walkUiState.otherGpsList.map {
+    LaunchedEffect(gpsList) {
+            path.value = gpsList.map {
                 LatLng(it.lat, it.lon)
             }
+            totalDistance.value = calculateTotalDistance(path.value)
+    }
+
+    LaunchedEffect(otherData) {
+        if (!isWalking.value && otherData != null) {
+            walkViewModel.updateOtherGpsList(otherData!!)
         }
+    }
+
+    LaunchedEffect(walkUiState.otherGpsList) {
+        Log.d(TAG, "WalkScreen: ${walkUiState.otherGpsList}")
+        path.value = walkUiState.otherGpsList.map {
+            LatLng(it.lat, it.lon)
         }
     }
 
 
     LaunchedEffect(isWalking.value) {
         if (isWalking.value) {
-
+            walkViewModel.deleteWalkingMembers()
             elapsedTime.value = 0L
 
-            while (true) {
-                val now = System.currentTimeMillis()
-                val started = WalkLiveData.startedTime // Long 값 (ms)
-
-                if (started != 0L) {
-                    elapsedTime.value = (now - started) / 1000L // 초 단위
-                }
-
-                kotlinx.coroutines.delay(1000L)
+            while (isWalking.value) {
+                elapsedTime.value =
+                    ((System.currentTimeMillis() - WalkLiveData.startedTime) / 1000)
+                delay(1000L)
             }
         } else {
-            familyId = MainApplication.getInstance().getDataStore().getFamilyId()
-
-            walkViewModel.getWalkingMembers(familyId)
+            familyId= MainApplication.getInstance().getDataStore().getFamilyId()
+            walkViewModel.getWalkingMembers(familyId, userId= MainApplication.getInstance().getDataStore().getUserId())
             elapsedTime.value = 0L
         }
     }
 
     LaunchedEffect(watching.value) {
-        if (watching.value != -1) {
+        if (watching.value != -1 && watching.value < walkUiState.walkingFamilyList.size) {
             val tmp = walkUiState.walkingFamilyList[watching.value]
             walkViewModel.getWalkPath(tmp.userId)
         }
@@ -181,15 +208,6 @@ fun WalkScreen(
         )
     }
 
-    WalkLiveData.gpsList.observeForever(
-        { list ->
-            if (list.isNotEmpty()) {
-                path.value = list.map {
-                    LatLng(it.lat, it.lon)
-                }
-            }
-        }
-    )
 
     Box(){
     Column(
@@ -270,12 +288,30 @@ fun WalkScreen(
                 },
 
             ){
-                if (path.value.size>2) {
-                    PathOverlay(
-                        coords = path.value,
-                        color = Color(0xFF3498DB),
-                        width = 10.dp,
-                    )
+                if (watching.value != -1 || isWalking.value) {
+                    var icon = R.drawable.cow_icon
+                    var color = mainBlue
+                    if (walkUiState.walkingFamilyList.isNotEmpty() && watching.value != -1) {
+                        icon =
+                            ProfileUtil().typeToProfile(walkUiState.walkingFamilyList[watching.value].userZodiacName) ?: R.drawable.cow_icon
+                        color =
+                            ProfileUtil().seqToColor(walkUiState.walkingFamilyList[watching.value].userFamilySequence)
+                    }
+                    if (path.value.size > 1) {
+                        PathOverlay(
+                            coords = path.value,
+                            color = color,
+                            width = 10.dp,
+                        )
+
+                        LocationOverlay(
+                            position = path.value.last(),
+                            icon = OverlayImage.fromResource(icon?: R.drawable.cow_icon),
+                            zIndex = 1,
+                            iconWidth = 150,
+                            iconHeight = 150,
+                        )
+                    }
                 }
             }
             LazyColumn(
@@ -326,21 +362,18 @@ fun WalkScreen(
                     onClick = {
                         if(isWalking.value){
                             isDialogOpen.value = true
-
                             //foregroundService 종료
                         }else {
 
-                            //foregroundService 시작
                             coroutineScope.launch {
-                                for (i in 3 downTo -1) {
+                                for (i in 3 downTo 0) {
                                     countdown.value = i
                                     delay(1000L)
                                 }
+                                path.value = listOf()
+                                isWalking.value = true
+                                WalkLiveData.startWalkLiveService(context)
                             }
-
-                            isWalking.value = !isWalking.value
-
-                            WalkLiveData.startWalkLiveService(context)
 
 
                         }},
@@ -371,7 +404,9 @@ fun WalkScreen(
 
     }
         if (countdown.value>0){
-        Column(modifier = Modifier.fillMaxSize().background(mainWhite),
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(mainWhite),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
             Text(
@@ -397,11 +432,11 @@ fun WalkScreen(
         StopWalkDialog(
             onDismissRequest = { isDialogOpen.value = false },
             onConfirmation = {
-                isWalking.value = !isWalking.value
-                isDialogOpen.value = false
-                WalkLiveData.stopWalkLiveService(context)
 
-                // 캡처 추가
+                isDialogOpen.value = false
+
+                walkDistanceSnapshot = totalDistance.value
+                Log.d(TAG, "WalkScreen: $walkDistanceSnapshot")
                 if (path.value.isNotEmpty()) {
                     Log.d(TAG, "WalkScreenaa: ${path.value}")
                     WalkMapCaptureHelper(
@@ -410,11 +445,10 @@ fun WalkScreen(
                         onCaptured = { bitmap ->
                             bitmap?.let {
                                 bitmapa.value = it
-                                val dis=totalDistance.value
                                 (context as? LifecycleOwner)?.lifecycleScope?.launch {
                                     walkViewModel.postWalk(
                                         WalkEndRequest(
-                                            walkDistance = dis,
+                                            walkDistance = String.format("%.2f", walkDistanceSnapshot).toDouble(),
                                             walkStartTime = Instant.ofEpochMilli(WalkLiveData.startedTime)
                                                 .atZone(ZoneId.systemDefault())
                                                 .toLocalDateTime().toString(),
@@ -430,9 +464,10 @@ fun WalkScreen(
                         }
                     ).capture()
                 }
+                WalkLiveData.stopWalkLiveService(context)
 
+                isWalking.value = !isWalking.value
                 // 초기화
-                WalkLiveData.gpsList.value = listOf()
                 Toast.makeText(context, "산책이 종료되었습니다.", Toast.LENGTH_SHORT).show()
             }
 
@@ -448,7 +483,7 @@ fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): D
             cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
             sin(dLon / 2).pow(2)
     val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c // 결과 단위: m
+    return (R * c) / 1000.0
 }
 
 fun calculateTotalDistance(path: List<LatLng>): Double {

@@ -35,9 +35,9 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDashboard(familyId: Int, today: String?): Result<FamilyTodayResponse> {
+    override suspend fun getDashboard(familyId: Int): Result<FamilyTodayResponse> {
         return ApiResultHandler.handleApi {
-            homeService.getDashboard(familyId, today)
+            homeService.getDashboard(familyId)
         }
     }
 

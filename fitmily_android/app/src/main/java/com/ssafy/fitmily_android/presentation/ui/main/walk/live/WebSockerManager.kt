@@ -34,15 +34,30 @@ object WebSocketManager {
         )
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
 
-
+//        val heartBeatHandler = Handler(Looper.getMainLooper())
+//        val heartBeatRunnable = object : Runnable {
+//            override fun run() {
+//                if (isConnected) {
+//                    sendStompHeartBeat(stompClient)
+//                    heartBeatHandler.postDelayed(this, 1000)
+//                }
+//            }
+//        }
         stompClient.lifecycle().subscribe { lifecycleEvent ->
             when (lifecycleEvent.type) {
                 LifecycleEvent.Type.OPENED -> {
                     isConnected = true
                     Log.d(TAG, "connectStomp: OPENED")
+//                    heartBeatHandler.post(heartBeatRunnable)
 
-                    if (!other) {
-                        subscribeStomp()
+                    // 이전에 구독했던 topic을 모두 재구독
+                    for (topic in subscribeMap.keys.toList()) {
+                        subscribeStomp(topic)
+                    }
+
+                    // 기본 구독
+                    if (!other && !subscribeMap.containsKey("/topic/walk/gps/$USERID")) {
+                        subscribeStomp("/topic/walk/gps/$USERID")
                     }
                 }
 
@@ -79,20 +94,16 @@ object WebSocketManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe({ topicMessage ->
-                    Log.d(TAG, "subscribeStomp: 메시지 도착 -> $topic")
                     if (topic== "/topic/walk/gps/$USERID") {
                         topicMessage.payload?.let { payload ->
                             val message = Gson().fromJson(payload, GpsDto::class.java)
-                            WalkLiveData.gpsList.postValue(
-                                WalkLiveData.gpsList.value?.plus(message) ?: listOf(message)
-                            )
+                            WalkLiveData.updateGpsList(message)
                         }
                     }else {
                         topicMessage.payload?.let { payload ->
                             val message = Gson().fromJson(payload, GpsDto::class.java)
-                            WalkLiveData.otherData.postValue(
-                                message
-                            )
+                            WalkLiveData.otherData.value= message
+                            Log.d(TAG, "waldd subscribeStomp: otherData -> ${message}")
                         }
                     }
                 }, { error ->
@@ -140,4 +151,21 @@ object WebSocketManager {
             }, 3000)
         }
     }
+//
+//    fun sendStompHeartBeat(stompClient: StompClient) {
+//        val heartBeat = HeartBeat(
+//            type = "PING",
+//        )
+//
+//        val jsonMessage = Gson().toJson(heartBeat)
+//        try {
+//            stompClient.send("/pub/chat/heartbeat", jsonMessage).subscribe()
+//        } catch (e: Exception) {
+//        }
+//    }
+//
+//    data class HeartBeat(
+//        val type: String,
+//    )
+
 }
