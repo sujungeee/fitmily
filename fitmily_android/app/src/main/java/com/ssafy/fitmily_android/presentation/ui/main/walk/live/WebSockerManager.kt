@@ -34,13 +34,21 @@ object WebSocketManager {
         )
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
 
-
+//        val heartBeatHandler = Handler(Looper.getMainLooper())
+//        val heartBeatRunnable = object : Runnable {
+//            override fun run() {
+//                if (isConnected) {
+//                    sendStompHeartBeat(stompClient)
+//                    heartBeatHandler.postDelayed(this, 1000)
+//                }
+//            }
+//        }
         stompClient.lifecycle().subscribe { lifecycleEvent ->
             when (lifecycleEvent.type) {
                 LifecycleEvent.Type.OPENED -> {
                     isConnected = true
                     Log.d(TAG, "connectStomp: OPENED")
-
+//                    heartBeatHandler.post(heartBeatRunnable)
 
                     // 이전에 구독했던 topic을 모두 재구독
                     for (topic in subscribeMap.keys.toList()) {
@@ -143,4 +151,21 @@ object WebSocketManager {
             }, 3000)
         }
     }
+//
+//    fun sendStompHeartBeat(stompClient: StompClient) {
+//        val heartBeat = HeartBeat(
+//            type = "PING",
+//        )
+//
+//        val jsonMessage = Gson().toJson(heartBeat)
+//        try {
+//            stompClient.send("/pub/chat/heartbeat", jsonMessage).subscribe()
+//        } catch (e: Exception) {
+//        }
+//    }
+//
+//    data class HeartBeat(
+//        val type: String,
+//    )
+
 }
