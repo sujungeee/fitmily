@@ -119,16 +119,24 @@ fun WalkScreen(
     val totalDistance = remember { mutableStateOf(0.0) }
     val coroutineScope = rememberCoroutineScope()
 
+    var walkDistanceSnapshot :Double = 1.0
+
     var familyId : Int
 
     val countdown = remember { mutableStateOf(-1) }
 
+    var userId:Int
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(Unit) {
         val observer = Observer<Boolean> { shouldUpdate ->
             if (shouldUpdate == true) {
-                WalkLiveData.shouldUpdateOtherGps.value = false
+                coroutineScope.launch {
+                    familyId = MainApplication.getInstance().getDataStore().getFamilyId()
+                    userId = MainApplication.getInstance().getDataStore().getUserId()
+                    walkViewModel.getWalkingMembers(familyId, userId )
+                    WalkLiveData.shouldUpdateOtherGps.value = false
+                }
             }
         }
         WalkLiveData.shouldUpdateOtherGps.observe(lifecycleOwner, observer)
@@ -176,7 +184,7 @@ fun WalkScreen(
             }
         } else {
             familyId= MainApplication.getInstance().getDataStore().getFamilyId()
-            walkViewModel.getWalkingMembers(familyId, userId = MainApplication.getInstance().getDataStore().getUserId())
+            walkViewModel.getWalkingMembers(familyId, userId= MainApplication.getInstance().getDataStore().getUserId())
             elapsedTime.value = 0L
         }
     }
@@ -354,7 +362,6 @@ fun WalkScreen(
                     onClick = {
                         if(isWalking.value){
                             isDialogOpen.value = true
-
                             //foregroundService 종료
                         }else {
 
@@ -428,8 +435,8 @@ fun WalkScreen(
 
                 isDialogOpen.value = false
 
-
-                // 캡처 추가
+                walkDistanceSnapshot = totalDistance.value
+                Log.d(TAG, "WalkScreen: $walkDistanceSnapshot")
                 if (path.value.isNotEmpty()) {
                     Log.d(TAG, "WalkScreenaa: ${path.value}")
                     WalkMapCaptureHelper(
@@ -438,11 +445,10 @@ fun WalkScreen(
                         onCaptured = { bitmap ->
                             bitmap?.let {
                                 bitmapa.value = it
-                                val dis=totalDistance.value
                                 (context as? LifecycleOwner)?.lifecycleScope?.launch {
                                     walkViewModel.postWalk(
                                         WalkEndRequest(
-                                            walkDistance = dis,
+                                            walkDistance = String.format("%.2f", walkDistanceSnapshot).toDouble(),
                                             walkStartTime = Instant.ofEpochMilli(WalkLiveData.startedTime)
                                                 .atZone(ZoneId.systemDefault())
                                                 .toLocalDateTime().toString(),
@@ -477,7 +483,7 @@ fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): D
             cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
             sin(dLon / 2).pow(2)
     val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c // 결과 단위: m
+    return (R * c) / 1000.0
 }
 
 fun calculateTotalDistance(path: List<LatLng>): Double {
