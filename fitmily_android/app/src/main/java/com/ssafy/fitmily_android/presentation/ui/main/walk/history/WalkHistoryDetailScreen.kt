@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.model.dto.response.walk.HistoryDto
 import com.ssafy.fitmily_android.presentation.ui.main.home.component.ProfileItem
@@ -111,17 +113,16 @@ fun WalkHistoryDetailScreen(
                 Text("칼로리", style = typography.bodyMedium, color = Color.Gray)
             }
         }
-
-            Image(
+        AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(top = 32.dp)
                     .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.FillBounds,
-                painter =
-                    painterResource(R.drawable.ic_launcher_background),
-                contentDescription = "walking",
+                    model = item.routeImg,
+                    placeholder = painterResource(R.drawable.ic_launcher_background),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = "route",
             )
 
 

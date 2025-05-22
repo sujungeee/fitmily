@@ -27,6 +27,7 @@ fun GoalItem(item: GoalDto, userColor: Color) {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (item.exerciseGoalProgress==100){
         Box(
             modifier = Modifier
                 .padding(8.dp)
@@ -36,15 +37,32 @@ fun GoalItem(item: GoalDto, userColor: Color) {
             Icon(
                 modifier = Modifier
                     .size(16.dp)
-                    .background(mainBlue, shape = RoundedCornerShape(100.dp)),
+                    .background(userColor, shape = RoundedCornerShape(100.dp)),
                 contentDescription = null,
                 tint = Color.White,
                 imageVector = androidx.compose.material.icons.Icons.Default.Check
             )
         }
+            }else{
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(16.dp)
+                    .background(mainGray, shape = RoundedCornerShape(100.dp))
+            ){
+                Icon(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .background(mainGray, shape = RoundedCornerShape(100.dp)),
+                    contentDescription = null,
+                    tint = mainGray,
+                    imageVector = androidx.compose.material.icons.Icons.Default.Check
+                )
+            }
+        }
         val last = if(item.exerciseGoalName=="산책") "km" else "회"
         Text(
-            text = "${item.exerciseGoalValue}  ${item.exerciseGoalValue}${last}",
+            text = "${item.exerciseGoalName}  ${item.exerciseGoalValue}${last}",
             style = typography.bodySmall,
             maxLines = 1,
         )
