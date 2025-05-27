@@ -211,7 +211,11 @@
 ### Backend Developer
 
 #### 🧑‍💻 동욱 - 백엔드 팀장
-- 
+- Spring Security + JWT 기반 인증/인가 처리를 활용한 회원관리
+- Websocket + Stomp을 활용한 실시간 산책 GPS 데이터 전송
+- Redis를 통한 GPS 데이터 수집 및 저장
+- 건강 및 운동 관련 CRUD API 개발 (MyBatis)
+
 
 #### 🧑‍💻 예지
 - 가족 단체 채팅 시스템 구현 (MongoDB + Redis 기반 실시간 메시징)
