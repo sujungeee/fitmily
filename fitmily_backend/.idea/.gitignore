@@ -1,0 +1,12 @@
+# IntelliJ 프로젝트 설정 무시
+.idea/
+*.iml
+*.iws
+
+# IDE 사용자 설정
+shelf/
+workspace.xml
+
+# 빌드 출력물
+/out/
+classes/
