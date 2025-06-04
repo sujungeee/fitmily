@@ -23,6 +23,7 @@ import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.ssafy.fitmily_android.R
 import com.ssafy.fitmily_android.ui.theme.Typography
 import com.ssafy.fitmily_android.ui.theme.mainBlack
 import com.ssafy.fitmily_android.ui.theme.mainWhite
@@ -49,7 +50,7 @@ fun OthersChatMessageItem(
                     .size(width = 44.dp, height = 44.dp)
             ) {
                 Image(
-                    painter = painterResource(ProfileUtil().typeToProfile(othersMessage.profileIcon)!!)
+                    painter = painterResource(ProfileUtil().typeToProfile(othersMessage.profileIcon?:"Cow")?: R.drawable.cow_icon)
                     , contentDescription = "typeImage"
                     , modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
