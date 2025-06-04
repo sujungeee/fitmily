@@ -29,7 +29,9 @@ class WalkHistoryViewModel @Inject constructor(
                 result = result,
                 onSuccess = { data ->
                     _uiState.value = _uiState.value.copy(
-                        walkHistoryResponse = data!!,
+                        walkHistoryResponse = data!!.copy(
+                            walk = data.walk.reversed()
+                        )
                     )
                 },
                 onError = { msg ->

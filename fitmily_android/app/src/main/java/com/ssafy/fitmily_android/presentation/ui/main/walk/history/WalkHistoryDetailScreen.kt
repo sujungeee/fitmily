@@ -120,10 +120,13 @@ fun WalkHistoryDetailScreen(
                     .padding(top = 32.dp)
                     .clip(RoundedCornerShape(16.dp)),
                     model = item.routeImg,
-                    placeholder = painterResource(R.drawable.ic_launcher_background),
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.FillHeight,
                     contentDescription = "route",
             )
+        Spacer(
+            modifier = Modifier
+                .weight(0.3f)
+        )
 
 
 
