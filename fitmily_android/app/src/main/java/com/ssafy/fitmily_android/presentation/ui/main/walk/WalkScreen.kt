@@ -246,7 +246,7 @@ fun WalkScreen(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("${String.format("%.2f m", totalDistance.value)}", style = typography.titleMedium)
+                Text("${String.format("%.2f km", totalDistance.value)}", style = typography.titleMedium)
                 Text("거리", style = typography.bodyMedium, color = Color.Gray)
             }
             Spacer(
@@ -371,9 +371,10 @@ fun WalkScreen(
                                     delay(1000L)
                                 }
                                 path.value = listOf()
-                                isWalking.value = true
-                                WalkLiveData.startWalkLiveService(context)
+
                             }
+                            isWalking.value = true
+                            WalkLiveData.startWalkLiveService(context)
 
 
                         }},

@@ -56,7 +56,6 @@ fun WalkHistoryItem(
                 .weight(0.8f)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(8.dp)),
-            placeholder = painterResource(R.drawable.ic_launcher_background),
             contentScale = ContentScale.Crop
         )
 

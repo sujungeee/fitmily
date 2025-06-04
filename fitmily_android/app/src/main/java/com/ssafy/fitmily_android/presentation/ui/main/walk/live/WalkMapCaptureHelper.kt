@@ -34,8 +34,21 @@ class WalkMapCaptureHelper(
     }
 
     override fun onMapReady(naverMap: NaverMap) {
+        // UI 요소 비활성화
+        naverMap.uiSettings.apply {
+            isZoomControlEnabled = false // + - 버튼 제거
+            isCompassEnabled = false
+            isScaleBarEnabled = false
+            isLocationButtonEnabled = false
+            isIndoorLevelPickerEnabled = false
+            isScrollGesturesEnabled = false
+            isZoomGesturesEnabled = false
+            isRotateGesturesEnabled = false
+            isTiltGesturesEnabled = false
+        }
+
         val pathOverlay = PathOverlay().apply {
-            coords = if (path.size<2){
+            coords = if (path.size < 2) {
                 listOf(path[0], path[0])
             } else {
                 path
@@ -48,7 +61,7 @@ class WalkMapCaptureHelper(
 
         if (path.isNotEmpty()) {
             val center = path[path.size / 2]
-            naverMap.cameraPosition = CameraPosition(center, 17.0)
+            naverMap.cameraPosition = CameraPosition(center, 16.0)
         }
 
         mapView.postDelayed({
@@ -61,4 +74,5 @@ class WalkMapCaptureHelper(
             }
         }, 1000L)
     }
+
 }
