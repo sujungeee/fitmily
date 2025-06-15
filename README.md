@@ -140,7 +140,7 @@
 
 ## 🔍 시스템 아키텍처
 <div align="center">
-    <img src="/uploads/20e86e4df7eeb856d05aa2211bf06617/architecture.png" alt="아키텍처" width=80%>
+    <img src="https://github.com/user-attachments/assets/7177c143-a299-43a6-99f2-027c377128d2" alt="아키텍처" width=80%>
 </div>
 
 <br/>
