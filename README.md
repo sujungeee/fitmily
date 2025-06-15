@@ -147,7 +147,7 @@
 
 ## 💾 ERD 다이어그램
 <div align="center">
-<img src="/uploads/8c8669cb71d7b3c72f372ab1fc149134/ERD.png" alt="ERD" width=80%>
+<img src="https://github.com/user-attachments/assets/f27849fa-f93b-4e3a-830b-586eec0a6686" alt="ERD" width=80%>
 </div>
 
 <br/>
